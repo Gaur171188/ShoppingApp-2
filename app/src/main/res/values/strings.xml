@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">Shopping App</string>
+
+
+    <string name="login_welcome">Welcome Back</string>
+    <string name="login_welcome_text">Log In!</string>
+    <string name="login_mobile_hint">MOBILE NUMBER</string>
+    <string name="login_mobile_ph">Enter mobile number</string>
+    <string name="login_password_hint">PASSWORD</string>
+    <string name="login_password_ph">Enter Password</string>
+    <string name="login_switch_remember_text">Remember Me</string>
+    <string name="login_btn_text">Log In</string>
+    <string name="login_forgot_text">Forgot Password?</string>
+
+
+    <string name="signup_switch_tnc_label">I accept the policy and terms</string>
+    <string name="signup_seller_text">Do you wish to sell any products?</string>
+    <string name="signup_error_message">Some error occurred</string>
+
+
+    <string name="login_signup_message">New User? Sign Up</string>
+    <string name="login_error_message">Some error occurred</string>
+    <string name="image_remove_button">Image Remove Button</string>
+    <string name="image_item">Image Item</string>
+    <string name="add_images_to_product_des">Add Images (Max 3)</string>
+    <string name="description">Description</string>
+    <string name="colors_available">Colors Available</string>
+    <string name="sizes_available">Sizes Available</string>
+    <string name="error_occurred">Error Occurred</string>
+    <string name="no_product_added_yet">No Product Added Yet!</string>
+    <string name="decrease_button">Decrease Button</string>
+    <string name="increase_button">Increase Button</string>
+    <string name="like_button">Like Button</string>
+    <string name="remove_product_button">Remove Product Button</string>
+    <string name="check_out">Check Out</string>
+    <string name="no_product_liked_yet">No product liked yet!</string>
+
+    <string name="product_actual_price_text"><strike>$1000.00</strike></string>
+    <string name="edit_product_button">Edit Product Button</string>
+    <string name="product_add_to_cart_button">Product add to cart button</string>
+    <string name="add_product">Add Product</string>
+    <string name="search_product">Search Product</string>
+    <string name="products">Products</string>
+    <string name="shipping_details">Shipping Details</string>
+    <string name="change_order_status_button">Change Order Status Button</string>
+    <string name="shipping_date">Shipping Date</string>
+    <string name="address">Address</string>
+    <string name="current_status">Current Status</string>
+    <string name="payment_details">Payment Details</string>
+    <string name="shipping_price">Shipping Price</string>
+    <string name="import_charges">Import Charges</string>
+    <string name="total_price">Total Price</string>
+    <string name="order_status">Order Status</string>
+    <string name="items">Items</string>
+    <string name="nothing_to_show">Nothing to show</string>
+    <string name="success_image">Success Image</string>
+    <string name="success">Success</string>
+    <string name="thank_you_for_shopping">thank you for shopping</string>
+    <string name="back_to_home">Back To Home</string>
+    <string name="like_button">Like Button</string>
+    <string name="select_sizes">Select Sizes</string>
+    <string name="select_color">Select Color</string>
+    <string name="specification">Specification</string>
+    <string name="add_to_cart">Add To Cart</string>
+    <string name="email">Email</string>
+    <string name="phone">Phone</string>
+
+</resources>

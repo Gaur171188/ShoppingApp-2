@@ -1,0 +1,87 @@
+package com.shoppingapp.info.utils
+
+import android.content.Context
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.room.TypeConverter
+import java.util.*
+import java.util.regex.Pattern
+import kotlin.math.roundToInt
+
+
+enum class StoreDataStatus { LOADING, ERROR, DONE }
+enum class UserType { CUSTOMER, SELLER }
+enum class OrderStatus { CONFIRMED, PACKAGING, PACKED, SHIPPING, SHIPPED, ARRIVING, DELIVERED }
+
+
+
+class MyOnFocusChangeListener : View.OnFocusChangeListener {
+    override fun onFocusChange(v: View?, hasFocus: Boolean) {
+        if (v != null) {
+            val inputManager =
+                v.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            if (!hasFocus) {
+
+                inputManager.hideSoftInputFromWindow(v.windowToken, 0)
+            } else {
+                inputManager.toggleSoftInputFromWindow(v.windowToken, 0, 0)
+
+            }
+        }
+    }
+}
+
+
+internal fun isEmailValid(email: String): Boolean {
+    val EMAIL_PATTERN = Pattern.compile(
+        "\\s*[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
+                "\\@" +
+                "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
+                "(" +
+                "\\." +
+                "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
+                ")+\\s*"
+    )
+    return if (email.isEmpty()) {
+        false
+    } else {
+        EMAIL_PATTERN.matcher(email).matches()
+    }
+}
+
+internal fun getProductId(ownerId: String, proCategory: String): String {
+    val uniqueId = UUID.randomUUID().toString()
+    return "pro-$proCategory-$ownerId-$uniqueId"
+}
+
+
+internal fun getOfferPercentage(costPrice: Double, sellingPrice: Double): Int {
+    if (costPrice == 0.0 || sellingPrice == 0.0 || costPrice <= sellingPrice)
+        return 0
+    val off = ((costPrice - sellingPrice) * 100) / costPrice
+    return off.roundToInt()
+}
+
+
+
+class ListTypeConverter {
+    @TypeConverter
+    fun fromStringToStringList(value: String): List<String> {
+        return value.split(",").map { it }
+    }
+
+    @TypeConverter
+    fun fromStringListToString(value: List<String>): String {
+        return value.joinToString(separator = ",")
+    }
+
+    @TypeConverter
+    fun fromStringToIntegerList(value: String): List<Int> {
+        return value.split(",").map { it.toInt() }
+    }
+
+    @TypeConverter
+    fun fromIntegerListToString(value: List<Int>): String {
+        return value.joinToString(separator = ",")
+    }
+}
