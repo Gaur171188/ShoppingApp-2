@@ -8,13 +8,16 @@ interface UserDataSource {
 
 	suspend fun addUser(userData: UserData)
 
-	suspend fun getUserById(userId: String): Result<UserData?>
+	suspend fun getUserById(userId: String,onComplete:(UserData?) -> Unit)
+	suspend fun checkUserIsExist(email: String, isExist:(Boolean) -> Unit, onError:(String) -> Unit)
 
 	suspend fun getUserByMobileAndPassword(
 		mobile: String,
 		password: String): MutableList<UserData> {
 		return mutableListOf()
 	}
+
+	suspend fun checkPassByUserId(userId: String, password: String,onComplete: (Boolean) -> Unit)
 
 	suspend fun likeProduct(productId: String, userId: String) {}
 
@@ -41,4 +44,5 @@ interface UserDataSource {
 
 
 	suspend fun getLikesByUserId(userId: String): Result<List<String>?>
+
 }

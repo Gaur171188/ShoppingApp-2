@@ -57,12 +57,20 @@
     <string name="success">Success</string>
     <string name="thank_you_for_shopping">thank you for shopping</string>
     <string name="back_to_home">Back To Home</string>
-    <string name="like_button">Like Button</string>
     <string name="select_sizes">Select Sizes</string>
     <string name="select_color">Select Color</string>
     <string name="specification">Specification</string>
     <string name="add_to_cart">Add To Cart</string>
     <string name="email">Email</string>
     <string name="phone">Phone</string>
+    <string name="select_a_payment_method">Select a payment method!</string>
+    <string name="next">Next</string>
+    <string name="name">Name</string>
+    <string name="password">Password</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="user_exist">Account already used</string>
+    <string name="user_is_not_exist">Account is not found</string>
+    <string name="you_have_account_text">Already have an account? Log In</string>
+    <string name="no_connection">No Connection</string>
 
 </resources>

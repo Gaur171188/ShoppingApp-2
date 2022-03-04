@@ -9,6 +9,7 @@
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/account_app_bar_layout.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/activity_registration.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/activity_splash.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/add_edit_product.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/add_image_to_product_layout.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/app_bar_label_layout.xml" value="0.25416666666666665" />
@@ -25,11 +26,13 @@
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/order_success.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/order_summary_card_layout.xml" value="0.4" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/orders.xml" value="0.264" />
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/payment_item.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/price_card_layout.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/product_details.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/product_item.xml" value="0.4" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/profile.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/registration.xml" value="0.264" />
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/select_payment.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/shipping_card_layout.xml" value="0.4" />
       </map>
     </option>

@@ -9,10 +9,20 @@
         android:id="@+id/login"
         android:name="com.shoppingapp.info.screens.login.Login"
         android:label="Login"
-        tools:layout="@layout/login"/>
+        tools:layout="@layout/login">
+        <action
+            android:id="@+id/action_login_to_registration"
+            app:destination="@id/registration" />
+    </fragment>
     <fragment
         android:id="@+id/registration"
         android:name="com.shoppingapp.info.screens.registration.Registration"
         android:label="Registration"
-        tools:layout="@layout/registration"/>
+        tools:layout="@layout/registration">
+        <action
+            android:id="@+id/action_registration_to_login"
+            app:destination="@id/login"
+            app:popUpTo="@id/login"
+            app:popUpToInclusive="true" />
+    </fragment>
 </navigation>

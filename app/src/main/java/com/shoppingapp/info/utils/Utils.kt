@@ -1,5 +1,6 @@
 package com.shoppingapp.info.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -62,6 +63,26 @@ internal fun getOfferPercentage(costPrice: Double, sellingPrice: Double): Int {
     return off.roundToInt()
 }
 
+
+@SuppressLint("CommitPrefEdits")
+class SharePref(context: Context,fileName: String){
+    companion object{
+        private const val KEY_REMEMBER_ME="RememberMe"
+        const val FILE_USER = "user_file"
+    }
+
+    private val pref = context.getSharedPreferences(fileName,Context.MODE_PRIVATE)
+    private val edit = pref.edit()
+
+    fun setRememberMe(value: Boolean){
+        edit.putBoolean(KEY_REMEMBER_ME,value)
+        edit.apply()
+    }
+
+    fun getRememberMe() = pref.getBoolean(KEY_REMEMBER_ME,false)
+
+
+}
 
 
 class ListTypeConverter {
