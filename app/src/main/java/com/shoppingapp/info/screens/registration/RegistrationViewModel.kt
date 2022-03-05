@@ -55,12 +55,16 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
 
 
 
-  private fun initRegister(){
+   fun initRegister(){
       _errorMessage.value = null
       _isRegistered.value = null
       _inProgress.value = null
     }
 
+    fun setRegistrationError(error: String){
+        _errorMessage.value = error
+        _inProgress.value = StoreDataStatus.ERROR
+    }
 
     fun registration(user: UserData){
         initRegister()
@@ -75,14 +79,12 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
                     Log.i(TAG,"user is not exist")
                 }else{// user is exist
                     Log.i(TAG,"user is exist")
-                    _inProgress.value = StoreDataStatus.ERROR
-                    _errorMessage.value = app.resources.getString(R.string.user_exist)
+                    setRegistrationError(app.resources.getString(R.string.user_exist))
                 }
             },
             onError = {error ->
                 Log.i(TAG,error)
-                _inProgress.value = StoreDataStatus.ERROR
-                _errorMessage.value = error
+                setRegistrationError(error)
             })
         }
     }

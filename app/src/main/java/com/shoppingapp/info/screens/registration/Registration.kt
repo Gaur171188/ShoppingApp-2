@@ -2,6 +2,7 @@ package com.shoppingapp.info.screens.registration
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Patterns
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import com.shoppingapp.info.UserDataSource
 import com.shoppingapp.info.data.UserData
 import com.shoppingapp.info.databinding.RegistrationBinding
 import com.shoppingapp.info.utils.StoreDataStatus
+import com.shoppingapp.info.utils.UserType
 
 class Registration : Fragment() {
 
@@ -37,27 +39,78 @@ class Registration : Fragment() {
 
         binding.apply {
 
-
             btnLogin.setOnClickListener {
                 findNavController().navigate(R.id.action_registration_to_login)
             }
 
-
             btnSignup.setOnClickListener {
+                viewModel.initRegister()
 
                 name = signupName.text!!.trim().toString()
                 email = signupEmail.text!!.trim().toString()
                 phone = signupPhone.text!!.trim().toString()
                 password = signupPassword.text!!.trim().toString()
 
-                val user = UserData(
-                    "",
-                    name,
-                    phone,
-                    email,
-                    password
-                )
-                viewModel.registration(user)
+                val usertype = if(signupSellerSwitch.isChecked) UserType.SELLER.name else UserType.CUSTOMER.name
+
+
+                if (name.isEmpty() && email.isEmpty() && email.isEmpty() && password.isEmpty()){
+                    viewModel.setRegistrationError("all fields is required!")
+                }else{
+
+                    if (name.isEmpty()){
+                        binding.signupName.error = "please enter your name!"
+                        binding.signupName.requestFocus()
+                        return@setOnClickListener
+                    }
+
+                    if (phone.length < 9){
+                        binding.signupPhone.error = "9 char required!"
+                        binding.signupPhone.requestFocus()
+                        return@setOnClickListener
+                    }
+
+                    if (phone.length < 6){
+                        binding.signupPhone.error = "6 char required!"
+                        binding.signupPhone.requestFocus()
+                        return@setOnClickListener
+                    }
+                    if (email.isEmpty()){
+                        binding.signupEmail.error = "please enter your email!"
+                        binding.signupEmail.requestFocus()
+                        return@setOnClickListener
+                    }
+                    if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+                        binding.signupEmail.error = "please enter a valid email"
+                        binding.signupEmail.requestFocus()
+                        return@setOnClickListener
+                    }
+
+                    if(password.isEmpty()){
+                        binding.signupPassword.error = "please enter your password!"
+                        binding.signupPassword.requestFocus()
+                        return@setOnClickListener
+                    }
+
+                    if (password.length < 6){
+                        binding.signupPassword.error = "6 char required!"
+                        binding.signupPassword.requestFocus()
+                        return@setOnClickListener
+                    }
+
+                    if (signupPolicySwitch.isChecked){
+                        val user = UserData("", name, phone, email, password, userType = usertype)
+                        viewModel.registration(user)
+                    }else{
+                        viewModel.setRegistrationError("You must confirm to the privacy policy!")
+                    }
+
+
+                }
+
+
+
+
             }
 
 
@@ -100,6 +153,8 @@ class Registration : Fragment() {
                         binding.loader.visibility = View.GONE
                     }
                 }
+            }else{
+                binding.signupErrorMessage.visibility = View.GONE
             }
         })
 
