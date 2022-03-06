@@ -5,7 +5,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
-import com.shoppingapp.info.utils.SharePref
+import com.shoppingapp.info.utils.ShoppingAppSessionManager
+
 
 @SuppressLint("CustomSplashScreen")
 class LaunchActivity : AppCompatActivity() {
@@ -15,15 +16,16 @@ class LaunchActivity : AppCompatActivity() {
         const val THREE_SECOND = 3000L
     }
 
+    private lateinit var appSessionManager: ShoppingAppSessionManager
 
-    private lateinit var userPref: SharePref
+
     private lateinit var timer: CountDownTimer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
 
-        userPref = SharePref(this,SharePref.FILE_USER)
+        appSessionManager = ShoppingAppSessionManager(this)
 
 
         timer = object : CountDownTimer(THREE_SECOND, ONE_SECOND){
@@ -44,7 +46,7 @@ class LaunchActivity : AppCompatActivity() {
 
 
     fun isRememberOn(){
-        if (userPref.getRememberMe()){
+        if (appSessionManager.isRememberMeOn()){
             val intent = Intent(this, MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)

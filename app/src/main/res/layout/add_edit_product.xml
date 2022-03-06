@@ -213,12 +213,12 @@
                     android:textColor="@color/black"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_add_images"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_add_images_to_product"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/descOutlinedTextField" />
 
                 <ImageButton
-                    android:id="@+id/btn_add_images"
+                    android:id="@+id/btn_add_images_to_product"
                     android:layout_width="35dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"

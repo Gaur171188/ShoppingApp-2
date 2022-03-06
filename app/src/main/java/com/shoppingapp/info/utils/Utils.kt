@@ -10,11 +10,13 @@ import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 
+const val ERR_UPLOAD = "UploadErrorException"
+
 enum class StoreDataStatus { LOADING, ERROR, DONE }
 enum class UserType { CUSTOMER, SELLER }
 enum class OrderStatus { CONFIRMED, PACKAGING, PACKED, SHIPPING, SHIPPED, ARRIVING, DELIVERED }
-
-
+enum class AddProductViewErrors { NONE, EMPTY, ERR_PRICE_0 }
+enum class AddProductErrors { NONE, ERR_ADD, ERR_ADD_IMG, ADDING }
 
 class MyOnFocusChangeListener : View.OnFocusChangeListener {
     override fun onFocusChange(v: View?, hasFocus: Boolean) {
@@ -56,6 +58,8 @@ internal fun getProductId(ownerId: String, proCategory: String): String {
 }
 
 
+
+
 internal fun getOfferPercentage(costPrice: Double, sellingPrice: Double): Int {
     if (costPrice == 0.0 || sellingPrice == 0.0 || costPrice <= sellingPrice)
         return 0
@@ -63,26 +67,32 @@ internal fun getOfferPercentage(costPrice: Double, sellingPrice: Double): Int {
     return off.roundToInt()
 }
 
-
-@SuppressLint("CommitPrefEdits")
-class SharePref(context: Context,fileName: String){
-    companion object{
-        private const val KEY_REMEMBER_ME="RememberMe"
-        const val FILE_USER = "user_file"
-    }
-
-    private val pref = context.getSharedPreferences(fileName,Context.MODE_PRIVATE)
-    private val edit = pref.edit()
-
-    fun setRememberMe(value: Boolean){
-        edit.putBoolean(KEY_REMEMBER_ME,value)
-        edit.apply()
-    }
-
-    fun getRememberMe() = pref.getBoolean(KEY_REMEMBER_ME,false)
-
-
+internal fun getRandomString(length: Int, uNum: String, endLength: Int): String {
+    val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+    fun getStr(l: Int): String = (1..l).map { allowedChars.random() }.joinToString("")
+    return getStr(length) + uNum + getStr(endLength)
 }
+
+
+//@SuppressLint("CommitPrefEdits")
+//class SharePref(context: Context,fileName: String){
+//    companion object{
+//        private const val KEY_REMEMBER_ME="RememberMe"
+//        const val FILE_USER = "user_file"
+//    }
+//
+//    private val pref = context.getSharedPreferences(fileName,Context.MODE_PRIVATE)
+//    private val edit = pref.edit()
+//
+//    fun setRememberMe(value: Boolean){
+//        edit.putBoolean(KEY_REMEMBER_ME,value)
+//        edit.apply()
+//    }
+//
+//    fun getRememberMe() = pref.getBoolean(KEY_REMEMBER_ME,false)
+//
+//
+//}
 
 
 class ListTypeConverter {

@@ -1,10 +1,13 @@
-package com.shoppingapp.info
+package com.shoppingapp.info.remote
 
 import android.content.Context
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.shoppingapp.info.R
+import com.shoppingapp.info.Result
+import com.shoppingapp.info.UserDataSource
 import com.shoppingapp.info.data.UserData
 import com.shoppingapp.info.utils.OrderStatus
 import kotlinx.coroutines.tasks.await
@@ -12,18 +15,15 @@ import kotlinx.coroutines.tasks.await
 
 class AuthRemoteDataSource(val context: Context) : UserDataSource {
 
-    val TAG = "Registration"
+    private val TAG = "AuthRemoteDataSource"
 
     private val _root by lazy {
         FirebaseFirestore.getInstance()
     }
 
     private fun usersCollectionRef() = _root.collection(USERS_COLLECTION)
-    private fun allEmailsMobilesRef() =
-        _root.collection(USERS_COLLECTION).document(EMAIL_MOBILE_DOC)
 
-
-    override suspend fun getUserById(userId: String,onComplete:(UserData?) -> Unit){
+    override suspend fun getUserById(userId: String, onComplete:(UserData?) -> Unit){
         val resRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
         if (resRef != null){
             val user = resRef.toObjects(UserData::class.java)[0]
@@ -75,6 +75,7 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
                 Log.d(TAG, "firebase fire store error occurred: $e")
             }
     }
+
 
 
     override suspend fun getUserByMobile(phoneNumber: String): UserData =

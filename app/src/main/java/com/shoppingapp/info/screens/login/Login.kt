@@ -15,7 +15,6 @@ import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.MainActivity
 import com.shoppingapp.info.R
 import com.shoppingapp.info.databinding.LoginBinding
-import com.shoppingapp.info.utils.SharePref
 import com.shoppingapp.info.utils.StoreDataStatus
 
 
@@ -124,6 +123,7 @@ class Login : Fragment() {
                     StoreDataStatus.ERROR ->{
                         binding.loginErrorMessage.visibility = View.VISIBLE
                         binding.loader.visibility = View.GONE
+
                     }
                 }
             }else{

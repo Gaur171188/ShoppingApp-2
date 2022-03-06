@@ -6,26 +6,29 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.shoppingapp.info.AuthRemoteDataSource
+import com.shoppingapp.info.remote.AuthRemoteDataSource
 import com.shoppingapp.info.R
 import com.shoppingapp.info.screens.registration.RegistrationViewModel
-import com.shoppingapp.info.utils.SharePref
+import com.shoppingapp.info.utils.ShoppingAppSessionManager
 import com.shoppingapp.info.utils.StoreDataStatus
+import com.shoppingapp.info.utils.UserType
 import kotlinx.coroutines.*
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val app = application
-    val userPref = SharePref(app.applicationContext, SharePref.FILE_USER)
+//    val userPref = SharePref(app.applicationContext, SharePref.FILE_USER)
+    private val appSessionManager = ShoppingAppSessionManager(application.applicationContext)
 
     companion object {
         const val TAG = "Login"
     }
 
     private val _authRemoteDataSource by lazy {
-        AuthRemoteDataSource(app)
+        AuthRemoteDataSource(application)
     }
 
 
@@ -104,14 +107,26 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                                 if (_auth.currentUser?.isEmailVerified!!) {
                                     _authRemoteDataSource.checkPassByUserId(userId, password){ isTypicalPass ->
                                         if (isTypicalPass){
-                                            scopeIO.launch {
-                                                withContext(Dispatchers.Main){
-                                                    Log.i("Login","password is correct")
-                                                    _inProgress.value = StoreDataStatus.DONE
-                                                    _errorMessage.value = "password correct"
-                                                    userPref.setRememberMe(isRemOn)
-                                                    _isLogged.value = true
-                                                }
+                                            viewModelScope.launch {
+                                                    _authRemoteDataSource.getUserById(userId){user ->
+                                                        if (user != null){
+                                                          viewModelScope.launch {
+                                                              withContext(Dispatchers.Main){
+                                                                 if (user.userType == UserType.SELLER.name){ // seller
+                                                                     appSessionManager.createLoginSession(user.userId,user.name
+                                                                         ,user.phone,isRemOn,isSeller = true)
+                                                                 }else{ // customer
+                                                                     appSessionManager.createLoginSession(user.userId,user.name
+                                                                         ,user.phone,isRemOn,isSeller = false)
+                                                                 }
+                                                                  _inProgress.value = StoreDataStatus.DONE
+                                                                  _isLogged.value = true
+                                                              }
+                                                          }
+                                                        }else{ // user is not found
+
+                                                        }
+                                                    }
                                             }
                                         }else{
                                            scopeIO.launch {
@@ -133,7 +148,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                             }
                         } else {
                             val error = task.exception!!.message.toString()
-                            _inProgress.value = StoreDataStatus.ERROR
+                            setLoginError("password is not correct!")
                             Log.i(TAG, error)
                         }
 

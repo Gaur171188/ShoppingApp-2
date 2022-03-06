@@ -8,7 +8,10 @@ interface UserDataSource {
 
 	suspend fun addUser(userData: UserData)
 
-	suspend fun getUserById(userId: String,onComplete:(UserData?) -> Unit)
+//	suspend fun getUserById(userId: String): Result<UserData?>
+
+	suspend fun getUserById(userId: String, onComplete: (UserData?) -> Unit)
+
 	suspend fun checkUserIsExist(email: String, isExist:(Boolean) -> Unit, onError:(String) -> Unit)
 
 	suspend fun getUserByMobileAndPassword(

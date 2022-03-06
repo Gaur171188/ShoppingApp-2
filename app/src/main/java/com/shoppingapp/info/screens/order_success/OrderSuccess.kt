@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import com.shoppingapp.info.R
 import com.shoppingapp.info.databinding.OrderDetailsBinding
-import com.shoppingapp.info.screens.orders.OrdersViewModel
+
 
 
 class OrderSuccess: Fragment() {
@@ -18,7 +18,7 @@ class OrderSuccess: Fragment() {
         const val TAG = "Order Success"
     }
 
-    private lateinit var viewModel: OrdersViewModel
+    private lateinit var viewModel: OrderSuccessViewModel
     private lateinit var binding: OrderDetailsBinding
 
 
@@ -26,7 +26,7 @@ class OrderSuccess: Fragment() {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.order_success, container, false)
 
-        viewModel = ViewModelProvider(this)[OrdersViewModel::class.java]
+        viewModel = ViewModelProvider(this)[OrderSuccessViewModel::class.java]
 
 
 

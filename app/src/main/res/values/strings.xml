@@ -72,5 +72,37 @@
     <string name="user_is_not_exist">Account is not found</string>
     <string name="you_have_account_text">Already have an account? Log In</string>
     <string name="no_connection">No Connection</string>
+    <string name="favorites">Favorites</string>
+    <string name="filter">Filter</string>
+    <string name="delete_dialog_title_text">Are you sure?</string>
+    <string name="delete_dialog_message_text">On proceeding, Product : %s will be deleted.</string>
+    <string name="pro_cat_dialog_title">Select Product Category</string>
+    <string name="pro_cat_dialog_cancel_btn">Cancel</string>
+    <string name="pro_cat_dialog_ok_btn">OK</string>
+    <string name="delete_dialog_delete_btn_text">Delete</string>
+    <string name="pro_details_price_value">$%s</string>
+    <string name="pro_details_actual_strike_value">$%s</string>
+    <string name="add_product_error_img_upload">Error uploading Images, Try Again!</string>
+    <string name="add_product_insert_error">Error Saving Product!</string>
+    <string name="edit_product_btn_text">Save Changes</string>
+    <string name="add_product_error_string">Fill all the details!</string>
+    <string name="add_pro_error_price_string">Price can not be 0.</string>
+    <string name="home">Home</string>
+    <string name="cart">Cart</string>
+    <string name="orders">Orders</string>
+    <string name="account">Account</string>
+    <string name="delete_cart_item_message_text">On Proceeding, selected Item will be deleted from your Cart.</string>
+    <string name="sign_out_dialog_title_text">Sign Out?</string>
+    <string name="sign_out_dialog_message_text">On proceeding, you will be signed out of the app.</string>
+    <string name="dialog_sign_out_btn_text">Sign Out</string>
+    <string name="price_text">$%s</string>
+    <string name="no_orders_placed_text">Nothing To Show</string>
+    <string name="orders_fragment_title">Orders</string>
+    <string name="order_date_text">Ordered On : %s %s, %s</string>
+    <string name="order_items_count_text">%s items purchased</string>
+    <string name="pro_offer_precent_text">%s%% Off</string>
+    <string name="cart_fragment_label">Your Cart</string>
+    <string name="price_card_items_string">Items(%s)</string>
+
 
 </resources>

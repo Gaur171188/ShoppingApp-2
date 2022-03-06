@@ -8,12 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
-import com.shoppingapp.info.UserDataSource
 import com.shoppingapp.info.data.UserData
 import com.shoppingapp.info.databinding.RegistrationBinding
+
 import com.shoppingapp.info.utils.StoreDataStatus
 import com.shoppingapp.info.utils.UserType
 

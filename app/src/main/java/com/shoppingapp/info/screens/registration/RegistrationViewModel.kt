@@ -2,15 +2,12 @@ package com.shoppingapp.info.screens.registration
 
 
 import android.app.Application
-import android.nfc.Tag
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
-import com.shoppingapp.info.AuthRemoteDataSource
+import com.shoppingapp.info.remote.AuthRemoteDataSource
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.UserData
 import com.shoppingapp.info.utils.StoreDataStatus

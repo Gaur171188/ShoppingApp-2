@@ -1,5 +1,6 @@
 package com.shoppingapp.info
 
+import com.shoppingapp.info.Result.Success
 
 /**
  * A generic class that holds a value with its loading status.
@@ -24,5 +25,5 @@ sealed class Result<out R> {
  * `true` if [Result] is of type [Success] & holds non-null [Success.data].
  */
 val Result<*>.succeeded
-	get() = this is Result.Success && data != null
+	get() = this is Success && data != null
 
