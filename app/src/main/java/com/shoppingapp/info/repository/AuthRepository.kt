@@ -44,18 +44,18 @@ class AuthRepository(
 	}
 
 	override suspend fun signUp(userData: UserData) {
-//		val isSeller = userData.userType == UserType.SELLER.name
-//		sessionManager.createLoginSession(
-//			userData.userId,
-//			userData.name,
-//			userData.phone,
-//			false,
-//			isSeller
-//		)
-//		Log.d(TAG, "on SignUp: Updating user in Local Source")
-//		userLocalDataSource.addUser(userData)
-//		Log.d(TAG, "on SignUp: Updating userdata on Remote Source")
-//		authRemoteDataSource.addUser(userData)
+		val isSeller = userData.userType == UserType.SELLER.name
+		sessionManager.createLoginSession(
+			userData.userId,
+			userData.name,
+			userData.phone,
+			false,
+			isSeller
+		)
+		Log.d(TAG, "on SignUp: Updating user in Local Source")
+		userLocalDataSource.addUser(userData)
+		Log.d(TAG, "on SignUp: Updating userdata on Remote Source")
+		authRemoteDataSource.addUser(userData)
 //
 	}
 

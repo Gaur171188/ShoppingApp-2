@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.shoppingapp.info.remote.AuthRemoteDataSource
 import com.shoppingapp.info.R
+import com.shoppingapp.info.ShoppingApplication
 import com.shoppingapp.info.data.UserData
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.*
@@ -16,11 +17,16 @@ import kotlinx.coroutines.*
 
 class RegistrationViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val app = application
-
     companion object{
         const val TAG = "Registration"
     }
+
+    private val app = application
+
+
+    private val shopApp = ShoppingApplication(application.applicationContext)
+    private val authRepository by lazy{ shopApp.authRepository }
+
 
     private val _authRemoteDataSource by lazy {
         AuthRemoteDataSource(app)
@@ -98,7 +104,8 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
                                 scopeIO.launch {
                                     Log.i(TAG,"send email verify has been done!")
                                     user.userId = FirebaseAuth.getInstance().currentUser!!.uid
-                                    _authRemoteDataSource.addUser(user)
+                                    authRepository.signUp(user)
+//                                    _authRemoteDataSource.addUser(user)
                                     withContext(Dispatchers.Main){
                                         _isRegistered.value = user
                                         _inProgress.value = StoreDataStatus.DONE
