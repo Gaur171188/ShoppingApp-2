@@ -24,27 +24,27 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 	inner class ViewHolder(private val binding: ProductItemBinding) :
 		RecyclerView.ViewHolder(binding.root) {
 		@SuppressLint("NotifyDataSetChanged")
-		fun bind(productData: Product) {
+		fun bind(product: Product) {
 			binding.productCard.setOnClickListener {
-				onClickListener.onClick(productData)
+				onClickListener.onClick(product)
 			}
-			binding.productNameTv.text = productData.name
+			binding.productNameTv.text = product.name
 			binding.productPriceTv.text =
-				context.getString(R.string.pro_details_price_value, productData.price.toString())
-			binding.productRatingBar.rating = productData.rating.toFloat()
+				context.getString(R.string.pro_details_price_value, product.price.toString())
+			binding.productRatingBar.rating = product.rating.toFloat()
 			binding.productActualPriceTv.apply {
 				paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
 				text = context.getString(
 					R.string.pro_details_actual_strike_value,
-					productData.mrp.toString()
+					product.mrp.toString()
 				)
 			}
 			binding.productOfferValueTv.text = context.getString(
 				R.string.pro_offer_precent_text,
-				getOfferPercentage(productData.mrp, productData.price).toString()
+				getOfferPercentage(product.mrp, product.price).toString()
 			)
-			if (productData.images.isNotEmpty()) {
-				val imgUrl = productData.images[0].toUri().buildUpon().scheme("https").build()
+			if (product.images.isNotEmpty()) {
+				val imgUrl = product.images[0].toUri().buildUpon().scheme("https").build()
 				Glide.with(context)
 					.asBitmap()
 					.load(imgUrl)
@@ -60,7 +60,7 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 			// setting edit button as delete button
 			binding.btnProductEdit.setImageResource(R.drawable.ic_delete_24)
 			binding.btnProductEdit.setOnClickListener {
-				onClickListener.onDeleteClick(productData.productId)
+				onClickListener.onDeleteClick(product.productId)
 				notifyDataSetChanged()
 			}
 		}

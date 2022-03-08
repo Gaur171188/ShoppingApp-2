@@ -7,6 +7,7 @@ interface UserDataSource {
 
 
 	suspend fun addUser(userData: UserData)
+	suspend fun deleteUser()
 
 //	suspend fun getUserById(userId: String): Result<UserData?>
 

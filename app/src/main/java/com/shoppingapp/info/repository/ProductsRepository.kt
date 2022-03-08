@@ -22,6 +22,7 @@ class ProductsRepository(
 		private const val TAG = "ProductsRepository"
 	}
 
+
 	override suspend fun refreshProducts(): StoreDataStatus? {
 		Log.d(TAG, "Updating Products in Room")
 		return updateProductsFromRemoteSource()
@@ -155,13 +156,18 @@ class ProductsRepository(
 		}
 	}
 
+	override suspend fun deleteAllProducts() {
+		productsLocalSource.deleteAllProducts()
+	}
+
+
 	private suspend fun updateProductsFromRemoteSource(): StoreDataStatus? {
 		var res: StoreDataStatus? = null
 		try {
 			val remoteProducts = productsRemoteSource.getAllProducts()
 			if (remoteProducts is Success) {
 				Log.d(TAG, "pro list = ${remoteProducts.data}")
-				productsLocalSource.deleteAllProducts()
+				deleteAllProducts()
 				productsLocalSource.insertMultipleProducts(remoteProducts.data)
 				res = StoreDataStatus.DONE
 			} else {

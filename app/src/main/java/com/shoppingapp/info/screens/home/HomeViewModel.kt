@@ -67,8 +67,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _userData = MutableLiveData<UserData?>()
     val userData: LiveData<UserData?> get() = _userData
 
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> get() = _errorMessage
+
+
+    // TODO: create live data for check from the connection of network
+
     init {
         viewModelScope.launch {
+            authRepository
             authRepository.hardRefreshUserData()
             getUserLikes()
 
@@ -77,6 +84,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             }else{
                 Log.i(TAG,"customer")
             }
+            Log.i(TAG,"userId = $userId")
 
         }
 
@@ -86,6 +94,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             getProducts()
     }
 
+
     fun setDataLoaded() {
         _storeDataStatus.value = StoreDataStatus.DONE
     }
@@ -93,6 +102,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun isProductLiked(productId: String): Boolean {
         return _userLikes.value?.contains(productId) == true
     }
+
 
     fun toggleLikeByProductId(productId: String) {
         Log.d(TAG, "Toggling Like")
@@ -137,24 +147,29 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         var itemId = ""
         viewModelScope.launch {
             val j = async {
-                authRepository.getUserDataById(userId!!){user ->
-                    user!!.cart.forEach { cartItem ->
-                        if (cartItem.productId == product.productId){ // cart item does is exist in user cart
-                            itemId = cartItem.productId
+                authRepository.getUserDataById(userId!!){ user ->
+                    if(user != null){
+                        user.cart.forEach { cartItem ->
+                            if (cartItem.productId == product.productId){ // cart item does is exist in user cart
+                                itemId = cartItem.productId
+                            }
                         }
+                        if (itemId != product.productId){ // you can add this item in cart
+                            val uniqueId = UUID.randomUUID().toString()
+                            val cartItem = UserData.CartItem(uniqueId,product.productId,product.owner,0,"",0)
+                            async {
+                                authRepository.insertCartItemByUserId(cartItem,userId!!)
+                                onSuccess("item is added")
+                            }
+                        }else{ // item already exist in cart
+                            async {
+                                onError("item is exist in your cart")
+                            }
+                        }
+                    }else{ // user is not found
+
                     }
-                    if (itemId != product.productId){ // you can add this item in cart
-                        val uniqueId = UUID.randomUUID().toString()
-                        val cartItem = UserData.CartItem(uniqueId,product.productId,product.owner,0,"",0)
-                        async {
-                            authRepository.insertCartItemByUserId(cartItem,userId!!)
-                            onSuccess("item is added")
-                        }
-                    }else{ // item already exist in cart
-                        async {
-                            onError("item is exist in your cart")
-                        }
-                    }
+
                 }
             }
             j.await()
@@ -212,7 +227,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 //        }
 //    }
 
+    // TODO: handle with error catch them
+    // TODO: display the liked product in favorites screen. fix issue!
+
     fun getLikedProducts() {
+        _dataStatus.value = StoreDataStatus.LOADING
         val res: List<Product> = if (_userLikes.value != null) {
             val allLikes = _userLikes.value ?: emptyList()
             if (!allLikes.isNullOrEmpty()) {
@@ -231,6 +250,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
         _likedProducts.value = res
     }
+
 
     private fun getProductsLiveData(result: Result<List<Product>?>?): LiveData<List<Product>> {
         val res = MutableLiveData<List<Product>>()
@@ -297,11 +317,17 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+
+    // TODO: you must remove all the database with user signout.
+    // TODO: clear all the data from the local database.
     fun signOut() {
         viewModelScope.launch {
             val deferredRes = async { authRepository.signOut() }
             deferredRes.await()
-            sessionManager.logoutFromSession()
+            async { shopApp.removeDB() }
+            async { sessionManager.logoutFromSession() }
+//            async { productsRepository.deleteAllProducts() }
+//            async { authRepository.deleteUser() }
         }
     }
 

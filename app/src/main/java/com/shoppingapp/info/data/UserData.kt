@@ -13,7 +13,7 @@ import kotlin.collections.ArrayList
 
 
 @Parcelize
-@Entity(tableName = "users")
+@Entity(tableName = "user")
 data class UserData(
     @PrimaryKey
     var userId: String = "",

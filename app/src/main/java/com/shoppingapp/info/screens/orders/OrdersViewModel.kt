@@ -83,9 +83,14 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
                         Log.d(TAG, "Getting Cart Items: Success ${_priceList.value}")
                     }
                 } else {
-                    _cartItems.value = emptyList()
-                    _dataStatus.value = StoreDataStatus.ERROR
-                    Log.d(TAG, "Getting Cart Items: User Not Found")
+                    viewModelScope.launch {
+                        withContext(Dispatchers.Main){
+                            _cartItems.value = emptyList()
+                            _dataStatus.value = StoreDataStatus.ERROR
+                            Log.d(TAG, "Getting Cart Items: User Not Found")
+                        }
+                    }
+
 
                 }
             }

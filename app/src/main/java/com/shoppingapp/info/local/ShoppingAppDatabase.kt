@@ -12,7 +12,7 @@ import com.shoppingapp.info.utils.ListTypeConverter
 import com.shoppingapp.info.utils.ObjectListTypeConvertor
 
 
-@Database(entities = [UserData::class, Product::class], version = 3)
+@Database(entities = [UserData::class, Product::class], version = 4)
 @TypeConverters(ListTypeConverter::class, ObjectListTypeConvertor::class, DateTypeConvertors::class)
 abstract class ShoppingAppDatabase : RoomDatabase() {
 	abstract fun userDao(): UserDao
@@ -21,6 +21,7 @@ abstract class ShoppingAppDatabase : RoomDatabase() {
 	companion object {
 		@Volatile
 		private var INSTANCE: ShoppingAppDatabase? = null
+
 
 
 		fun getInstance(context: Context): ShoppingAppDatabase =
@@ -36,5 +37,7 @@ abstract class ShoppingAppDatabase : RoomDatabase() {
 				.fallbackToDestructiveMigration()
 				.allowMainThreadQueries()
 				.build()
+
+
 	}
 }

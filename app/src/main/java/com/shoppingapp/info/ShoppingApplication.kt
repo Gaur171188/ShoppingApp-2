@@ -13,6 +13,10 @@ class ShoppingApplication(private val context: Context) : Application() {
 	val productsRepository: ProductsRepoInterface
 		get() = ServiceLocator.provideProductsRepository(context)
 
+	fun removeDB(){
+		ServiceLocator.resetRepository()
+	}
+
 	override fun onCreate() {
 		super.onCreate()
 	}

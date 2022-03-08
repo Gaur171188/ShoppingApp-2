@@ -18,8 +18,14 @@ class UserLocalDataSource internal constructor(
 
 	override suspend fun addUser(userData: UserData) {
 		withContext(ioDispatcher) {
-			userDao.clear()
+//			userDao.deleteUser()
 			userDao.insert(userData)
+		}
+	}
+
+	override suspend fun deleteUser() {
+		withContext(ioDispatcher){
+			userDao.deleteUser()
 		}
 	}
 

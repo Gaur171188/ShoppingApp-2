@@ -10,9 +10,11 @@ import com.shoppingapp.info.Result
 interface AuthRepoInterface {
 	suspend fun refreshData()
 	suspend fun signUp(userData: UserData)
-	fun login(userData: UserData, rememberMe: Boolean)
+	suspend fun login(userData: UserData, rememberMe: Boolean)
 //	suspend fun checkLogin(mobile: String, password: String): UserData?
 	suspend fun signOut()
+	suspend fun deleteUser()
+
 	suspend fun hardRefreshUserData()
 	suspend fun insertProductToLikes(productId: String, userId: String): Result<Boolean>
 	suspend fun removeProductFromLikes(productId: String, userId: String): Result<Boolean>

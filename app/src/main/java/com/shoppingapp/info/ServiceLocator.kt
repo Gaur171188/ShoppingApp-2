@@ -39,7 +39,7 @@ object ServiceLocator {
 		}
 	}
 
-	@VisibleForTesting
+//	@VisibleForTesting
 	fun resetRepository() {
 		synchronized(lock) {
 			database?.apply {

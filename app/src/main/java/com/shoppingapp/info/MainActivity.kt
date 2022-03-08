@@ -54,4 +54,9 @@ class MainActivity : AppCompatActivity() {
         binding.homeBottomNavigation.visibility = visibility
     }
 
+
+    // TODO: display a toast message the connection is not exist.
+
+    // TODO: make broadcast receiver to check from the connection of network
+
 }

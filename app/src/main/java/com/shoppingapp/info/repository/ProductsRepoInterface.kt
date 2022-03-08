@@ -18,4 +18,5 @@ interface ProductsRepoInterface {
 	suspend fun updateProduct(product: Product): Result<Boolean>
 	suspend fun updateImages(newList: List<Uri>, oldList: List<String>): List<String>
 	suspend fun deleteProductById(productId: String): Result<Boolean>
+	suspend fun deleteAllProducts()
 }

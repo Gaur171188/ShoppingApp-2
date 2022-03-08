@@ -11,6 +11,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shoppingapp.info.remote.AuthRemoteDataSource
 import com.shoppingapp.info.R
+import com.shoppingapp.info.ShoppingApplication
+import com.shoppingapp.info.local.UserLocalDataSource
 import com.shoppingapp.info.screens.registration.RegistrationViewModel
 import com.shoppingapp.info.utils.ShoppingAppSessionManager
 import com.shoppingapp.info.utils.StoreDataStatus
@@ -27,9 +29,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         const val TAG = "Login"
     }
 
+    private val shopApp = ShoppingApplication(application.applicationContext)
+    private val authRepository by lazy{ shopApp.authRepository }
+
     private val _authRemoteDataSource by lazy {
         AuthRemoteDataSource(application)
     }
+//    private val _userLocalDataSource by lazy {
+//        UserLocalDataSource(authRepository.in)
+//    }
 
 
     //    private val userRepositoryOnline = UserRepositoryOnline()
@@ -93,7 +101,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
+// TODO: enhance the function
 
     private fun signWithEmailAndPassword(email: String, password: String,isRemOn: Boolean){
         scopeIO.launch {
@@ -112,13 +120,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                                                         if (user != null){
                                                           viewModelScope.launch {
                                                               withContext(Dispatchers.Main){
-                                                                 if (user.userType == UserType.SELLER.name){ // seller
-                                                                     appSessionManager.createLoginSession(user.userId,user.name
-                                                                         ,user.phone,isRemOn,isSeller = true)
-                                                                 }else{ // customer
-                                                                     appSessionManager.createLoginSession(user.userId,user.name
-                                                                         ,user.phone,isRemOn,isSeller = false)
-                                                                 }
+                                                                  authRepository.login(user,isRemOn)
                                                                   _inProgress.value = StoreDataStatus.DONE
                                                                   _isLogged.value = true
                                                               }

@@ -59,15 +59,17 @@ class AuthRepository(
 //
 	}
 
-	override fun login(userData: UserData, rememberMe: Boolean) {
-//		val isSeller = userData.userType == UserType.SELLER.name
-//		sessionManager.createLoginSession(
-//			userData.userId,
-//			userData.name,
-//			userData.phone,
-//			rememberMe,
-//			isSeller
-//		)
+	override suspend fun login(userData: UserData, rememberMe: Boolean) {
+		val isSeller = userData.userType == UserType.SELLER.name
+		sessionManager.createLoginSession(
+			userData.userId,
+			userData.name,
+			userData.phone,
+			rememberMe,
+			isSeller
+		)
+
+		userLocalDataSource.addUser(userData)
 	}
 
 
@@ -124,6 +126,10 @@ class AuthRepository(
 //		userLocalDataSource.clearUser()
 	}
 
+	override suspend fun deleteUser() {
+		userLocalDataSource.deleteUser()
+	}
+
 	override suspend fun hardRefreshUserData() {
 
 	}
@@ -164,6 +170,8 @@ class AuthRepository(
 //		}
 //	}
 
+	// TODO: add the product likes to local and source only if the connection is exist.
+
 	override suspend fun insertProductToLikes(
 		productId: String,
 		userId: String
@@ -187,6 +195,7 @@ class AuthRepository(
 		}
 	}
 
+	// TODO: remove the product likes from local and remote only if the connection is exist.
 	override suspend fun removeProductFromLikes(
 		productId: String,
 		userId: String
@@ -279,31 +288,35 @@ class AuthRepository(
 	}
 
 	override suspend fun placeOrder(newOrder: UserData.OrderItem, userId: String): Result<Boolean> {
-//		return supervisorScope {
-//			val remoteRes = async {
-//				Log.d(TAG, "onPlaceOrder: adding item to remote source")
-//				authRemoteDataSource.placeOrder(newOrder, userId)
-//			}
-//			val localRes = async {
-//				Log.d(TAG, "onPlaceOrder: adding item to local source")
-//				val userRes = authRemoteDataSource.getUserById(userId)
-//				if (userRes is Result.Success) {
-//					userLocalDataSource.clearUser(userId)
-//					userLocalDataSource.addUser(userRes.data!!)
-//				} else if (userRes is Error) {
-//					throw userRes.exception
-//				}
-//			}
-//			try {
-//				remoteRes.await()
-//				localRes.await()
-//				Result.Success(true)
-//			} catch (e: Exception) {
-//				Result.Error(e)
-//			}
-//		}
+		return supervisorScope {
+			val remoteRes = async {
+				Log.d(TAG, "onPlaceOrder: adding item to remote source")
+				authRemoteDataSource.placeOrder(newOrder, userId)
+			}
+			val localRes = async {
+				Log.d(TAG, "onPlaceOrder: adding item to local source")
+				authRemoteDataSource.getUserById(userId){ user ->
+					async {
+						userLocalDataSource.clearUser(user!!.userId)
+					}
+					async {
+						if (user != null) {
+							userLocalDataSource.addUser(user)
+						}
+					}
+				}
+			}
+			try {
+				remoteRes.await()
+				localRes.await()
+				Result.Success(true)
+			} catch (e: Exception) {
+				Result.Error(e)
+			}
+		}
 		return Result.Success(true)
 	}
+
 
 	override suspend fun setStatusOfOrder(
 		orderId: String,

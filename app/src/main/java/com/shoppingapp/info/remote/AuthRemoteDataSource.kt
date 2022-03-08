@@ -76,6 +76,9 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
             }
     }
 
+    // TODO: user this function if you want to remove the user from the remote data source
+    override suspend fun deleteUser() {
+    }
 
 
     override suspend fun getUserByMobile(phoneNumber: String): UserData =

@@ -25,7 +25,7 @@
             android:layout_below="@id/fav_top_app_bar">
 
             <TextView
-                android:id="@+id/favorites_empty"
+                android:id="@+id/favorites_empty_message"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
