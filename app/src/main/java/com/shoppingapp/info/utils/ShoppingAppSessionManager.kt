@@ -24,8 +24,10 @@ class ShoppingAppSessionManager(context: Context) {
 		editor.putBoolean(KEY_REMEMBER_ME, isRemOn)
 		editor.putBoolean(KEY_IS_SELLER, isSeller)
 
+
 		editor.commit()
 	}
+
 
 
 	fun isUserSeller(): Boolean = userSession.getBoolean(KEY_IS_SELLER, false)
@@ -59,5 +61,6 @@ class ShoppingAppSessionManager(context: Context) {
 		private const val KEY_ID = "userId"
 		private const val KEY_REMEMBER_ME = "isRemOn"
 		private const val KEY_IS_SELLER = "isSeller"
+		private const val KEY_FAV_PRODUCTS_IDs = "favoriteProductsIds"
 	}
 }

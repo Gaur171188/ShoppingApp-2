@@ -19,6 +19,7 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 	RecyclerView.Adapter<LikedProductAdapter.ViewHolder>() {
 
 	var data = proList
+
 	lateinit var onClickListener: OnClickListener
 
 	inner class ViewHolder(private val binding: ProductItemBinding) :
@@ -29,8 +30,7 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 				onClickListener.onClick(product)
 			}
 			binding.productNameTv.text = product.name
-			binding.productPriceTv.text =
-				context.getString(R.string.pro_details_price_value, product.price.toString())
+			binding.productPriceTv.text = context.getString(R.string.pro_details_price_value, product.price.toString())
 			binding.productRatingBar.rating = product.rating.toFloat()
 			binding.productActualPriceTv.apply {
 				paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
@@ -77,13 +77,13 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		holder.bind(data[position])
+		holder.bind(data!![position])
 	}
 
-	override fun getItemCount() = data.size
+	override fun getItemCount() = data!!.size
 
 	interface OnClickListener {
-		fun onClick(productData: Product)
+		fun onClick(product: Product)
 		fun onDeleteClick(productId: String)
 	}
 }

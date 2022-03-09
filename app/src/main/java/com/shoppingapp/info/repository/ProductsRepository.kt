@@ -32,6 +32,10 @@ class ProductsRepository(
 		return productsLocalSource.observeProducts()
 	}
 
+	override suspend fun getProducts(): Result<List<Product>> {
+		return productsLocalSource.getAllProducts()
+	}
+
 	override fun observeProductsByOwner(ownerId: String): LiveData<Result<List<Product>>?> {
 		return productsLocalSource.observeProductsByOwner(ownerId)
 	}
@@ -181,6 +185,8 @@ class ProductsRepository(
 
 		return res
 	}
+
+
 
 	private suspend fun updateProductFromRemoteSource(productId: String): StoreDataStatus? {
 		var res: StoreDataStatus? = null

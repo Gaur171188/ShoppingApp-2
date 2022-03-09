@@ -10,6 +10,7 @@ import com.shoppingapp.info.utils.StoreDataStatus
 interface ProductsRepoInterface {
 	suspend fun refreshProducts(): StoreDataStatus?
 	fun observeProducts(): LiveData<Result<List<Product>>?>
+	suspend fun getProducts(): Result<List<Product>>
 	fun observeProductsByOwner(ownerId: String): LiveData<Result<List<Product>>?>
 	suspend fun getAllProductsByOwner(ownerId: String): Result<List<Product>>
 	suspend fun getProductById(productId: String, forceUpdate: Boolean = false): Result<Product>

@@ -76,13 +76,13 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
             }
     }
 
-    // TODO: user this function if you want to remove the user from the remote data source
+    // TODO: use this function if you want to remove the user from the remote data source
     override suspend fun deleteUser() {
     }
 
 
-    override suspend fun getUserByMobile(phoneNumber: String): UserData =
-        usersCollectionRef().whereEqualTo(PHONE_FIELD, phoneNumber).get().await()
+    override suspend fun getUserById(userId: String): UserData =
+        usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
             .toObjects(UserData::class.java)[0]
 
 

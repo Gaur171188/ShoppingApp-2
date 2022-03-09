@@ -54,7 +54,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/fav_products_recycler_view"
+                android:id="@+id/favorite_products_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
@@ -65,6 +65,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:spanCount="2"
                 tools:itemCount="10"
+                android:visibility="visible"
                 tools:listitem="@layout/product_item" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </RelativeLayout>

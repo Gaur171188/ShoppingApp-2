@@ -67,6 +67,7 @@ class Account : Fragment() {
                     dialog.cancel()
                 }
                 .setPositiveButton(getString(R.string.dialog_sign_out_btn_text)) { dialog, _ ->
+                    // TODO: make sign out require network
                     viewModel.signOut()
                     navigateToSignUpActivity()
                     dialog.cancel()

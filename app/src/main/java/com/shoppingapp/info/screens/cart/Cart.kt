@@ -122,6 +122,10 @@ class Cart : Fragment() {
         val items = viewModel.cartItems.value ?: emptyList()
         val likeList = viewModel.userLikes.value ?: emptyList()
         val prosList = viewModel.cartProducts.value ?: emptyList()
+
+        Log.i(TAG,"items: ${items.size}")
+        Log.i(TAG,"likeList: ${likeList.size}")
+        Log.i(TAG,"productList: ${prosList.size}")
         itemsAdapter.apply {
             data = items
             proList = prosList
@@ -138,6 +142,8 @@ class Cart : Fragment() {
         val proList = viewModel.cartProducts.value ?: emptyList()
         itemsAdapter = CartItemAdapter(requireContext(), items, proList, likesList)
         itemsAdapter.onClickListener = object : CartItemAdapter.OnClickListener {
+
+            // TODO: make the like require network
             override fun onLikeClick(productId: String) {
                 Log.d(TAG, "onToggle Like Clicked")
                 viewModel.toggleLikeProduct(productId)
@@ -148,11 +154,14 @@ class Cart : Fragment() {
                 showDeleteDialog(itemId, itemBinding)
             }
 
+            // TODO: make increase quantity require network
             override fun onPlusClick(itemId: String) {
+
                 Log.d(TAG, "onPlus: Increasing quantity")
                 viewModel.setQuantityOfItem(itemId, 1)
             }
 
+            // TODO: make decrease quantity require network
             override fun onMinusClick(itemId: String, currQuantity: Int,itemBinding: CircularLoaderLayoutBinding) {
                 Log.d(TAG, "onMinus: decreasing quantity")
                 if (currQuantity == 1) {
@@ -168,6 +177,7 @@ class Cart : Fragment() {
 //        findNavController().navigate(R.id.action_cartFragment_to_selectAddressFragment)
     }
 
+
     private fun showDeleteDialog(itemId: String, itemBinding: CircularLoaderLayoutBinding) {
         context?.let {
             MaterialAlertDialogBuilder(it)
@@ -177,6 +187,7 @@ class Cart : Fragment() {
                     dialog.cancel()
                     itemBinding.loaderFrameLayout.visibility = View.GONE
                 }
+                // TODO: make delete item from cart require network
                 .setPositiveButton(getString(R.string.delete_dialog_delete_btn_text)) { dialog, _ ->
                     viewModel.deleteItemFromCart(itemId)
                     dialog.cancel()

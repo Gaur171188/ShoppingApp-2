@@ -2,7 +2,6 @@ package com.shoppingapp.info.screens.home
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,7 +17,6 @@ import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -57,7 +55,7 @@ class Home : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getUserLikes()
+        viewModel.getUserLikes(0L)
     }
 
 //	override fun onResume() {
@@ -166,7 +164,10 @@ class Home : Fragment() {
             }
             R.id.item_favorites -> {
                 // show favorite products list
-                findNavController().navigate(R.id.action_homeFragment_to_favoritesFragment)
+                val likedProducts = viewModel.likedProducts.value
+                val userLikes = bundleOf("userLikes" to likedProducts)
+                findNavController().navigate(R.id.action_homeFragment_to_favoritesFragment,userLikes)
+
                 true
             }
             else -> false
@@ -243,11 +244,13 @@ class Home : Fragment() {
                 navigateToAddEditProductScreen(isEdit = true, productId = productId)
             }
 
+            // TODO: make the set like require network
             override fun onLikeClick(productId: String) {
                 Log.d(TAG, "onToggleLike: initiated for $productId")
                 viewModel.toggleLikeByProductId(productId)
             }
 
+            // TODO: make the add product in cart require network
             override fun onAddToCartClick(productData: Product) {
                 Log.d(TAG, "onToggleCartAddition: initiated")
                 viewModel.toggleProductInCart(productData,
@@ -263,10 +266,11 @@ class Home : Fragment() {
         productAdapter.bindImageButtons = object : ProductAdapter.BindImageButtons {
             @SuppressLint("ResourceAsColor")
             override fun setLikeButton(productId: String, button: CheckBox) {
+
                 button.isChecked = viewModel.isProductLiked(productId)
             }
 
-            // todo  fix update the cart button
+
             override fun setCartButton(productId: String, imgView: ImageView) {
                 if (viewModel.isProductInCart(productId)) {
                     imgView.setImageResource(R.drawable.ic_remove_shopping_cart_24)
@@ -287,6 +291,7 @@ class Home : Fragment() {
                     dialog.cancel()
                 }
                 .setPositiveButton(getString(R.string.delete_dialog_delete_btn_text)) { dialog, _ ->
+                    // TODO: make the remove product require network
                     viewModel.deleteProduct(productId)
                     dialog.cancel()
                 }

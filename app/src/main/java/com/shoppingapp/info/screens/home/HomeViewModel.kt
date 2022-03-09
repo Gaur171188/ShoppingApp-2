@@ -8,11 +8,10 @@ import com.shoppingapp.info.ShoppingApplication
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.UserData
 import com.shoppingapp.info.utils.StoreDataStatus
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import java.time.Month
 import com.shoppingapp.info.Result
 import com.shoppingapp.info.utils.ShoppingAppSessionManager
+import kotlinx.coroutines.*
 import java.util.*
 
 
@@ -49,8 +48,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private var _orderProducts = MutableLiveData<List<Product>>()
     val orderProducts: LiveData<List<Product>> get() = _orderProducts
 
-    private var _likedProducts = MutableLiveData<List<Product>>()
-    val likedProducts: LiveData<List<Product>> get() = _likedProducts
+    private var _likedProducts = MutableLiveData<List<Product>?>()
+    val likedProducts: LiveData<List<Product>?> get() = _likedProducts
 
     private var _userLikes = MutableLiveData<List<String>?>()
     val userLikes: LiveData<List<String>?> get() = _userLikes
@@ -77,7 +76,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             authRepository
             authRepository.hardRefreshUserData()
-            getUserLikes()
+            getUserLikes(0L)
 
             if (isUserASeller){
                 Log.i(TAG,"Seller")
@@ -107,6 +106,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun toggleLikeByProductId(productId: String) {
         Log.d(TAG, "Toggling Like")
         viewModelScope.launch {
+            getUserLikes(200)
             val isLiked = isProductLiked(productId)
             val allLikes = _userLikes.value?.toMutableList() ?: mutableListOf()
             val deferredRes = async {
@@ -137,6 +137,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+
     }
 
     fun isProductInCart(productId: String): Boolean {
@@ -146,7 +147,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     fun toggleProductInCart(product: Product,onSuccess:(String?)-> Unit,onError:(String?)-> Unit) {
         var itemId = ""
         viewModelScope.launch {
-            val j = async {
+            async {
                 authRepository.getUserDataById(userId!!){ user ->
                     if(user != null){
                         user.cart.forEach { cartItem ->
@@ -172,7 +173,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
                 }
             }
-            j.await()
+
+//            j.await()
         }
 
     }
@@ -194,19 +196,28 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun getUserLikes(){
+    fun getUserLikes(d: Long){
         viewModelScope.launch {
+            delay(d)
+            val correctLikesIds = arrayListOf<String>() // for correction error
             val res = authRepository.getLikesByUserId(userId!!)
             if (res is Result.Success){
                 val likes = res.data
                 if (likes != null){
-                    _userLikes.value = likes
+                    likes.forEach {
+                        if (it != ""){
+                            correctLikesIds.add(it)
+                        }
+                    }
+                    _userLikes.value = correctLikesIds
+                    getLikedProducts()
                 }else{
                     _userLikes.value = emptyList()
                 }
             }
         }
     }
+
 
 //    fun getUserLikes() {
 //        viewModelScope.launch {
@@ -227,28 +238,32 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 //        }
 //    }
 
-    // TODO: handle with error catch them
-    // TODO: display the liked product in favorites screen. fix issue!
 
-    fun getLikedProducts() {
-        _dataStatus.value = StoreDataStatus.LOADING
-        val res: List<Product> = if (_userLikes.value != null) {
-            val allLikes = _userLikes.value ?: emptyList()
-            if (!allLikes.isNullOrEmpty()) {
-                Log.d(TAG, "alllikes = ${allLikes.size}")
-                _dataStatus.value = StoreDataStatus.DONE
-                allLikes.map { proId ->
-                    _allProducts.value?.find { it.productId == proId } ?: Product()
+
+    private fun getLikedProducts() {
+//        _dataStatus.value = StoreDataStatus.LOADING
+
+            val res: List<Product> = if (_userLikes.value != null) {
+                val allLikes = _userLikes.value ?: emptyList()
+                if (!allLikes.isNullOrEmpty()) {
+                    Log.d(TAG, "alllikes = ${allLikes.size}")
+                    _dataStatus.value = StoreDataStatus.DONE
+                    allLikes.map { proId ->
+                        _allProducts.value?.find { it.productId == proId } ?: Product()
+                    }
+                } else {
+                    _dataStatus.value = StoreDataStatus.ERROR
+                    emptyList()
                 }
             } else {
                 _dataStatus.value = StoreDataStatus.ERROR
                 emptyList()
             }
-        } else {
-            _dataStatus.value = StoreDataStatus.ERROR
-            emptyList()
-        }
         _likedProducts.value = res
+
+
+
+
     }
 
 
@@ -318,8 +333,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    // TODO: you must remove all the database with user signout.
-    // TODO: clear all the data from the local database.
+    // TODO: make the sign out function inside work manager and require network
     fun signOut() {
         viewModelScope.launch {
             val deferredRes = async { authRepository.signOut() }

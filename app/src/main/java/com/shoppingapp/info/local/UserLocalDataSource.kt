@@ -60,7 +60,7 @@ class UserLocalDataSource internal constructor(
 
 	}
 
-	override suspend fun getUserByMobile(phoneNumber: String): UserData? =
+	override suspend fun getUserById(phoneNumber: String): UserData? =
 		withContext(ioDispatcher) {
 			try {
 				val uData = userDao.getByMobile(phoneNumber)

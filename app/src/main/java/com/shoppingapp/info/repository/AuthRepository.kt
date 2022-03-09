@@ -5,15 +5,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.shoppingapp.info.UserDataSource
 import com.shoppingapp.info.data.UserData
 import com.shoppingapp.info.utils.ShoppingAppSessionManager
 import com.shoppingapp.info.utils.UserType
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import com.shoppingapp.info.Result
 
@@ -130,9 +127,7 @@ class AuthRepository(
 		userLocalDataSource.deleteUser()
 	}
 
-	override suspend fun hardRefreshUserData() {
 
-	}
 
 	private fun makeErrToast(text: String, context: Context) {
 		Toast.makeText(context, text, Toast.LENGTH_LONG).show()
@@ -159,18 +154,20 @@ class AuthRepository(
 //		}
 	}
 
-//	override suspend fun hardRefreshUserData() {
-////		userLocalDataSource.clearUser()
-//		val mobile = sessionManager.getPhoneNumber()
-//		if (mobile != null) {
-//			val uData = authRemoteDataSource.getUserByMobile(mobile)
-//			if (uData != null) {
-//				userLocalDataSource.addUser(uData)
-//			}
-//		}
-//	}
 
-	// TODO: add the product likes to local and source only if the connection is exist.
+
+	override suspend fun hardRefreshUserData() {
+		val userId = sessionManager.getUserIdFromSession()
+		if (userId != null) {
+			userLocalDataSource.clearUser(userId)
+			val uData = authRemoteDataSource.getUserById(userId)
+			if (uData != null) {
+				userLocalDataSource.addUser(uData)
+			}
+		}
+	}
+
+
 
 	override suspend fun insertProductToLikes(
 		productId: String,
@@ -195,7 +192,7 @@ class AuthRepository(
 		}
 	}
 
-	// TODO: remove the product likes from local and remote only if the connection is exist.
+
 	override suspend fun removeProductFromLikes(
 		productId: String,
 		userId: String

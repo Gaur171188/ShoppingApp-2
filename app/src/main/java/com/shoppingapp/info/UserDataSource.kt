@@ -40,7 +40,7 @@ interface UserDataSource {
 
 	suspend fun clearUser(userId: String) {}
 
-	suspend fun getUserByMobile(phoneNumber: String): UserData? {
+	suspend fun getUserById(phoneNumber: String): UserData? {
 		return null
 	}
 
