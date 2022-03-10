@@ -103,6 +103,7 @@
     <string name="pro_offer_precent_text">%s%% Off</string>
     <string name="cart_fragment_label">Your Cart</string>
     <string name="price_card_items_string">Items(%s)</string>
+    <string name="refresh">Refresh</string>
 
 
 </resources>

@@ -5,16 +5,19 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shoppingapp.info.R
+import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.UserData
 import com.shoppingapp.info.databinding.*
+import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.screens.orders.OrdersViewModel
 import com.shoppingapp.info.utils.StoreDataStatus
 
@@ -27,6 +30,7 @@ class Cart : Fragment() {
     }
 
     private lateinit var viewModel: OrdersViewModel
+    private val homeViewModel by activityViewModels<HomeViewModel>()
     private lateinit var binding: CartBinding
     private lateinit var itemsAdapter: CartItemAdapter
     private lateinit var concatAdapter: ConcatAdapter
@@ -146,7 +150,10 @@ class Cart : Fragment() {
             // TODO: make the like require network
             override fun onLikeClick(productId: String) {
                 Log.d(TAG, "onToggle Like Clicked")
+                val isConnected = homeViewModel.isConnected.value
+
                 viewModel.toggleLikeProduct(productId)
+
             }
 
             override fun onDeleteClick(itemId: String, itemBinding: CircularLoaderLayoutBinding) {

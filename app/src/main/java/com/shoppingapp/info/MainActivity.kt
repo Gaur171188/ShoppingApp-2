@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
 
     private lateinit var binding: ActivityMainBinding
     private val networkReceiver = NetworkReceiver()
-//    private var isConnected: Boolean? = null
+    private var isConnected: Boolean? = null
     private val homeViewModel by viewModels<HomeViewModel>()
 
 
@@ -35,6 +35,23 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
 
         registerReceiver(networkReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
 
+
+        binding.apply {
+
+
+            /** button refresh **/
+            noConnectionLayout.btnRefresh.setOnClickListener {
+                if (isConnected!!){
+                    binding.mainActivity.visibility = View.VISIBLE
+                    binding.noConnectionLayout.root.visibility = View.GONE
+                    setBottomNavVisibility(View.VISIBLE)
+                }
+            }
+
+
+
+
+        }
 
     }
 
@@ -76,10 +93,21 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
     // this function with listen if there is any change in network
     override fun onNetworkConnectionChanged(isConnect: Boolean) {
         homeViewModel.setConnectivityState(isConnect)
+        isConnected = isConnect
+        if (isConnect){
+//            binding.mainActivity.visibility = View.VISIBLE
+//            binding.noConnectionLayout.visibility = View.GONE
+        }else{
+            binding.mainActivity.visibility = View.GONE
+            binding.noConnectionLayout.root.visibility = View.VISIBLE
+            setBottomNavVisibility(View.GONE)
+        }
+
+
 //        if (isConnected != null){
 //            homeViewModel.setConnectivityState(isConnected!!)
 //        }
-//        isConnected = isConnect
+
     }
 
 

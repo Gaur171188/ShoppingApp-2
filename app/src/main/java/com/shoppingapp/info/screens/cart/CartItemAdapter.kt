@@ -56,7 +56,9 @@ class CartItemAdapter(
 					binding.cartProductLikeBtn.setImageResource(R.drawable.heart_icon_drawable)
 				}
 				onClickListener.onLikeClick(proData.productId)
+//				onClickListener.onLikeClick(proData.productId)
 			}
+
 			binding.cartProductDeleteBtn.setOnClickListener {
 				binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
 				onClickListener.onDeleteClick(itemData.itemId, binding.loaderLayout)
