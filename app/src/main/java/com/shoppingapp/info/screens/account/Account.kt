@@ -44,6 +44,12 @@ class Account : Fragment() {
 
     private fun setViews() {
         binding.accountTopAppBar.topAppBar.title = getString(R.string.account)
+
+        if (!homeViewModel.isUserASeller){
+            binding.btnOrders.visibility = View.GONE
+        }
+
+
         binding.btnProfile.setOnClickListener {
             Log.d(TAG, "Profile Selected")
             findNavController().navigate(R.id.action_accountFragment_to_profileFragment)
