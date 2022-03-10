@@ -1,6 +1,5 @@
 package com.shoppingapp.info.screens.account
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -14,6 +13,8 @@ import com.shoppingapp.info.databinding.AccountBinding
 import android.content.Intent
 
 import android.util.Log
+import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shoppingapp.info.screens.home.HomeViewModel
@@ -25,12 +26,12 @@ class Account : Fragment() {
         private const val TAG = "Account"
     }
 
-    private lateinit var viewModel: HomeViewModel
+
+    private val homeViewModel by activityViewModels<HomeViewModel>()
     private lateinit var binding: AccountBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         binding = DataBindingUtil.inflate(inflater,R.layout.account, container, false)
 
 
@@ -67,14 +68,23 @@ class Account : Fragment() {
                     dialog.cancel()
                 }
                 .setPositiveButton(getString(R.string.dialog_sign_out_btn_text)) { dialog, _ ->
-                    // TODO: make sign out require network
-                    viewModel.signOut()
-                    navigateToSignUpActivity()
-                    dialog.cancel()
+                    homeViewModel.signOut(
+                        onComplete = { onComplete ->
+                            if (onComplete){
+                                navigateToSignUpActivity()
+                                dialog.cancel()
+                            }
+                        },
+                        onError = { error ->
+                            Toast.makeText(requireContext(),error,Toast.LENGTH_SHORT).show()
+                            dialog.cancel()
+                        })
+
                 }
                 .show()
         }
     }
+
 
     private fun navigateToSignUpActivity() {
         val homeIntent = Intent(context, RegistrationActivity::class.java)

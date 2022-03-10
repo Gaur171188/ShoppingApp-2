@@ -42,7 +42,8 @@ class Favorites : Fragment() {
         binding.favTopAppBar.topAppBar.title = "Favorite Products"
 
 
-        // TODO: get the data from the room
+        // TODO: fix issue the favorites data does not displayed in first time.
+
 
 
         setViews()
@@ -124,10 +125,7 @@ class Favorites : Fragment() {
             }
 
             override fun onDeleteClick(product: Product) {
-                // TODO: make the remove like require network.
                 removeLike(product)
-
-
             }
         }
 

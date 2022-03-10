@@ -204,7 +204,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun getUserLikes(d: Long){
+    fun getUserLikes(d: Long) {
         viewModelScope.launch {
             delay(d)
             val correctLikesIds = arrayListOf<String>() // for correction error
@@ -342,15 +342,24 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
 
     // TODO: make the sign out function inside work manager and require network
-    fun signOut() {
-        viewModelScope.launch {
-            val deferredRes = async { authRepository.signOut() }
-            deferredRes.await()
-            async { shopApp.removeDB() }
-            async { sessionManager.logoutFromSession() }
-//            async { productsRepository.deleteAllProducts() }
-//            async { authRepository.deleteUser() }
+    fun signOut(onComplete:(Boolean)-> Unit, onError: (String) -> Unit) {
+        val isConnected = _isConnected.value
+        if (isConnected != null){
+            if (isConnected){
+                viewModelScope.launch {
+                    val deferredRes = async { authRepository.signOut() }
+                    deferredRes.await()
+                    async { shopApp.removeDB() }
+                    async { sessionManager.logoutFromSession() }
+                    onComplete(true)
+                }
+            }else{
+                onComplete(false)
+                onError("Connection is not found!")
+            }
         }
+
+
     }
 
     fun getAllOrders() {
