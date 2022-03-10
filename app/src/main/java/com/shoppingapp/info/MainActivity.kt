@@ -1,17 +1,28 @@
 package com.shoppingapp.info
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.shoppingapp.info.databinding.ActivityMainBinding
+import com.shoppingapp.info.receiver.NetworkReceiver
+import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.ShoppingAppSessionManager
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverListener {
 
     private lateinit var binding: ActivityMainBinding
+    private val networkReceiver = NetworkReceiver()
+    private var isConnected: Boolean? = null
+    private val homeViewModel by viewModels<HomeViewModel>()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,8 +33,15 @@ class MainActivity : AppCompatActivity() {
         setUpNav()
 
 
+        registerReceiver(networkReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+
+
     }
 
+    override fun onResume() {
+        super.onResume()
+        NetworkReceiver.connectivityReceiverListener = this
+    }
 
 
     private fun setUpNav() {
@@ -54,6 +72,20 @@ class MainActivity : AppCompatActivity() {
         binding.homeBottomNavigation.visibility = visibility
     }
 
+
+    // this function with listen if there is any change in network
+    override fun onNetworkConnectionChanged(isConnect: Boolean) {
+        if (isConnected != null){
+            homeViewModel.setConnectivityState(isConnected!!)
+        }
+        isConnected = isConnect
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(networkReceiver)
+    }
 
     // TODO: display a toast message the connection is not exist.
 

@@ -69,6 +69,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> get() = _errorMessage
 
+    private val _isConnected = MutableLiveData<Boolean?>()
+    val isConnected: LiveData<Boolean?> get() = _isConnected
+
 
     // TODO: create live data for check from the connection of network
 
@@ -93,6 +96,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             getProducts()
     }
 
+
+    fun setConnectivityState(b: Boolean){
+        _isConnected.value = b
+    }
 
     fun setDataLoaded() {
         _storeDataStatus.value = StoreDataStatus.DONE
@@ -136,6 +143,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                     Log.d(TAG, "onToggleLike: Error, ${res.message}")
                 }
             }
+            getUserLikes(0L)
         }
 
     }

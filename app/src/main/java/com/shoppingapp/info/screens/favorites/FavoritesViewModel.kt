@@ -29,6 +29,7 @@ class FavoritesViewModel(application: Application): AndroidViewModel(application
 
 
     private val productsRepository by lazy { appShop.productsRepository }
+    private val authRepository by lazy { appShop.authRepository }
 
     private val _dataStatus = MutableLiveData<StoreDataStatus>()
     val dataStatus: LiveData<StoreDataStatus> = _dataStatus
@@ -92,46 +93,38 @@ class FavoritesViewModel(application: Application): AndroidViewModel(application
 //    }
 
 
-//    private fun isProductLiked(productId: String): Boolean {
-//        return _userLikes.value?.contains(productId) == true
-//    }
+    private fun isProductLiked(product: Product): Boolean {
+        return _likedProducts.value?.contains(product) == true
+    }
 
 //
-//    fun toggleLikeByProductId(productId: String) {
-//        _dataStatus.value = StoreDataStatus.LOADING
-//        viewModelScope.launch {
-//            val isLiked = isProductLiked(productId)
-//            val allLikes = _userLikes.value?.toMutableList() ?: mutableListOf()
-//            val deferredRes = async {
-//                if (isLiked) {
-//                    authRepository.removeProductFromLikes(productId, currentUser!!)
-//                } else {
-//                    authRepository.insertProductToLikes(productId, currentUser!!)
-//                }
-//            }
-//            val res = deferredRes.await()
-//            if (res is Result.Success) {
-//                if (isLiked) {
-//                    allLikes.remove(productId)
-//                } else {
-//                    allLikes.add(productId)
-//                }
-//                _userLikes.value = allLikes
-//                val proList = _likedProducts.value?.toMutableList() ?: mutableListOf()
-//                val pro = proList.find { it.productId == productId }
-//                if (pro != null) {
-//                    proList.remove(pro)
-//                }
-//                _likedProducts.value = proList
-//                loadingIsDone()
-//                Log.d(TAG, "onToggleLike: Success")
-//            } else {
-//                _dataStatus.value = StoreDataStatus.ERROR
-//               Error("onToggleLike: Error ")
-//            }
-//        }
-//    }
-//
+    fun toggleLikeByProductId(product: Product,onError:(String) -> Unit) {
+        _dataStatus.value = StoreDataStatus.LOADING
+        viewModelScope.launch {
+            val isLiked = isProductLiked(product)
+            val allLikes = _likedProducts.value?.toMutableList() ?: mutableListOf()
+            val deferredRes = async {
+                if (isLiked) {
+                    authRepository.removeProductFromLikes(product.productId, currentUser!!)
+                } else {
+                    authRepository.insertProductToLikes(product.productId, currentUser!!)
+                }
+            }
+            val res = deferredRes.await()
+            if (res is Result.Success) {
+                if (isLiked) {
+                    allLikes.remove(product)
+                } else {
+                    allLikes.add(product)
+                }
+                _likedProducts.value = allLikes
+            } else {
+                _dataStatus.value = StoreDataStatus.ERROR
+                onError("sorry error happen..")
+            }
+        }
+    }
+
 
 
 //    fun getLikedProducts(allProducts: List<Product>) {

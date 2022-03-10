@@ -60,8 +60,11 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 			// setting edit button as delete button
 			binding.btnProductEdit.setImageResource(R.drawable.ic_delete_24)
 			binding.btnProductEdit.setOnClickListener {
-				onClickListener.onDeleteClick(product.productId)
-				notifyDataSetChanged()
+				onClickListener.onDeleteClick(product)
+
+//				notifyItemRemoved(adapterPosition)
+//				notifyDataSetChanged()
+
 			}
 		}
 	}
@@ -77,13 +80,13 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 	}
 
 	override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-		holder.bind(data!![position])
+		holder.bind(data[position])
 	}
 
-	override fun getItemCount() = data!!.size
+	override fun getItemCount() = data.size
 
 	interface OnClickListener {
 		fun onClick(product: Product)
-		fun onDeleteClick(productId: String)
+		fun onDeleteClick(product: Product)
 	}
 }

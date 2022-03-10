@@ -17,6 +17,8 @@ import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -30,24 +32,21 @@ import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.*
 
 
-
-
 class Home : Fragment() {
 
     companion object{
         const val TAG = "Home"
     }
 
-
     private lateinit var binding: HomeBinding
-    private lateinit var viewModel: HomeViewModel
+    private val viewModel: HomeViewModel by activityViewModels()
     private val focusChangeListener = MyOnFocusChangeListener()
     private lateinit var productAdapter: ProductAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(layoutInflater,R.layout.home,container,false)
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         setViews()
         setObservers()
         return binding.root
@@ -60,7 +59,7 @@ class Home : Fragment() {
 
 //	override fun onResume() {
 //		super.onResume()
-//		viewModel.getLikedProducts()
+//		viewModel.getUserLikes(0L)
 //	}
 
     private fun setViews() {
@@ -147,6 +146,18 @@ class Home : Fragment() {
                 }
             }
         }
+
+
+        viewModel.isConnected.observe(viewLifecycleOwner){
+            if (it != null){
+                if (!it){
+                    Toast.makeText(requireContext(),"connection is back",Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(requireContext(),"no connection",Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
     }
 
     private fun performSearch(query: String) {
