@@ -43,6 +43,9 @@ class Cart : Fragment() {
         viewModel = ViewModelProvider(this)[OrdersViewModel::class.java]
 
 
+        // TODO: improve the cart item design.
+        // TODO: fix issue of display the favorites data inside cart item ..
+
         setViews()
         setObservers()
 
@@ -51,7 +54,6 @@ class Cart : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getUserLikes()
         viewModel.getCartItems()
     }
 
@@ -114,8 +116,8 @@ class Cart : Fragment() {
                 updateAdapter()
             }
         }
-        viewModel.userLikes.observe(viewLifecycleOwner) {
-            if (it.isNotEmpty()) {
+        homeViewModel.userLikes.observe(viewLifecycleOwner) {
+            if (it != null) {
                 updateAdapter()
             }
         }
@@ -124,7 +126,7 @@ class Cart : Fragment() {
     @SuppressLint("NotifyDataSetChanged")
     private fun updateAdapter() {
         val items = viewModel.cartItems.value ?: emptyList()
-        val likeList = viewModel.userLikes.value ?: emptyList()
+        val likeList = homeViewModel.userLikes.value ?: emptyList()
         val prosList = viewModel.cartProducts.value ?: emptyList()
 
         Log.i(TAG,"items: ${items.size}")
@@ -142,7 +144,7 @@ class Cart : Fragment() {
 
     private fun setItemsAdapter(itemList: List<UserData.CartItem>?) {
         val items = itemList ?: emptyList()
-        val likesList = viewModel.userLikes.value ?: emptyList()
+        val likesList = homeViewModel.userLikes.value ?: emptyList()
         val proList = viewModel.cartProducts.value ?: emptyList()
         itemsAdapter = CartItemAdapter(requireContext(), items, proList, likesList)
         itemsAdapter.onClickListener = object : CartItemAdapter.OnClickListener {
@@ -152,7 +154,8 @@ class Cart : Fragment() {
                 Log.d(TAG, "onToggle Like Clicked")
                 val isConnected = homeViewModel.isConnected.value
 
-                viewModel.toggleLikeProduct(productId)
+                homeViewModel.toggleLikeByProductId(productId)
+//                viewModel.toggleLikeProduct(productId)
 
             }
 

@@ -35,8 +35,8 @@
 
             <ImageView
                 android:id="@+id/product_image_view"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
@@ -92,25 +92,27 @@
                 app:srcCompat="@drawable/ic_delete_24"
                 app:tint="@color/gray" />
 
+
             <TextView
                 android:id="@+id/cart_product_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginBottom="8dp"
-                android:textAppearance="@style/TextAppearance.MyTheme.Body1"
+                android:textAppearance="@style/TextAppearance.MyTheme.Body2"
                 android:textColor="@color/blue_accent_300"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/product_image_view"
                 app:layout_constraintTop_toBottomOf="@+id/cart_product_title"
-                app:layout_constraintVertical_bias="1.0"
+                app:layout_constraintVertical_bias="0.789"
                 tools:text="$1234.56" />
 
             <LinearLayout
                 android:id="@+id/cart_product_quantity_buttons_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/layout_background_rounded_corners"
                 android:orientation="horizontal"
@@ -123,8 +125,8 @@
 
                 <ImageButton
                     android:id="@+id/btn_cart_product_minus"
-                    android:layout_width="36dp"
-                    android:layout_height="30dp"
+                    android:layout_width="33dp"
+                    android:layout_height="28dp"
                     android:layout_weight="1"
                     android:background="@null"
                     android:contentDescription="@string/decrease_button"
@@ -137,15 +139,15 @@
                     android:layout_weight="1"
                     android:background="@color/blue_shadow_color"
                     android:gravity="center_horizontal|center_vertical"
-                    android:textAppearance="@style/TextAppearance.MyTheme.Body1"
+                    android:textAppearance="@style/TextAppearance.MyTheme.Body2"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     tools:text="123" />
 
                 <ImageButton
                     android:id="@+id/btn_cart_product_plus"
-                    android:layout_width="36dp"
-                    android:layout_height="30dp"
+                    android:layout_width="33dp"
+                    android:layout_height="28dp"
                     android:layout_weight="1"
                     android:background="@null"
                     android:contentDescription="@string/increase_button"

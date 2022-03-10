@@ -36,7 +36,6 @@ class Account : Fragment() {
 
 
 
-
         setViews()
 
         return binding.root
