@@ -10,11 +10,13 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.FavoritiesBinding
+import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.screens.home.RecyclerViewPaddingItemDecoration
 import com.shoppingapp.info.utils.StoreDataStatus
 
@@ -26,6 +28,7 @@ class Favorites : Fragment() {
 
 
     private lateinit var viewModel: FavoritesViewModel
+    private val homeViewModel: HomeViewModel by activityViewModels()
     private lateinit var binding: FavoritiesBinding
     private lateinit var productsAdapter: LikedProductAdapter
 
@@ -122,11 +125,8 @@ class Favorites : Fragment() {
 
             override fun onDeleteClick(product: Product) {
                 // TODO: make the remove like require network.
-                viewModel.toggleLikeByProductId(product,
-                    onError = { error ->
-                        Toast.makeText(requireContext(),error,Toast.LENGTH_SHORT).show()
-                    })
-//                binding.favoriteProductsRecyclerView.adapter?.notifyItemRemoved(adapterPosition)
+                removeLike(product)
+
 
             }
         }
@@ -140,6 +140,20 @@ class Favorites : Fragment() {
         viewModel.loadingIsDone()
     }
 
+
+    private fun removeLike(product: Product){
+        val isConnected = homeViewModel.isConnected.value
+        if (isConnected != null){
+            if (isConnected){
+                viewModel.toggleLikeByProductId(product,
+                    onError = { error ->
+                        Toast.makeText(requireContext(),error,Toast.LENGTH_SHORT).show()
+                    })
+            }else{
+                Toast.makeText(requireContext(),"error connection!",Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
 
 

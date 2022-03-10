@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
 
     private lateinit var binding: ActivityMainBinding
     private val networkReceiver = NetworkReceiver()
-    private var isConnected: Boolean? = null
+//    private var isConnected: Boolean? = null
     private val homeViewModel by viewModels<HomeViewModel>()
 
 
@@ -75,10 +75,11 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
 
     // this function with listen if there is any change in network
     override fun onNetworkConnectionChanged(isConnect: Boolean) {
-        if (isConnected != null){
-            homeViewModel.setConnectivityState(isConnected!!)
-        }
-        isConnected = isConnect
+        homeViewModel.setConnectivityState(isConnect)
+//        if (isConnected != null){
+//            homeViewModel.setConnectivityState(isConnected!!)
+//        }
+//        isConnected = isConnect
     }
 
 

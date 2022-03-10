@@ -148,15 +148,15 @@ class Home : Fragment() {
         }
 
 
-        viewModel.isConnected.observe(viewLifecycleOwner){
-            if (it != null){
-                if (!it){
-                    Toast.makeText(requireContext(),"connection is back",Toast.LENGTH_SHORT).show()
-                }else{
-                    Toast.makeText(requireContext(),"no connection",Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
+//        viewModel.isConnected.observe(viewLifecycleOwner){
+//            if (it != null){
+//                if (!it){
+//                    Toast.makeText(requireContext(),"connection is back",Toast.LENGTH_SHORT).show()
+//                }else{
+//                    Toast.makeText(requireContext(),"no connection",Toast.LENGTH_SHORT).show()
+//                }
+//            }
+//        }
 
     }
 
