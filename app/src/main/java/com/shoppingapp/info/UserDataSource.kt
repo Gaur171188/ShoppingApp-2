@@ -11,6 +11,8 @@ interface UserDataSource {
 
 //	suspend fun getUserById(userId: String): Result<UserData?>
 
+	suspend fun getUser(userId: String): UserData?
+
 	suspend fun getUserById(userId: String, onComplete: (UserData?) -> Unit)
 
 	suspend fun checkUserIsExist(email: String, isExist:(Boolean) -> Unit, onError:(String) -> Unit)

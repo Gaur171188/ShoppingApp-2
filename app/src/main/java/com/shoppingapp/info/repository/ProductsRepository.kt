@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import com.shoppingapp.info.Result
 import com.shoppingapp.info.Result.*
 import com.shoppingapp.info.data.Product
+import com.shoppingapp.info.data.UserData
 import com.shoppingapp.info.local.ProductDataSource
 import com.shoppingapp.info.utils.ERR_UPLOAD
 import com.shoppingapp.info.utils.StoreDataStatus

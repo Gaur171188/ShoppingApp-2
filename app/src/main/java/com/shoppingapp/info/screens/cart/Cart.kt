@@ -44,7 +44,7 @@ class Cart : Fragment() {
 
 
         // TODO: improve the cart item design.
-        // TODO: fix issue of display the favorites data inside cart item ..
+
 
         setViews()
         setObservers()

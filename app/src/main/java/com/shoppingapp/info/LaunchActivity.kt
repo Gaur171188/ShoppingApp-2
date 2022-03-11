@@ -28,6 +28,11 @@ class LaunchActivity : AppCompatActivity() {
         appSessionManager = ShoppingAppSessionManager(this)
 
 
+        // TODO: fitch all the data from the remote and update: use work manager to do that.
+        // 1- user data if user is logged in.
+        // 2- all products.
+
+
         timer = object : CountDownTimer(THREE_SECOND, ONE_SECOND){
             override fun onTick(p0: Long) {
 

@@ -29,6 +29,10 @@ class UserLocalDataSource internal constructor(
 		}
 	}
 
+	override suspend fun getUser(userId: String): UserData? {
+		return userDao.getById(userId)
+	}
+
 
 	override suspend fun getUserById(userId: String,onComplete: (UserData?) -> Unit) {
 		withContext(ioDispatcher){

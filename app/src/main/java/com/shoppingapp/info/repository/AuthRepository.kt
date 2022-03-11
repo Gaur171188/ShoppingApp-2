@@ -137,7 +137,7 @@ class AuthRepository(
 //		userLocalDataSource.clearUser()
 	}
 
-	private suspend fun updateUserInLocalSource(phoneNumber: String?) {
+//	private suspend fun updateUserInLocalSource(phoneNumber: String?) {
 //		coroutineScope {
 //			launch {
 //				if (phoneNumber != null) {
@@ -152,7 +152,7 @@ class AuthRepository(
 //				}
 //			}
 //		}
-	}
+//	}
 
 
 
@@ -191,6 +191,12 @@ class AuthRepository(
 			}
 		}
 	}
+
+
+	 override suspend fun getUser(userId: String): UserData? {
+		return userLocalDataSource.getUser(userId)
+	}
+
 
 
 	override suspend fun removeProductFromLikes(
@@ -240,6 +246,7 @@ class AuthRepository(
 			}
 		}
 	}
+
 
 	override suspend fun updateCartItemByUserId(
 		cartItem: UserData.CartItem,

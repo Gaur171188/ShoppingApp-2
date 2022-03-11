@@ -98,7 +98,7 @@
                 tools:text="$2000" />
 
             <TextView
-                android:id="@+id/product_actual_price_tv"
+                android:id="@+id/product_actual_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -109,16 +109,16 @@
                 tools:text="@string/product_actual_price_text" />
 
             <TextView
-                android:id="@+id/product_offer_value_tv"
+                android:id="@+id/product_offer_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:textColor="@android:color/holo_red_light"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/product_actual_price_tv"
-                app:layout_constraintStart_toEndOf="@+id/product_actual_price_tv"
-                app:layout_constraintTop_toTopOf="@+id/product_actual_price_tv"
+                app:layout_constraintBottom_toBottomOf="@+id/product_actual_price"
+                app:layout_constraintStart_toEndOf="@+id/product_actual_price"
+                app:layout_constraintTop_toTopOf="@+id/product_actual_price"
                 tools:text="25% off" />
 
             <ImageView

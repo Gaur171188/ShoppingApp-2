@@ -15,6 +15,7 @@ interface AuthRepoInterface {
 	suspend fun signOut()
 	suspend fun deleteUser()
 
+	suspend fun getUser(userId: String):UserData?
 	suspend fun hardRefreshUserData()
 	suspend fun insertProductToLikes(productId: String, userId: String): Result<Boolean>
 	suspend fun removeProductFromLikes(productId: String, userId: String): Result<Boolean>

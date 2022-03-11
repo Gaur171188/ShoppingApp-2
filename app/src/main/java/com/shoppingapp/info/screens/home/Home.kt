@@ -138,9 +138,6 @@ class Home : Fragment() {
         }
         viewModel.userLikes.observe(viewLifecycleOwner) {
             if (it != null) {
-               it.forEach { item->
-                   Log.i(TAG,"item: $item")
-               }
                 binding.productsRecyclerView.adapter?.apply {
                     notifyDataSetChanged()
                 }
@@ -148,15 +145,6 @@ class Home : Fragment() {
         }
 
 
-//        viewModel.isConnected.observe(viewLifecycleOwner){
-//            if (it != null){
-//                if (!it){
-//                    Toast.makeText(requireContext(),"connection is back",Toast.LENGTH_SHORT).show()
-//                }else{
-//                    Toast.makeText(requireContext(),"no connection",Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//        }
 
     }
 
@@ -265,12 +253,12 @@ class Home : Fragment() {
             override fun onAddToCartClick(productData: Product) {
                 Log.d(TAG, "onToggleCartAddition: initiated")
                 viewModel.toggleProductInCart(productData,
-                onSuccess = {
-                    Toast.makeText(requireContext(),"added to cart",Toast.LENGTH_SHORT).show()
-                },
-                onError = {
-                    Toast.makeText(requireContext(),"Item is exist in cart",Toast.LENGTH_SHORT).show()
-                })
+                    onSuccess = {
+                        Toast.makeText(requireContext(),"added to cart",Toast.LENGTH_SHORT).show()
+                    },
+                    onError = {
+                        Toast.makeText(requireContext(),"Item is exist in cart",Toast.LENGTH_SHORT).show()
+                    })
 
             }
         }
@@ -279,11 +267,16 @@ class Home : Fragment() {
             override fun setLikeButton(productId: String, button: CheckBox) {
 
                 button.isChecked = viewModel.isProductLiked(productId)
+
             }
 
 
             override fun setCartButton(productId: String, imgView: ImageView) {
+
+                Log.i("setImageButton","product Id: $productId , In Cart: ${viewModel.isProductInCart(productId)}")
+
                 if (viewModel.isProductInCart(productId)) {
+
                     imgView.setImageResource(R.drawable.ic_remove_shopping_cart_24)
                 } else {
                     imgView.setImageResource(R.drawable.ic_add_shopping_cart_24)

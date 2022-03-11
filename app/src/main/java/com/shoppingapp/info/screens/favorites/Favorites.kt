@@ -43,6 +43,7 @@ class Favorites : Fragment() {
 
 
         // TODO: fix issue the favorites data does not displayed in first time.
+        // TODO: get the data from the room
 
 
 

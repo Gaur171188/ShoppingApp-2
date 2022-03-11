@@ -77,7 +77,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         viewModelScope.launch {
-            authRepository
             authRepository.hardRefreshUserData()
             getUserLikes(0L)
 
@@ -147,10 +146,21 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     }
-
-    fun isProductInCart(productId: String): Boolean {
+    fun isProductInCart(productId: String): Boolean{
         return false
     }
+
+//    fun isProductInCart(productId: String): Boolean {
+//        var p = ""
+//        val userCart = _userData.value?.cart
+//        Log.i("setImageButton","${userCart!!.size}")
+//        userCart?.forEach {
+//            if (it.productId == productId){
+//             p = it.productId
+//            }
+//        }
+//        return p == productId
+//    }
 
     fun toggleProductInCart(product: Product,onSuccess:(String?)-> Unit,onError:(String?)-> Unit) {
         var itemId = ""
@@ -251,22 +261,22 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private fun getLikedProducts() {
 //        _dataStatus.value = StoreDataStatus.LOADING
 
-            val res: List<Product> = if (_userLikes.value != null) {
-                val allLikes = _userLikes.value ?: emptyList()
-                if (!allLikes.isNullOrEmpty()) {
-                    Log.d(TAG, "alllikes = ${allLikes.size}")
-                    _dataStatus.value = StoreDataStatus.DONE
-                    allLikes.map { proId ->
-                        _allProducts.value?.find { it.productId == proId } ?: Product()
-                    }
-                } else {
-                    _dataStatus.value = StoreDataStatus.ERROR
-                    emptyList()
+        val res: List<Product> = if (_userLikes.value != null) {
+            val allLikes = _userLikes.value ?: emptyList()
+            if (!allLikes.isNullOrEmpty()) {
+                Log.d(TAG, "alllikes = ${allLikes.size}")
+                _dataStatus.value = StoreDataStatus.DONE
+                allLikes.map { proId ->
+                    _allProducts.value?.find { it.productId == proId } ?: Product()
                 }
             } else {
                 _dataStatus.value = StoreDataStatus.ERROR
                 emptyList()
             }
+        } else {
+            _dataStatus.value = StoreDataStatus.ERROR
+            emptyList()
+        }
         _likedProducts.value = res
 
 
@@ -470,9 +480,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 //        }
 //    }
 
-fun getUserData() {
-    _dataStatus.value = StoreDataStatus.LOADING
-		viewModelScope.launch {
+    fun getUserData() {
+        _dataStatus.value = StoreDataStatus.LOADING
+        viewModelScope.launch {
             authRepository.getUserDataById(userId!!){ user ->
                 viewModelScope.launch {
                     withContext(Dispatchers.Main){
@@ -481,7 +491,7 @@ fun getUserData() {
                     }
                 }
             }
-		}
-	}
+        }
+    }
 
 }

@@ -80,6 +80,10 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
     override suspend fun deleteUser() {
     }
 
+    override suspend fun getUser(userId: String): UserData? {
+        return null
+    }
+
 
     override suspend fun getUserById(userId: String): UserData =
         usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()

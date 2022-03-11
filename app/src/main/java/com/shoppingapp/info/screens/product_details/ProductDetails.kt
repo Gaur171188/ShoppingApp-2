@@ -93,19 +93,27 @@ class ProductDetails: Fragment() {
     }
 
     private fun setObservers() {
+
+        /** live data data status **/
         viewModel.dataStatus.observe(viewLifecycleOwner) {
             when (it) {
+                StoreDataStatus.LOADING ->{
+
+                }
                 StoreDataStatus.DONE -> {
                     binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
                     binding.proDetailsLayout.visibility = View.VISIBLE
                     setViews()
                 }
+                StoreDataStatus.ERROR ->{}
                 else -> {
                     binding.proDetailsLayout.visibility = View.GONE
                     binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
                 }
             }
         }
+
+        /** live data is liked **/
         viewModel.isLiked.observe(viewLifecycleOwner) {
             if (it == true) {
                 binding.btnProductDetailsLike.setImageResource(R.drawable.liked_heart_drawable)
@@ -113,6 +121,8 @@ class ProductDetails: Fragment() {
                 binding.btnProductDetailsLike.setImageResource(R.drawable.heart_icon_drawable)
             }
         }
+
+        /** live data item in cart **/
         viewModel.isItemInCart.observe(viewLifecycleOwner) {
             if (it == true) {
                 binding.btnAddProductToCart.text =
@@ -122,10 +132,12 @@ class ProductDetails: Fragment() {
                     getString(R.string.pro_details_add_to_cart_btn_text)
             }
         }
+
         viewModel.errorStatus.observe(viewLifecycleOwner) {
-            if (it.isNotEmpty())
-                modifyErrors(it)
+
         }
+
+
     }
 
     @SuppressLint("ResourceAsColor")
@@ -149,9 +161,12 @@ class ProductDetails: Fragment() {
         binding.layoutViewsGroup.visibility = View.VISIBLE
         binding.btnAddProductToCart.visibility = View.VISIBLE
         binding.addProAppBar.topAppBar.title = viewModel.productData.value?.name
+
+        /** back button **/
         binding.addProAppBar.topAppBar.setNavigationOnClickListener {
             findNavController().navigateUp()
         }
+
         binding.addProAppBar.topAppBar.inflateMenu(R.menu.app_bar_menu)
         binding.addProAppBar.topAppBar.overflowIcon?.setTint(
             ContextCompat.getColor(
@@ -160,6 +175,7 @@ class ProductDetails: Fragment() {
             )
         )
 
+        // set images and dots
         setImagesView()
 
         binding.productDetailsTitle.text = viewModel.productData.value?.name ?: ""
@@ -168,19 +184,33 @@ class ProductDetails: Fragment() {
                 viewModel.toggleLikeProduct()
             }
         }
+
+        /** set rating data **/
         binding.proDetailsRatingBar.rating = (viewModel.productData.value?.rating ?: 0.0).toFloat()
+
+        /** set price data **/
         binding.productPrice.text = resources.getString(
             R.string.pro_details_price_value,
             viewModel.productData.value?.price.toString()
         )
+
         setShoeSizeButtons()
         setShoeColorsButtons()
-        binding.proDetailsSpecificsText.text = viewModel.productData.value?.description ?: ""
+
+        /** set product description  **/
+        binding.productDescription.text = viewModel.productData.value?.description ?: ""
     }
 
     private fun onAddToCart() {
         viewModel.addToCart(selectedSize, selectedColor)
     }
+
+//    private fun onAddToCart() {
+//        viewModel.addToCart(selectedSize, selectedColor,
+//        onError = {error ->
+//            Toast.makeText(context,error,Toast.LENGTH_SHORT).show()
+//        })
+//    }
 
     private fun navigateToCartFragment() {
         findNavController().navigate(R.id.action_productDetails_to_cart)
@@ -202,8 +232,7 @@ class ProductDetails: Fragment() {
             val dotsHeight = resources.getDimensionPixelSize(R.dimen.dots_height)
             val inactiveColor = ContextCompat.getColor(requireContext(), R.color.gray)
             val activeColor = ContextCompat.getColor(requireContext(), R.color.blue_accent_300)
-            val itemDecoration =
-                DotsIndicatorDecoration(rad, rad * 4, dotsHeight, inactiveColor, activeColor)
+            val itemDecoration = DotsIndicatorDecoration(rad, rad * 4, dotsHeight, inactiveColor, activeColor)
             binding.proDetailsImagesRecyclerview.addItemDecoration(itemDecoration)
             PagerSnapHelper().attachToRecyclerView(binding.proDetailsImagesRecyclerview)
         }
@@ -216,14 +245,12 @@ class ProductDetails: Fragment() {
                     val radioButton = RadioButton(context)
                     radioButton.id = v
                     radioButton.tag = v
-                    val param =
-                        binding.proDetailsSizesRadioGroup.layoutParams as ViewGroup.MarginLayoutParams
+                    val param = binding.proDetailsSizesRadioGroup.layoutParams as ViewGroup.MarginLayoutParams
                     param.setMargins(resources.getDimensionPixelSize(R.dimen.radio_margin_size))
                     param.width = ViewGroup.LayoutParams.WRAP_CONTENT
                     param.height = ViewGroup.LayoutParams.WRAP_CONTENT
                     radioButton.layoutParams = param
-                    radioButton.background =
-                        ContextCompat.getDrawable(context, R.drawable.radio_selector)
+                    radioButton.background = ContextCompat.getDrawable(context, R.drawable.radio_selector)
                     radioButton.setButtonDrawable(R.color.transparent)
                     radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
                     radioButton.setTextColor(Color.BLACK)

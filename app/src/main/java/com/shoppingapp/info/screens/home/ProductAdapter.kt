@@ -16,6 +16,7 @@ import com.shoppingapp.info.databinding.AccountBinding.inflate
 import com.shoppingapp.info.databinding.HomeAdLayoutBinding
 import com.shoppingapp.info.databinding.ProductItemBinding
 import com.shoppingapp.info.utils.ShoppingAppSessionManager
+import com.shoppingapp.info.utils.getOfferPercentage
 
 
 class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val context: Context) :
@@ -27,6 +28,7 @@ class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val co
     lateinit var onClickListener: OnClickListener
     lateinit var bindImageButtons: BindImageButtons
     private val sessionManager = ShoppingAppSessionManager(context)
+    private val isUserSeller = sessionManager.isUserSeller()
 
     inner class ItemViewHolder(binding: ProductItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -36,30 +38,65 @@ class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val co
         private val productImage = binding.productImageView
         private val proDeleteButton = binding.productDeleteButton
         private val proEditBtn = binding.btnProductEdit
-        private val proMrp = binding.productActualPriceTv
-        private val proOffer = binding.productOfferValueTv
+        private val proMrp = binding.productActualPrice
+        private val proOffer = binding.productOfferValue
         private val proRatingBar = binding.productRatingBar
         private val proLikeButton = binding.productLikeCheckbox
         private val proCartButton = binding.productAddToCartButton
 
         fun bind(productData: Product) {
+
+            /** btn product card **/
             productCard.setOnClickListener {
-                onClickListener.onClick(productData)
+                if (!isUserSeller){
+                    onClickListener.onClick(productData)
+                }
             }
+
+            /** product name **/
             proName.text = productData.name
-            proPrice.text =
-                context.getString(R.string.pro_details_price_value, productData.price.toString())
+
+            /** price data **/
+            proPrice.text = context.getString(R.string.pro_details_price_value, productData.price.toString())
+
+            /** rating data **/
             proRatingBar.rating = productData.rating.toFloat()
+
+            /** actual price **/
             proMrp.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
-//            proMrp.text =
-//                context.getString(
-//                    R.string.pro_details_actual_strike_value,
-//                    productData.mrp.toString()
-//                )
-//            proOffer.text = context.getString(
-//                R.string.pro_offer_precent_text,
-//                getOfferPercentage(productData.mrp, productData.price).toString()
-//            )
+            proMrp.text =
+                context.getString(
+                    R.string.pro_details_actual_strike_value,
+                    productData.mrp.toString()
+                )
+
+            /** product offer **/
+            proOffer.text = context.getString(
+                R.string.pro_offer_precent_text,
+                getOfferPercentage(productData.mrp, productData.price).toString()
+            )
+
+            /** button product liked **/
+            proLikeButton.setOnClickListener {
+                onClickListener.onLikeClick(productData.productId)
+            }
+
+            /** button add product to cart **/
+            proCartButton.setOnClickListener {
+                onClickListener.onAddToCartClick(productData)
+            }
+
+            /** button edit product **/
+            proEditBtn.setOnClickListener {
+                onClickListener.onEditClick(productData.productId)
+            }
+
+            /** button delete product **/
+            proDeleteButton.setOnClickListener {
+                onClickListener.onDeleteClick(productData)
+            }
+
+            /** product image **/
             if (productData.images.isNotEmpty()) {
                 val imgUrl = productData.images[0].toUri().buildUpon().scheme("https").build()
                 Glide.with(context)
@@ -70,33 +107,26 @@ class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val co
                 productImage.clipToOutline = true
             }
 
+            /** liked button **/
             proLikeButton.isChecked = likesList.contains(productData.productId)
 
-            if (sessionManager.isUserSeller()) {
+
+
+            bindImageButtons.setLikeButton(productData.productId, proLikeButton)
+
+
+            bindImageButtons.setCartButton(productData.productId, proCartButton)
+
+            if (isUserSeller) {
                 proLikeButton.visibility = View.GONE
                 proCartButton.visibility = View.GONE
-                proEditBtn.setOnClickListener {
-                    onClickListener.onEditClick(productData.productId)
-                }
 
-                proDeleteButton.setOnClickListener {
-                    onClickListener.onDeleteClick(productData)
-                }
             } else {
                 proEditBtn.visibility = View.GONE
                 proDeleteButton.visibility = View.GONE
-                bindImageButtons.setLikeButton(productData.productId, proLikeButton)
-                bindImageButtons.setCartButton(productData.productId, proCartButton)
-                proLikeButton.setOnCheckedChangeListener { _, _ ->
 
 
-                }
-                proLikeButton.setOnClickListener {
-                    onClickListener.onLikeClick(productData.productId)
-                }
-                proCartButton.setOnClickListener {
-                    onClickListener.onAddToCartClick(productData)
-                }
+
             }
         }
     }

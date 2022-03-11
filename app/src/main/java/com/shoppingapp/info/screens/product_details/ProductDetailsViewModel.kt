@@ -37,8 +37,11 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
     private val _dataStatus = MutableLiveData<StoreDataStatus>()
     val dataStatus: LiveData<StoreDataStatus> get() = _dataStatus
 
-    private val _errorStatus = MutableLiveData<List<AddItemErrors>>()
-    val errorStatus: LiveData<List<AddItemErrors>> get() = _errorStatus
+    private val _errorStatus = MutableLiveData<String?>()
+    val errorStatus: LiveData<String?> get() = _errorStatus
+
+//    private val _errorStatus = MutableLiveData<List<AddItemErrors>>()
+//    val errorStatus: LiveData<List<AddItemErrors>> get() = _errorStatus
 
     private val _addItemStatus = MutableLiveData<AddObjectStatus?>()
     val addItemStatus: LiveData<AddObjectStatus?> get() = _addItemStatus
@@ -56,7 +59,7 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
 
     init {
         _isLiked.value = false
-        _errorStatus.value = emptyList()
+        _errorStatus.value = null
         viewModelScope.launch {
             Log.d(TAG, "init: productId: $productId")
             getProductDetails()
@@ -81,6 +84,7 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
             } catch (e: Exception) {
                 _productData.value = Product()
                 _dataStatus.value = StoreDataStatus.ERROR
+                _errorStatus.value = "Error happening!"
             }
         }
     }
@@ -122,7 +126,6 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
     fun isSeller() = sessionManager.isUserSeller()
 
 
-
     fun checkIfInCart() {
         viewModelScope.launch {
             async { authRepository.getUserDataById(currentUserId!!){ uData ->
@@ -140,6 +143,8 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
                         }
                     }
                 }
+
+
             }}
         }
     }
@@ -177,6 +182,21 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
             insertCartItem(newItem)
         }
     }
+
+//    fun addToCart(size: Int?, color: String?,onError:(String)-> Unit) {
+//
+//        if (size != null && color!!.isNotEmpty()){
+//            val itemId = UUID.randomUUID().toString()
+//            val newItem = UserData.CartItem(
+//                itemId, productId, productData.value!!.owner, 1, color, size
+//            )
+//            insertCartItem(newItem)
+//        }else{
+//            onError("some info is required!")
+//        }
+//
+//    }
+
 
     private fun insertCartItem(item: UserData.CartItem) {
         viewModelScope.launch {

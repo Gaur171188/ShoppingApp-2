@@ -33,7 +33,7 @@ class Profile: Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.profile, container, false)
         viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
 
-        homeViewModel.getUserData()
+//        homeViewModel.getUserData()
         setObserves()
 
 
