@@ -104,6 +104,9 @@
     <string name="cart_fragment_label">Your Cart</string>
     <string name="price_card_items_string">Items(%s)</string>
     <string name="refresh">Refresh</string>
+    <string name="profile">Profile</string>
+    <string name="pro_details_go_to_cart_btn_text">Go To Cart</string>
+    <string name="pro_details_add_to_cart_btn_text">Add To Cart</string>
 
 
 </resources>

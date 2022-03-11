@@ -19,13 +19,20 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true" />
 
+        <include
+            android:id="@+id/loader"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/circular_loader_layout"/>
+
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/profile_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/profile_top_app_bar">
 
             <ImageView
-                android:id="@+id/profile_image_view"
+                android:id="@+id/btn_image_account"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_marginStart="16dp"
@@ -46,9 +53,9 @@
                 android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/profile_image_view"
-                app:layout_constraintStart_toEndOf="@+id/profile_image_view"
-                app:layout_constraintTop_toTopOf="@+id/profile_image_view"
+                app:layout_constraintBottom_toBottomOf="@+id/btn_image_account"
+                app:layout_constraintStart_toEndOf="@+id/btn_image_account"
+                app:layout_constraintTop_toTopOf="@+id/btn_image_account"
                 tools:text="User Name" />
 
             <TextView
@@ -65,7 +72,7 @@
                 app:drawableStartCompat="@drawable/ic_outline_email_24"
                 app:drawableTint="@color/blue_accent_300"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/profile_image_view" />
+                app:layout_constraintTop_toBottomOf="@+id/btn_image_account" />
 
             <TextView
                 android:id="@+id/email"

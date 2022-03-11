@@ -351,6 +351,8 @@ class AuthRepository(
 		return userLocalDataSource.getLikesByUserId(userId)
 	}
 
+//	suspend fun getUserData(userId: String): UserData? = userLocalDataSource.getUserById(userId)
+
 	override suspend fun getUserDataById(userId: String, onComplete: (UserData?) -> Unit) {
 		userLocalDataSource.getUserById(userId, onComplete)
 	}

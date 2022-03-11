@@ -99,6 +99,8 @@ class Account : Fragment() {
         context?.startActivity(homeIntent)
         requireActivity().finish()
     }
+
+
 }
 
 

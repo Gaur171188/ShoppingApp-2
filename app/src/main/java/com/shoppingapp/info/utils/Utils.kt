@@ -17,6 +17,8 @@ enum class UserType { CUSTOMER, SELLER }
 enum class OrderStatus { CONFIRMED, PACKAGING, PACKED, SHIPPING, SHIPPED, ARRIVING, DELIVERED }
 enum class AddProductViewErrors { NONE, EMPTY, ERR_PRICE_0 }
 enum class AddProductErrors { NONE, ERR_ADD, ERR_ADD_IMG, ADDING }
+enum class AddItemErrors { ERROR_SIZE, ERROR_COLOR }
+enum class AddObjectStatus { DONE, ERR_ADD, ADDING }
 
 class MyOnFocusChangeListener : View.OnFocusChangeListener {
     override fun onFocusChange(v: View?, hasFocus: Boolean) {

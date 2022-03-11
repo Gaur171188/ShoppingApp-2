@@ -15,15 +15,17 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import com.shoppingapp.info.Result
 
-private const val TAG = "AddEditViewModel"
+
 
 class AddEditProductViewModel(application: Application) : AndroidViewModel(application) {
 
+    companion object{
+        private const val TAG = "AddEditViewModel"
+    }
+
     private val appShop = ShoppingApplication(application)
 
-    private val productsRepository by lazy {
-        appShop.productsRepository
-    }
+    private val productsRepository by lazy { appShop.productsRepository }
 
     private val sessionManager = ShoppingAppSessionManager(application.applicationContext)
 

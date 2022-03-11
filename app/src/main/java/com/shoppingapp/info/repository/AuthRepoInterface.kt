@@ -25,7 +25,7 @@ interface AuthRepoInterface {
 	suspend fun setStatusOfOrder(orderId: String, userId: String, status: String): Result<Boolean>
 	suspend fun getOrdersByUserId(userId: String): Result<List<UserData.OrderItem>?>
 	suspend fun getLikesByUserId(userId: String): Result<List<String>?>
-//	suspend fun getUserData(userId: String): Result<UserData?>
+//	suspend fun getUserData(userId: String): UserData?
 	suspend fun getUserDataById(userId: String, onComplete:(UserData?) -> Unit)
 	fun getFirebaseAuth(): FirebaseAuth
 	fun signInWithPhoneAuthCredential(

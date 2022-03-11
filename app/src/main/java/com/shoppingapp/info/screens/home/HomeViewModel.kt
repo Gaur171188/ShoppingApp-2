@@ -470,19 +470,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 //        }
 //    }
 
-    fun getUserData() {
-//        viewModelScope.launch {
-//            _dataStatus.value = StoreDataStatus.LOADING
-//            val deferredRes = async { authRepository.getUserData(currentUser!!) }
-//            val res = deferredRes.await()
-//            if (res is Result.Success) {
-//                val uData = res.data
-//                _userData.value = uData
-//                _dataStatus.value = StoreDataStatus.DONE
-//            } else {
-//                _dataStatus.value = StoreDataStatus.ERROR
-//                _userData.value = null
-//            }
-//        }
-    }
+fun getUserData() {
+    _dataStatus.value = StoreDataStatus.LOADING
+		viewModelScope.launch {
+            authRepository.getUserDataById(userId!!){ user ->
+                viewModelScope.launch {
+                    withContext(Dispatchers.Main){
+                        _userData.value = user
+                        _dataStatus.value = StoreDataStatus.DONE
+                    }
+                }
+            }
+		}
+	}
+
 }
