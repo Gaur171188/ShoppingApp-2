@@ -6,13 +6,13 @@ import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.shoppingapp.info.ShoppingApplication
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.data.UserData
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.StoreDataStatus
 import java.time.Month
-import com.shoppingapp.info.Result
-import com.shoppingapp.info.utils.ShoppingAppSessionManager
+import com.shoppingapp.info.utils.Result
 import kotlinx.coroutines.*
 import java.util.*
+
 
 
 @Suppress("DeferredResultUnused")
@@ -23,27 +23,26 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private val shopApp = ShoppingApplication(application.applicationContext)
-    private val authRepository by lazy{ shopApp.authRepository }
-    private val productsRepository by lazy { shopApp.productsRepository }
+    private val userRepository by lazy{ shopApp.userRepository }
+    private val productsRepository by lazy { shopApp.productRepository }
 
-    private val sessionManager = ShoppingAppSessionManager(application.applicationContext)
     private val userId by lazy {FirebaseAuth.getInstance().uid}
-    val isUserASeller = sessionManager.isUserSeller()
+
 
     private var _products = MutableLiveData<List<Product>>()
     val products: LiveData<List<Product>> get() = _products
 
-    private lateinit var _allProducts: MutableLiveData<List<Product>>
+    private var _allProducts =  MutableLiveData<List<Product>>()
     val allProducts: LiveData<List<Product>> get() = _allProducts
 
     private var _userProducts = MutableLiveData<List<Product>>()
     val userProducts: LiveData<List<Product>> get() = _userProducts
 
-    private var _userOrders = MutableLiveData<List<UserData.OrderItem>>()
-    val userOrders: LiveData<List<UserData.OrderItem>> get() = _userOrders
+    private var _userOrders = MutableLiveData<List<User.OrderItem>>()
+    val userOrders: LiveData<List<User.OrderItem>> get() = _userOrders
 
-    private var _selectedOrder = MutableLiveData<UserData.OrderItem?>()
-    val selectedOrder: LiveData<UserData.OrderItem?> get() = _selectedOrder
+    private var _selectedOrder = MutableLiveData<User.OrderItem?>()
+    val selectedOrder: LiveData<User.OrderItem?> get() = _selectedOrder
 
     private var _orderProducts = MutableLiveData<List<Product>>()
     val orderProducts: LiveData<List<Product>> get() = _orderProducts
@@ -63,40 +62,38 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val _dataStatus = MutableLiveData<StoreDataStatus>()
     val dataStatus: LiveData<StoreDataStatus> get() = _dataStatus
 
-    private val _userData = MutableLiveData<UserData?>()
-    val userData: LiveData<UserData?> get() = _userData
+    private val _user = MutableLiveData<User?>()
+    val user: LiveData<User?> get() = _user
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> get() = _errorMessage
 
-    private val _isConnected = MutableLiveData<Boolean?>()
-    val isConnected: LiveData<Boolean?> get() = _isConnected
+    private val _isConnected = MutableLiveData<Boolean>()
+    val isConnected: LiveData<Boolean> get() = _isConnected
 
 
-    // TODO: create live data for check from the connection of network
 
     init {
         viewModelScope.launch {
-            authRepository.hardRefreshUserData()
+            userRepository.hardRefreshUserData()
             getUserLikes(0L)
-
-            if (isUserASeller){
-                Log.i(TAG,"Seller")
-            }else{
-                Log.i(TAG,"customer")
-            }
-            Log.i(TAG,"userId = $userId")
-
+            initUser()
         }
 
-        if (isUserASeller)
+        if (isUserSeller()) {
             getProductsByOwner()
-        else
+            Log.i(TAG,"Seller")
+        }else{
             getProducts()
+            Log.i(TAG,"customer")
+        }
+
+
     }
 
+    fun isUserSeller() = userRepository.isUserSeller()
 
-    fun setConnectivityState(b: Boolean){
+    fun setConnectivityState(b: Boolean) {
         _isConnected.value = b
     }
 
@@ -117,9 +114,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             val allLikes = _userLikes.value?.toMutableList() ?: mutableListOf()
             val deferredRes = async {
                 if (isLiked) {
-                    authRepository.removeProductFromLikes(productId, userId!!)
+                    userRepository.removeProductFromLikes(productId)
                 } else {
-                    authRepository.insertProductToLikes(productId, userId!!)
+                    userRepository.insertProductToLikes(productId)
                 }
             }
             val res = deferredRes.await()
@@ -162,40 +159,70 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 //        return p == productId
 //    }
 
-    fun toggleProductInCart(product: Product,onSuccess:(String?)-> Unit,onError:(String?)-> Unit) {
+
+//    // add product in cart
+//    fun toggleProductInCart(product: Product,onSuccess:(String?)-> Unit,onError:(String?)-> Unit) {
+//        var itemId = ""
+//        return supervisorScope {
+//
+//            if(_user.value != null){
+//                _user.value!!.cart.forEach { cartItem ->
+//                    if (cartItem.productId == product.productId){ // cart item does is exist in user cart
+//                        itemId = cartItem.productId
+//                    }
+//                }
+//                if (itemId != product.productId){ // you can add this item in cart
+//                    val uniqueId = UUID.randomUUID().toString()
+//                    val cartItem = User.CartItem(uniqueId,product.productId,product.owner,0,"",0)
+//                    async {
+//                        userRepository.insertCartItemByUserId(cartItem,userId!!)
+//                        onSuccess("item is added")
+//                    }
+//                }else{ // item already exist in cart
+//                    async {
+//                        onError("item is exist in your cart")
+//                    }
+//                }
+//            }else{ // user is not found
+//
+//            }
+//
+//
+//
+//
+////            j.await()
+//        }
+//
+//    }
+    // add product in cart
+ fun toggleProductInCart(product: Product) {
         var itemId = ""
         viewModelScope.launch {
-            async {
-                authRepository.getUserDataById(userId!!){ user ->
-                    if(user != null){
-                        user.cart.forEach { cartItem ->
-                            if (cartItem.productId == product.productId){ // cart item does is exist in user cart
-                                itemId = cartItem.productId
+                     if(_user.value != null){
+                        val checkItemIdExist = async {
+                            _user.value!!.cart.forEach { cartItem ->
+                                if (cartItem.productId == product.productId){ // cart item does is exist in user cart
+                                    itemId = cartItem.productId
+                                }
                             }
                         }
-                        if (itemId != product.productId){ // you can add this item in cart
-                            val uniqueId = UUID.randomUUID().toString()
-                            val cartItem = UserData.CartItem(uniqueId,product.productId,product.owner,0,"",0)
-                            async {
-                                authRepository.insertCartItemByUserId(cartItem,userId!!)
-                                onSuccess("item is added")
-                            }
-                        }else{ // item already exist in cart
-                            async {
-                                onError("item is exist in your cart")
+                        val addItemToCart = async {
+                            if (itemId != product.productId){ // you can add this item in cart
+                                val uniqueId = UUID.randomUUID().toString()
+                                val cartItem = User.CartItem(uniqueId,product.productId,product.owner,0,"",0)
+                                Result.Success( userRepository.insertCartItemByUserId(cartItem,userId!!))
                             }
                         }
-                    }else{ // user is not found
-
-                    }
-
-                }
-            }
-
-//            j.await()
+                        try {
+                            checkItemIdExist.await()
+                            addItemToCart.await()
+                            Result.Success(true)
+                        }catch (ex: Exception) {
+                            Result.Error(ex)
+                        }
+                     }
         }
-
-    }
+ }
 
     fun setDataLoading() {
         _dataStatus.value = StoreDataStatus.LOADING
@@ -218,7 +245,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             delay(d)
             val correctLikesIds = arrayListOf<String>() // for correction error
-            val res = authRepository.getLikesByUserId(userId!!)
+            val res = userRepository.getLikesByUserId()
             if (res is Result.Success){
                 val likes = res.data
                 if (likes != null){
@@ -351,31 +378,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    // TODO: make the sign out function inside work manager and require network
-    fun signOut(onComplete:(Boolean)-> Unit, onError: (String) -> Unit) {
-        val isConnected = _isConnected.value
-        if (isConnected != null){
-            if (isConnected){
-                viewModelScope.launch {
-                    val deferredRes = async { authRepository.signOut() }
-                    deferredRes.await()
-                    async { shopApp.removeDB() }
-                    async { sessionManager.logoutFromSession() }
-                    onComplete(true)
-                }
-            }else{
-                onComplete(false)
-                onError("Connection is not found!")
-            }
-        }
 
-
-    }
 
     fun getAllOrders() {
         viewModelScope.launch {
             _storeDataStatus.value = StoreDataStatus.LOADING
-            val deferredRes = async { authRepository.getOrdersByUserId(userId!!) }
+            val deferredRes = async { userRepository.getOrdersByUserId(userId!!) }
             val res = deferredRes.await()
             if (res is Result.Success) {
                 _userOrders.value = res.data ?: emptyList()
@@ -425,7 +433,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             _storeDataStatus.value = StoreDataStatus.LOADING
             val deferredRes = async {
-                authRepository.setStatusOfOrder(orderId, userId!!, statusString)
+                userRepository.setStatusOfOrder(orderId, userId!!, statusString)
             }
             val res = deferredRes.await()
             if (res is Result.Success) {
@@ -480,18 +488,14 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 //        }
 //    }
 
-    fun getUserData() {
-        _dataStatus.value = StoreDataStatus.LOADING
+    private fun initUser() {
         viewModelScope.launch {
-            authRepository.getUserDataById(userId!!){ user ->
-                viewModelScope.launch {
-                    withContext(Dispatchers.Main){
-                        _userData.value = user
-                        _dataStatus.value = StoreDataStatus.DONE
-                    }
-                }
+            val user = userRepository.getUser()
+            if (user != null){
+                _user.value = user
+            }else{
+                _user.value = null
             }
         }
     }
-
 }

@@ -6,22 +6,23 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.data.UserData
+import com.shoppingapp.info.data.User
+import com.shoppingapp.info.local.api.ProductApi
+import com.shoppingapp.info.local.api.UserApi
 import com.shoppingapp.info.utils.DateTypeConvertors
 import com.shoppingapp.info.utils.ListTypeConverter
 import com.shoppingapp.info.utils.ObjectListTypeConvertor
 
 
-@Database(entities = [UserData::class, Product::class], version = 4)
+@Database(entities = [User::class, Product::class], version = 4)
 @TypeConverters(ListTypeConverter::class, ObjectListTypeConvertor::class, DateTypeConvertors::class)
 abstract class ShoppingAppDatabase : RoomDatabase() {
-	abstract fun userDao(): UserDao
-	abstract fun productsDao(): ProductsDao
+	abstract fun userDao(): UserApi
+	abstract fun productsDao(): ProductApi
 
 	companion object {
 		@Volatile
 		private var INSTANCE: ShoppingAppDatabase? = null
-
 
 
 		fun getInstance(context: Context): ShoppingAppDatabase =

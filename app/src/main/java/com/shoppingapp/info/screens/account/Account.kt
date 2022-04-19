@@ -26,8 +26,9 @@ class Account : Fragment() {
         private const val TAG = "Account"
     }
 
-
-    private val homeViewModel by activityViewModels<HomeViewModel>()
+//
+//    private val homeViewModel by activityViewModels<HomeViewModel>()
+    private val viewModel by activityViewModels<AccountViewModel>()
     private lateinit var binding: AccountBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -44,9 +45,10 @@ class Account : Fragment() {
     private fun setViews() {
         binding.accountTopAppBar.topAppBar.title = getString(R.string.account)
 
-        if (!homeViewModel.isUserASeller){
-            binding.btnOrders.visibility = View.GONE
-        }
+        // TODO: 4/19/2022   user this after dependency injection
+//        if (viewModel.isUserIsSeller()){
+//            binding.btnOrders.visibility = View.GONE
+//        }
 
 
         binding.btnProfile.setOnClickListener {
@@ -72,19 +74,10 @@ class Account : Fragment() {
                 .setNegativeButton(getString(R.string.pro_cat_dialog_cancel_btn)) { dialog, _ ->
                     dialog.cancel()
                 }
-                .setPositiveButton(getString(R.string.dialog_sign_out_btn_text)) { dialog, _ ->
-                    homeViewModel.signOut(
-                        onComplete = { onComplete ->
-                            if (onComplete){
-                                navigateToSignUpActivity()
-                                dialog.cancel()
-                            }
-                        },
-                        onError = { error ->
-                            Toast.makeText(requireContext(),error,Toast.LENGTH_SHORT).show()
-                            dialog.cancel()
-                        })
+                .setPositiveButton(getString(R.string.dialog_sign_out_btn_text)) { _, _ ->
 
+                    // TODO: 4/19/2022 user this after dependency injection
+//                   viewModel.signOut()
                 }
                 .show()
         }

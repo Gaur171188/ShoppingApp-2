@@ -12,10 +12,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.databinding.AccountBinding.inflate
 import com.shoppingapp.info.databinding.HomeAdLayoutBinding
 import com.shoppingapp.info.databinding.ProductItemBinding
-import com.shoppingapp.info.utils.ShoppingAppSessionManager
+import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.getOfferPercentage
 
 
@@ -27,7 +26,7 @@ class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val co
 
     lateinit var onClickListener: OnClickListener
     lateinit var bindImageButtons: BindImageButtons
-    private val sessionManager = ShoppingAppSessionManager(context)
+    private val sessionManager = SharePrefManager(context)
     private val isUserSeller = sessionManager.isUserSeller()
 
     inner class ItemViewHolder(binding: ProductItemBinding) :

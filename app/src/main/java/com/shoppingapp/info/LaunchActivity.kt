@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
-import com.shoppingapp.info.utils.ShoppingAppSessionManager
+import com.shoppingapp.info.utils.SharePrefManager
 
 
 @SuppressLint("CustomSplashScreen")
@@ -16,7 +16,7 @@ class LaunchActivity : AppCompatActivity() {
         const val THREE_SECOND = 3000L
     }
 
-    private lateinit var appSessionManager: ShoppingAppSessionManager
+    private lateinit var appSessionManager: SharePrefManager
 
 
     private lateinit var timer: CountDownTimer
@@ -25,7 +25,7 @@ class LaunchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
 
-        appSessionManager = ShoppingAppSessionManager(this)
+        appSessionManager = SharePrefManager(this)
 
 
         // TODO: fitch all the data from the remote and update: use work manager to do that.

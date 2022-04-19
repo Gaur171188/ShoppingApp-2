@@ -6,18 +6,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.shoppingapp.info.Result
+import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.ShoppingApplication
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.data.UserData
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.AddItemErrors
 import com.shoppingapp.info.utils.AddObjectStatus
-import com.shoppingapp.info.utils.ShoppingAppSessionManager
+import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.StoreDataStatus
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 
@@ -26,7 +24,7 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
 
     private val shopApp = ShoppingApplication(application.applicationContext)
 
-    companion object{
+    companion object {
         private const val TAG = "ProductDetailsViewModel"
     }
 
@@ -52,9 +50,10 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
     private val _isItemInCart = MutableLiveData<Boolean>()
     val isItemInCart: LiveData<Boolean> get() = _isItemInCart
 
-    private val productsRepository by lazy { shopApp.productsRepository }
-    private val authRepository by lazy { shopApp.authRepository }
-    private val sessionManager = ShoppingAppSessionManager(application.applicationContext)
+    private val productsRepository by lazy { shopApp.productRepository }
+    private val userRepository by lazy { shopApp.userRepository }
+
+    private val sessionManager = SharePrefManager(application.applicationContext)
     private val currentUserId = sessionManager.getUserIdFromSession()
 
     init {
@@ -69,12 +68,13 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
 
     }
 
+
     private fun getProductDetails() {
         viewModelScope.launch {
             _dataStatus.value = StoreDataStatus.LOADING
             try {
                 Log.d(TAG, "getting product Data")
-                val res = productsRepository.getProductById(productId)
+                val res = productsRepository.getProductById(productId, false)
                 if (res is Result.Success) {
                     _productData.value = res.data
                     _dataStatus.value = StoreDataStatus.DONE
@@ -89,9 +89,10 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
         }
     }
 
+
     fun setLike() {
         viewModelScope.launch {
-            val res = authRepository.getLikesByUserId(currentUserId!!)
+            val res = userRepository.getLikesByUserId()
             if (res is Result.Success) {
                 val userLikes = res.data ?: emptyList()
                 _isLiked.value = userLikes.contains(productId)
@@ -108,16 +109,16 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
         viewModelScope.launch {
             val deferredRes = async {
                 if (_isLiked.value == true) {
-                    authRepository.removeProductFromLikes(productId, currentUserId!!)
+                    userRepository.removeProductFromLikes(productId)
                 } else {
-                    authRepository.insertProductToLikes(productId, currentUserId!!)
+                    userRepository.insertProductToLikes(productId)
                 }
             }
             val res = deferredRes.await()
             if (res is Result.Success) {
                 _isLiked.value = !_isLiked.value!!
-            } else{
-                if(res is Error)
+            } else {
+                if (res is Error)
                     Log.d(TAG, "Error toggling like, ${res.message}")
             }
         }
@@ -128,26 +129,17 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
 
     fun checkIfInCart() {
         viewModelScope.launch {
-            async { authRepository.getUserDataById(currentUserId!!){ uData ->
-                viewModelScope.launch {
-                    if (uData != null) {
-                        val cartList = uData.cart
-                        val idx = cartList.indexOfFirst { it.productId == productId }
-                        withContext(Dispatchers.Main){
-                            _isItemInCart.value = idx >= 0
-                            Log.d(TAG, "Checking in Cart: Success, value = ${_isItemInCart.value}, ${cartList.size}")
-                        }
-                    } else {
-                        withContext(Dispatchers.Main){
-                            _isItemInCart.value = false
-                        }
-                    }
-                }
-
-
-            }}
+            val user = userRepository.getUser()
+            if (user != null) {
+                val cartList = user.cart
+                val idx = cartList.indexOfFirst { it.productId == productId }
+                _isItemInCart.value = idx >= 0
+            } else {
+                _isItemInCart.value = false
+            }
         }
     }
+
 
 //    fun checkIfInCart() {
 //        viewModelScope.launch {
@@ -173,36 +165,23 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
         val errList = mutableListOf<AddItemErrors>()
         if (size == null) errList.add(AddItemErrors.ERROR_SIZE)
         if (color.isNullOrBlank()) errList.add(AddItemErrors.ERROR_COLOR)
-
         if (errList.isEmpty()) {
             val itemId = UUID.randomUUID().toString()
-            val newItem = UserData.CartItem(
-                itemId, productId, productData.value!!.owner, 1, color, size
+            val newItem = User.CartItem(
+                itemId, productId, _productData.value!!.owner, 1, color, size
             )
             insertCartItem(newItem)
         }
     }
 
-//    fun addToCart(size: Int?, color: String?,onError:(String)-> Unit) {
-//
-//        if (size != null && color!!.isNotEmpty()){
-//            val itemId = UUID.randomUUID().toString()
-//            val newItem = UserData.CartItem(
-//                itemId, productId, productData.value!!.owner, 1, color, size
-//            )
-//            insertCartItem(newItem)
-//        }else{
-//            onError("some info is required!")
-//        }
-//
-//    }
 
 
-    private fun insertCartItem(item: UserData.CartItem) {
+
+    private fun insertCartItem(item: User.CartItem) {
         viewModelScope.launch {
             _addItemStatus.value = AddObjectStatus.ADDING
             val deferredRes = async {
-                authRepository.insertCartItemByUserId(item, currentUserId!!)
+                userRepository.insertCartItemByUserId(item, currentUserId!!)
             }
             val res = deferredRes.await()
             if (res is Result.Success) {
@@ -216,5 +195,6 @@ class ProductDetailsViewModel(private val productId: String, application: Applic
             }
         }
     }
+
 
 }

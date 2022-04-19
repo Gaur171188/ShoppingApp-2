@@ -1,66 +1,65 @@
-package com.shoppingapp.info.repository
+package com.shoppingapp.info.repository.product
 
 import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
-import com.shoppingapp.info.Result
-import com.shoppingapp.info.Result.*
+import com.shoppingapp.info.utils.Result.Success
+import com.shoppingapp.info.utils.Result.Error
+import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.data.UserData
-import com.shoppingapp.info.local.ProductDataSource
 import com.shoppingapp.info.utils.ERR_UPLOAD
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.*
 import java.util.*
 
-class ProductsRepository(
-	private val productsRemoteSource: ProductDataSource,
-	private val productsLocalSource: ProductDataSource
-) : ProductsRepoInterface {
+class ProductRepository(
+	private val remoteProductRepository: RemoteProductRepository,
+	private val localProductRepository: LocalProductRepository
+){
 
 	companion object {
 		private const val TAG = "ProductsRepository"
 	}
 
 
-	override suspend fun refreshProducts(): StoreDataStatus? {
+	suspend fun refreshProducts(): StoreDataStatus? {
 		Log.d(TAG, "Updating Products in Room")
 		return updateProductsFromRemoteSource()
 	}
 
-	override fun observeProducts(): LiveData<Result<List<Product>>?> {
-		return productsLocalSource.observeProducts()
+	 fun observeProducts(): LiveData<Result<List<Product>>?> {
+		return localProductRepository.observeProducts()
 	}
 
-	override suspend fun getProducts(): Result<List<Product>> {
-		return productsLocalSource.getAllProducts()
+	 suspend fun getProducts(): Result<List<Product>> {
+		return localProductRepository.getAllProducts()
 	}
 
-	override fun observeProductsByOwner(ownerId: String): LiveData<Result<List<Product>>?> {
-		return productsLocalSource.observeProductsByOwner(ownerId)
+	 fun observeProductsByOwner(ownerId: String): LiveData<Result<List<Product>>?> {
+		return localProductRepository.observeProductsByOwner(ownerId)
 	}
 
-	override suspend fun getAllProductsByOwner(ownerId: String): Result<List<Product>> {
-		return productsLocalSource.getAllProductsByOwner(ownerId)
+	 suspend fun getAllProductsByOwner(ownerId: String): Result<List<Product>> {
+		return localProductRepository.getAllProductsByOwner(ownerId)
 	}
 
-	override suspend fun getProductById(productId: String, forceUpdate: Boolean): Result<Product> {
+	 suspend fun getProductById(productId: String, forceUpdate: Boolean): Result<Product> {
 		if (forceUpdate) {
 			updateProductFromRemoteSource(productId)
 		}
-		return productsLocalSource.getProductById(productId)
+		return localProductRepository.getProductById(productId)
 	}
 
-	override suspend fun insertProduct(newProduct: Product): Result<Boolean> {
+	 suspend fun insertProduct(newProduct: Product): Result<Boolean> {
 		return supervisorScope {
 			val localRes = async {
 				Log.d(TAG, "onInsertProduct: adding product to local source")
-				productsLocalSource.insertProduct(newProduct)
+				localProductRepository.insertProduct(newProduct)
 			}
 			val remoteRes = async {
 				Log.d(TAG, "onInsertProduct: adding product to remote source")
-				productsRemoteSource.insertProduct(newProduct)
+				remoteProductRepository.insertProduct(newProduct)
 			}
 
 			try {
@@ -74,16 +73,16 @@ class ProductsRepository(
 		}
 	}
 
-	override suspend fun insertImages(imgList: List<Uri>): List<String> {
+	 suspend fun insertImages(imgList: List<Uri>): List<String> {
 		var urlList = mutableListOf<String>()
 		imgList.forEach label@{ uri ->
 			val uniId = UUID.randomUUID().toString()
 			val fileName = uniId + uri.lastPathSegment?.split("/")?.last()
 			try {
-				val downloadUrl = productsRemoteSource.uploadImage(uri, fileName)
+				val downloadUrl = remoteProductRepository.uploadImage(uri, fileName)
 				urlList.add(downloadUrl.toString())
 			} catch (e: Exception) {
-				productsRemoteSource.revertUpload(fileName)
+				remoteProductRepository.revertUpload(fileName)
 				Log.d(TAG, "exception: message = $e")
 				urlList = mutableListOf()
 				urlList.add(ERR_UPLOAD)
@@ -93,15 +92,15 @@ class ProductsRepository(
 		return urlList
 	}
 
-	override suspend fun updateProduct(product: Product): Result<Boolean> {
+	 suspend fun updateProduct(product: Product): Result<Boolean> {
 		return supervisorScope {
 			val remoteRes = async {
 				Log.d(TAG, "onUpdate: updating product in remote source")
-				productsRemoteSource.updateProduct(product)
+				remoteProductRepository.updateProduct(product)
 			}
 			val localRes = async {
 				Log.d(TAG, "onUpdate: updating product in local source")
-				productsLocalSource.insertProduct(product)
+				localProductRepository.insertProduct(product)
 			}
 			try {
 				remoteRes.await()
@@ -113,17 +112,17 @@ class ProductsRepository(
 		}
 	}
 
-	override suspend fun updateImages(newList: List<Uri>, oldList: List<String>): List<String> {
+	 suspend fun updateImages(newList: List<Uri>, oldList: List<String>): List<String> {
 		var urlList = mutableListOf<String>()
 		newList.forEach label@{ uri ->
 			if (!oldList.contains(uri.toString())) {
 				val uniId = UUID.randomUUID().toString()
 				val fileName = uniId + uri.lastPathSegment?.split("/")?.last()
 				try {
-					val downloadUrl = productsRemoteSource.uploadImage(uri, fileName)
+					val downloadUrl = remoteProductRepository.uploadImage(uri, fileName)
 					urlList.add(downloadUrl.toString())
 				} catch (e: Exception) {
-					productsRemoteSource.revertUpload(fileName)
+					remoteProductRepository.revertUpload(fileName)
 					Log.d(TAG, "exception: message = $e")
 					urlList = mutableListOf()
 					urlList.add(ERR_UPLOAD)
@@ -135,21 +134,21 @@ class ProductsRepository(
 		}
 		oldList.forEach { imgUrl ->
 			if (!newList.contains(imgUrl.toUri())) {
-				productsRemoteSource.deleteImage(imgUrl)
+				remoteProductRepository.deleteImage(imgUrl)
 			}
 		}
 		return urlList
 	}
 
-	override suspend fun deleteProductById(productId: String): Result<Boolean> {
+	 suspend fun deleteProductById(productId: String): Result<Boolean> {
 		return supervisorScope {
 			val remoteRes = async {
 				Log.d(TAG, "onDelete: deleting product from remote source")
-				productsRemoteSource.deleteProduct(productId)
+				remoteProductRepository.deleteProduct(productId)
 			}
 			val localRes = async {
 				Log.d(TAG, "onDelete: deleting product from local source")
-				productsLocalSource.deleteProduct(productId)
+				localProductRepository.deleteProduct(productId)
 			}
 			try {
 				remoteRes.await()
@@ -161,19 +160,39 @@ class ProductsRepository(
 		}
 	}
 
-	override suspend fun deleteAllProducts() {
-		productsLocalSource.deleteAllProducts()
+	private suspend fun deleteAllProductsFromLocal(): Result<Boolean> {
+		 return supervisorScope {
+			 val localRes = async {  localProductRepository.deleteAllProducts() }
+			 try {
+			     localRes.await()
+				 Success(true)
+			 }catch (ex: Exception){
+			 	Error(ex)
+			 }
+		 }
+	}
+
+	private suspend fun deleteAllUserProduct(): Result<Boolean> {
+		return supervisorScope {
+			val localRes = async {  localProductRepository.deleteAllProducts() }
+			try {
+				localRes.await()
+				Success(true)
+			}catch (ex: Exception){
+				Error(ex)
+			}
+		}
 	}
 
 
 	private suspend fun updateProductsFromRemoteSource(): StoreDataStatus? {
 		var res: StoreDataStatus? = null
 		try {
-			val remoteProducts = productsRemoteSource.getAllProducts()
+			val remoteProducts = remoteProductRepository.getAllProducts()
 			if (remoteProducts is Success) {
 				Log.d(TAG, "pro list = ${remoteProducts.data}")
-				deleteAllProducts()
-				productsLocalSource.insertMultipleProducts(remoteProducts.data)
+				deleteAllProductsFromLocal()
+				localProductRepository.insertMultipleProducts(remoteProducts.data)
 				res = StoreDataStatus.DONE
 			} else {
 				res = StoreDataStatus.ERROR
@@ -192,9 +211,9 @@ class ProductsRepository(
 	private suspend fun updateProductFromRemoteSource(productId: String): StoreDataStatus? {
 		var res: StoreDataStatus? = null
 		try {
-			val remoteProduct = productsRemoteSource.getProductById(productId)
+			val remoteProduct = remoteProductRepository.getProductById(productId)
 			if (remoteProduct is Success) {
-				productsLocalSource.insertProduct(remoteProduct.data)
+				localProductRepository.insertProduct(remoteProduct.data)
 				res = StoreDataStatus.DONE
 			} else {
 				res = StoreDataStatus.ERROR

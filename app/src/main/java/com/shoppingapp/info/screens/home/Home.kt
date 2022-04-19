@@ -91,7 +91,7 @@ class Home : Fragment() {
             }
         }
 
-        if (!viewModel.isUserASeller) {
+        if (!viewModel.isUserSeller()) {
             binding.btnAddProduct.visibility = View.GONE
         }
 
@@ -178,7 +178,7 @@ class Home : Fragment() {
         val debounceJob: Job? = null
         val uiScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
         binding.homeTopAppBar.topAppBar.inflateMenu(R.menu.home_app_bar_menu)
-        if (viewModel.isUserASeller) {
+        if (viewModel.isUserSeller()) {
             binding.homeTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites)
         }
         binding.homeTopAppBar.homeSearchEditText.onFocusChangeListener = focusChangeListener
@@ -252,15 +252,10 @@ class Home : Fragment() {
             // TODO: make the add product in cart require network
             override fun onAddToCartClick(productData: Product) {
                 Log.d(TAG, "onToggleCartAddition: initiated")
-                viewModel.toggleProductInCart(productData,
-                    onSuccess = {
-                        Toast.makeText(requireContext(),"added to cart",Toast.LENGTH_SHORT).show()
-                    },
-                    onError = {
-                        Toast.makeText(requireContext(),"Item is exist in cart",Toast.LENGTH_SHORT).show()
-                    })
+                viewModel.toggleProductInCart(productData)
 
             }
+
         }
         productAdapter.bindImageButtons = object : ProductAdapter.BindImageButtons {
             @SuppressLint("ResourceAsColor")

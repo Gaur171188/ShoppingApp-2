@@ -8,12 +8,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.shoppingapp.info.ShoppingApplication
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.data.UserData
-import com.shoppingapp.info.utils.ShoppingAppSessionManager
+import com.shoppingapp.info.data.User
+import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import com.shoppingapp.info.Result
+import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.utils.getRandomString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,24 +27,24 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
     }
 
 
-    private val sessionManager = ShoppingAppSessionManager(application.applicationContext)
+    private val sessionManager = SharePrefManager(application.applicationContext)
     private val currentUser = sessionManager.getUserIdFromSession()
     private val appShop = ShoppingApplication(application.applicationContext)
 
-    private val authRepository by lazy {
-        appShop.authRepository
+    private val userRepository by lazy {
+        appShop.userRepository
     }
 
     private val productsRepository by lazy {
-        appShop.productsRepository
+        appShop.productRepository
     }
 
 
 //    private val _userLikes = MutableLiveData<List<String>>()
 //    val userLikes: LiveData<List<String>> get() = _userLikes
 
-    private val _cartItems = MutableLiveData<List<UserData.CartItem>>()
-    val cartItems: LiveData<List<UserData.CartItem>> get() = _cartItems
+    private val _cartItems = MutableLiveData<List<User.CartItem>>()
+    val cartItems: LiveData<List<User.CartItem>> get() = _cartItems
 
     private val _priceList = MutableLiveData<Map<String, Double>>()
     val priceList: LiveData<Map<String, Double>> get() = _priceList
@@ -60,14 +60,15 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
 
     private val _selectedAddress = MutableLiveData<String>()
     private val _selectedPaymentMethod = MutableLiveData<String>()
-    private val newOrderData = MutableLiveData<UserData.OrderItem>()
+    private val newOrderData = MutableLiveData<User.OrderItem>()
 
 
+    // TODO: 4/19/2022 enhance this function
     fun getCartItems() {
         Log.d(TAG, "Getting Cart Items")
         _dataStatus.value = StoreDataStatus.LOADING
         viewModelScope.launch {
-            authRepository.getUserDataById(currentUser!!){ user ->
+            val user = userRepository.getUser()
                 if(user != null){
                     viewModelScope.launch {
                         withContext(Dispatchers.Main){
@@ -86,9 +87,8 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
                         }
                     }
 
-
                 }
-            }
+
         }
     }
 
@@ -203,7 +203,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
     fun setQuantityOfItem(itemId: String, value: Int) {
         viewModelScope.launch {
 //			_dataStatus.value = StoreDataStatus.LOADING
-            var cartList: MutableList<UserData.CartItem>
+            var cartList: MutableList<User.CartItem>
             _cartItems.value?.let { items ->
                 val item = items.find { it.itemId == itemId }
                 val itemPos = items.indexOfFirst { it.itemId == itemId }
@@ -211,7 +211,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
                 if (item != null) {
                     item.quantity = item.quantity + value
                     val deferredRes = async {
-                        authRepository.updateCartItemByUserId(item, currentUser!!)
+                        userRepository.updateCartItemByUserId(item, currentUser!!)
                     }
                     val res = deferredRes.await()
                     if (res is Result.Success) {
@@ -231,12 +231,12 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteItemFromCart(itemId: String) {
         viewModelScope.launch {
 //			_dataStatus.value = StoreDataStatus.LOADING
-            var cartList: MutableList<UserData.CartItem>
+            var cartList: MutableList<User.CartItem>
             _cartItems.value?.let { items ->
                 val itemPos = items.indexOfFirst { it.itemId == itemId }
                 cartList = items.toMutableList()
                 val deferredRes = async {
-                    authRepository.deleteCartItemByUserId(itemId, currentUser!!)
+                    userRepository.deleteCartItemByUserId(itemId, currentUser!!)
                 }
                 val res = deferredRes.await()
                 if (res is Result.Success) {
@@ -272,7 +272,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
         val itemPrices = _priceList.value
         val shippingCharges = 0.0
         if (paymentMethod != null && !items.isNullOrEmpty() && !itemPrices.isNullOrEmpty()) {
-            val newOrder = UserData.OrderItem(
+            val newOrder = User.OrderItem(
                 orderId,
                 currentUser!!,
                 items,
@@ -294,7 +294,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
             if (newOrderData.value != null) {
                 _orderStatus.value = StoreDataStatus.LOADING
                 val deferredRes = async {
-                    authRepository.placeOrder(newOrderData.value!!, currentUser!!)
+                    userRepository.placeOrder(newOrderData.value!!)
                 }
                 val res = deferredRes.await()
                 if (res is Result.Success) {

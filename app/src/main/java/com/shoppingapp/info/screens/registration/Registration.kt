@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
-import com.shoppingapp.info.data.UserData
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.RegistrationBinding
 
 import com.shoppingapp.info.utils.StoreDataStatus
@@ -98,7 +98,7 @@ class Registration : Fragment() {
                     }
 
                     if (signupPolicySwitch.isChecked){
-                        val user = UserData("", name, phone, email, password, userType = usertype)
+                        val user = User("", name, phone, email, password, userType = usertype)
                         viewModel.registration(user)
                     }else{
                         viewModel.setRegistrationError("You must confirm to the privacy policy!")

@@ -1,17 +1,13 @@
 package com.shoppingapp.info.screens.favorites
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
-import com.shoppingapp.info.Result
+import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.ShoppingApplication
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.screens.home.HomeViewModel
-import com.shoppingapp.info.screens.orders.OrdersViewModel
-import com.shoppingapp.info.utils.ShoppingAppSessionManager
+import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class FavoritesViewModel(application: Application): AndroidViewModel(application) {
@@ -23,13 +19,13 @@ class FavoritesViewModel(application: Application): AndroidViewModel(application
 
 
 
-    private val sessionManager = ShoppingAppSessionManager(application.applicationContext)
+    private val sessionManager = SharePrefManager(application.applicationContext)
     private val currentUser = sessionManager.getUserIdFromSession()
     private val appShop = ShoppingApplication(application.applicationContext)
 
 
-    private val productsRepository by lazy { appShop.productsRepository }
-    private val authRepository by lazy { appShop.authRepository }
+    private val productsRepository by lazy { appShop.productRepository }
+    private val authRepository by lazy { appShop.userRepository }
 
     private val _dataStatus = MutableLiveData<StoreDataStatus>()
     val dataStatus: LiveData<StoreDataStatus> = _dataStatus
@@ -97,7 +93,7 @@ class FavoritesViewModel(application: Application): AndroidViewModel(application
         return _likedProducts.value?.contains(product) == true
     }
 
-//
+    // TODO: 4/19/2022 enhance function
     fun toggleLikeByProductId(product: Product,onError:(String) -> Unit) {
         _dataStatus.value = StoreDataStatus.LOADING
         viewModelScope.launch {
@@ -105,9 +101,9 @@ class FavoritesViewModel(application: Application): AndroidViewModel(application
             val allLikes = _likedProducts.value?.toMutableList() ?: mutableListOf()
             val deferredRes = async {
                 if (isLiked) {
-                    authRepository.removeProductFromLikes(product.productId, currentUser!!)
+                    authRepository.removeProductFromLikes(product.productId)
                 } else {
-                    authRepository.insertProductToLikes(product.productId, currentUser!!)
+                    authRepository.insertProductToLikes(product.productId)
                 }
             }
             val res = deferredRes.await()

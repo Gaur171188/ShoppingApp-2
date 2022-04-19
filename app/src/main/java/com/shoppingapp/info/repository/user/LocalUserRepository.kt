@@ -1,73 +1,51 @@
-package com.shoppingapp.info.local
+package com.shoppingapp.info.repository.user
 
 import android.util.Log
-import com.shoppingapp.info.UserDataSource
-import com.shoppingapp.info.data.UserData
-import kotlinx.coroutines.CoroutineDispatcher
+import com.shoppingapp.info.data.User
+import com.shoppingapp.info.local.api.UserApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import com.shoppingapp.info.Result
-
+import com.shoppingapp.info.utils.Result
 
 // this class to fitch the data from local database UserLocalDataSource
 
-class UserLocalDataSource internal constructor(
-    private val userDao: UserDao,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
-) : UserDataSource {
+class LocalUserRepository(private val userApi: UserApi) {
 
-	override suspend fun addUser(userData: UserData) {
+	private val ioDispatcher = Dispatchers.IO
+
+	suspend fun addUser(user: User) {
 		withContext(ioDispatcher) {
-//			userDao.deleteUser()
-			userDao.insert(userData)
+			userApi.insert(user)
 		}
 	}
 
-	override suspend fun deleteUser() {
+	suspend fun deleteUser(userId: String) {
 		withContext(ioDispatcher){
-			userDao.deleteUser()
+			userApi.deleteUserById(userId)
 		}
 	}
 
-	override suspend fun getUser(userId: String): UserData? {
-		return userDao.getById(userId)
-	}
+	suspend fun getUser(userId: String) = userApi.getUserById(userId)
 
-
-	override suspend fun getUserById(userId: String,onComplete: (UserData?) -> Unit) {
-		withContext(ioDispatcher){
-			val uData = userDao.getById(userId)
-			if (uData != null) {
-				onComplete(uData)
-			} else { // user not found
-				onComplete(null)
-			}
+	suspend fun getUserById(userId: String): User? = withContext(ioDispatcher) {
+		try {
+			val user = userApi.getUserById(userId)
+			if (user != null) return@withContext user
+			else return@withContext null
+		}catch (ex: Exception){
+			return@withContext null
 		}
 	}
 
-
-
-
-	override suspend fun checkUserIsExist(
-		email: String,
-		isExist: (Boolean) -> Unit,
-		onError: (String) -> Unit
-	) {
+	suspend fun checkUserIsExist(email: String, isExist: (Boolean) -> Unit, onError: (String) -> Unit) {
 
 	}
 
-	override suspend fun checkPassByUserId(
-		userId: String,
-		password: String,
-		onComplete: (Boolean) -> Unit
-	) {
+	suspend fun checkPassByUserId(userId: String, password: String, onComplete: (Boolean) -> Unit) {}
 
-	}
-
-	override suspend fun getUserById(phoneNumber: String): UserData? =
-		withContext(ioDispatcher) {
+	suspend fun getUserByPhone(phoneNumber: String): User? = withContext(ioDispatcher) {
 			try {
-				val uData = userDao.getByMobile(phoneNumber)
+				val uData = userApi.getUserByMobile(phoneNumber)
 				if (uData != null) {
 					return@withContext uData
 				} else {
@@ -79,10 +57,9 @@ class UserLocalDataSource internal constructor(
 			}
 		}
 
-	override suspend fun getOrdersByUserId(userId: String): Result<List<UserData.OrderItem>?> =
-		withContext(ioDispatcher) {
+	suspend fun getOrdersByUserId(userId: String): Result<List<User.OrderItem>?> = withContext(ioDispatcher) {
 			try {
-				val uData = userDao.getById(userId)
+				val uData = userApi.getUserById(userId)
 				if (uData != null) {
 					val ordersList = uData.orders
 					return@withContext Result.Success(ordersList)
@@ -96,7 +73,146 @@ class UserLocalDataSource internal constructor(
 			}
 		}
 
-//	override suspend fun getAddressesByUserId(userId: String): Result<List<UserData.Address>?> =
+	suspend fun getLikesByUserId(userId: String): Result<List<String>?> = withContext(ioDispatcher) {
+			try {
+				val uData = userApi.getUserById(userId)
+				if (uData != null) {
+					val likesList = uData.likes
+					return@withContext Result.Success(likesList)
+				} else {
+					return@withContext Result.Error(Exception("User Not Found"))
+				}
+
+			} catch (e: Exception) {
+				Log.d("UserLocalSource", "onGetLikes: Error Occurred, ${e.message}")
+				return@withContext Result.Error(e)
+			}
+		}
+
+	suspend fun dislikeProduct(productId: String, userId: String) = withContext(ioDispatcher) {
+			try {
+				val uData = userApi.getUserById(userId)
+				if (uData != null) {
+					val likesList = uData.likes.toMutableList()
+					likesList.remove(productId)
+					uData.likes = likesList
+					userApi.updateUser(uData)
+				} else {
+					throw Exception("User Not Found")
+				}
+			} catch (e: Exception) {
+				Log.d("UserLocalSource", "onGetLikes: Error Occurred, ${e.message}")
+				throw e
+			}
+		}
+
+	suspend fun likeProduct(productId: String, userId: String) = withContext(ioDispatcher) {
+			try {
+				val uData = userApi.getUserById(userId)
+				if (uData != null) {
+					val likesList = uData.likes.toMutableList()
+					likesList.add(productId)
+					uData.likes = likesList
+					userApi.updateUser(uData)
+				} else {
+					throw Exception("User Not Found")
+				}
+			} catch (e: Exception) {
+				Log.d("UserLocalSource", "onGetLikes: Error Occurred, ${e.message}")
+				throw e
+			}
+		}
+
+	suspend fun insertCartItem(newItem: User.CartItem, userId: String) = withContext(ioDispatcher) {
+			try {
+				val uData = userApi.getUserById(userId)
+				if (uData != null) {
+					val cartItems = uData.cart.toMutableList()
+					cartItems.add(newItem)
+					uData.cart = cartItems
+					userApi.updateUser(uData)
+				} else {
+					throw Exception("User Not Found")
+				}
+			} catch (e: Exception) {
+				Log.d("UserLocalSource", "onInsertCartItem: Error Occurred, ${e.message}")
+				throw e
+			}
+		}
+
+	suspend fun updateCartItem(item: User.CartItem, userId: String) = withContext(ioDispatcher) {
+			try {
+				val uData = userApi.getUserById(userId)
+				if (uData != null) {
+					val cartItems = uData.cart.toMutableList()
+					val pos = cartItems.indexOfFirst { it.itemId == item.itemId }
+					if (pos >= 0) {
+						cartItems[pos] = item
+					}
+					uData.cart = cartItems
+					userApi.updateUser(uData)
+				} else {
+					throw Exception("User Not Found")
+				}
+			} catch (e: Exception) {
+				Log.d("UserLocalSource", "onInsertCartItem: Error Occurred, ${e.message}")
+				throw e
+			}
+		}
+
+	suspend fun deleteCartItem(itemId: String, userId: String) = withContext(ioDispatcher) {
+			try {
+				val uData = userApi.getUserById(userId)
+				if (uData != null) {
+					val cartItems = uData.cart.toMutableList()
+					val pos = cartItems.indexOfFirst { it.itemId == itemId }
+					if (pos >= 0) {
+						cartItems.removeAt(pos)
+					}
+					uData.cart = cartItems
+					userApi.updateUser(uData)
+				} else {
+					throw Exception("User Not Found")
+				}
+			} catch (e: Exception) {
+				Log.d("UserLocalSource", "onInsertCartItem: Error Occurred, ${e.message}")
+				throw e
+			}
+		}
+
+	suspend fun setStatusOfOrderByUserId(orderId: String, userId: String, status: String) = withContext(ioDispatcher) {
+			try {
+				val uData = userApi.getUserById(userId)
+				if (uData != null) {
+					val orders = uData.orders.toMutableList()
+					val pos = orders.indexOfFirst { it.orderId == orderId }
+					if (pos >= 0) {
+						orders[pos].status = status
+						val custId = orders[pos].customerId
+						val custData = userApi.getUserById(custId)
+						if (custData != null) {
+							val orderList = custData.orders.toMutableList()
+							val idx = orderList.indexOfFirst { it.orderId == orderId }
+							if (idx >= 0) {
+								orderList[idx].status = status
+							}
+							custData.orders = orderList
+							userApi.updateUser(custData)
+						}
+					}
+					uData.orders = orders
+					userApi.updateUser(uData)
+				} else {
+					throw Exception("User Not Found")
+				}
+			} catch (e: Exception) {
+				Log.d("UserLocalSource", "onInsertCartItem: Error Occurred, ${e.message}")
+				throw e
+			}
+		}
+
+
+	//    suspend fun getAddressesByUserId(userId: String): Result<List<UserData.Address>?> =
 //		withContext(ioDispatcher) {
 //			try {
 //				val uData = userDao.getById(userId)
@@ -113,155 +229,5 @@ class UserLocalDataSource internal constructor(
 //			}
 //		}
 
-	override suspend fun getLikesByUserId(userId: String): Result<List<String>?> =
-		withContext(ioDispatcher) {
-			try {
-				val uData = userDao.getById(userId)
-				if (uData != null) {
-					val likesList = uData.likes
-					return@withContext Result.Success(likesList)
-				} else {
-					return@withContext Result.Error(Exception("User Not Found"))
-				}
-
-			} catch (e: Exception) {
-				Log.d("UserLocalSource", "onGetLikes: Error Occurred, ${e.message}")
-				return@withContext Result.Error(e)
-			}
-		}
-
-	override suspend fun dislikeProduct(productId: String, userId: String) =
-		withContext(ioDispatcher) {
-			try {
-				val uData = userDao.getById(userId)
-				if (uData != null) {
-					val likesList = uData.likes.toMutableList()
-					likesList.remove(productId)
-					uData.likes = likesList
-					userDao.updateUser(uData)
-				} else {
-					throw Exception("User Not Found")
-				}
-			} catch (e: Exception) {
-				Log.d("UserLocalSource", "onGetLikes: Error Occurred, ${e.message}")
-				throw e
-			}
-		}
-
-	override suspend fun likeProduct(productId: String, userId: String) =
-		withContext(ioDispatcher) {
-			try {
-				val uData = userDao.getById(userId)
-				if (uData != null) {
-					val likesList = uData.likes.toMutableList()
-					likesList.add(productId)
-					uData.likes = likesList
-					userDao.updateUser(uData)
-				} else {
-					throw Exception("User Not Found")
-				}
-			} catch (e: Exception) {
-				Log.d("UserLocalSource", "onGetLikes: Error Occurred, ${e.message}")
-				throw e
-			}
-		}
-
-	override suspend fun insertCartItem(newItem: UserData.CartItem, userId: String) =
-		withContext(ioDispatcher) {
-			try {
-				val uData = userDao.getById(userId)
-				if (uData != null) {
-					val cartItems = uData.cart.toMutableList()
-					cartItems.add(newItem)
-					uData.cart = cartItems
-					userDao.updateUser(uData)
-				} else {
-					throw Exception("User Not Found")
-				}
-			} catch (e: Exception) {
-				Log.d("UserLocalSource", "onInsertCartItem: Error Occurred, ${e.message}")
-				throw e
-			}
-		}
-
-	override suspend fun updateCartItem(item: UserData.CartItem, userId: String) =
-		withContext(ioDispatcher) {
-			try {
-				val uData = userDao.getById(userId)
-				if (uData != null) {
-					val cartItems = uData.cart.toMutableList()
-					val pos = cartItems.indexOfFirst { it.itemId == item.itemId }
-					if (pos >= 0) {
-						cartItems[pos] = item
-					}
-					uData.cart = cartItems
-					userDao.updateUser(uData)
-				} else {
-					throw Exception("User Not Found")
-				}
-			} catch (e: Exception) {
-				Log.d("UserLocalSource", "onInsertCartItem: Error Occurred, ${e.message}")
-				throw e
-			}
-		}
-
-	override suspend fun deleteCartItem(itemId: String, userId: String) =
-		withContext(ioDispatcher) {
-			try {
-				val uData = userDao.getById(userId)
-				if (uData != null) {
-					val cartItems = uData.cart.toMutableList()
-					val pos = cartItems.indexOfFirst { it.itemId == itemId }
-					if (pos >= 0) {
-						cartItems.removeAt(pos)
-					}
-					uData.cart = cartItems
-					userDao.updateUser(uData)
-				} else {
-					throw Exception("User Not Found")
-				}
-			} catch (e: Exception) {
-				Log.d("UserLocalSource", "onInsertCartItem: Error Occurred, ${e.message}")
-				throw e
-			}
-		}
-
-	override suspend fun setStatusOfOrderByUserId(orderId: String, userId: String, status: String) =
-		withContext(ioDispatcher) {
-			try {
-				val uData = userDao.getById(userId)
-				if (uData != null) {
-					val orders = uData.orders.toMutableList()
-					val pos = orders.indexOfFirst { it.orderId == orderId }
-					if (pos >= 0) {
-						orders[pos].status = status
-						val custId = orders[pos].customerId
-						val custData = userDao.getById(custId)
-						if (custData != null) {
-							val orderList = custData.orders.toMutableList()
-							val idx = orderList.indexOfFirst { it.orderId == orderId }
-							if (idx >= 0) {
-								orderList[idx].status = status
-							}
-							custData.orders = orderList
-							userDao.updateUser(custData)
-						}
-					}
-					uData.orders = orders
-					userDao.updateUser(uData)
-				} else {
-					throw Exception("User Not Found")
-				}
-			} catch (e: Exception) {
-				Log.d("UserLocalSource", "onInsertCartItem: Error Occurred, ${e.message}")
-				throw e
-			}
-		}
-
-//	override suspend fun clearUser() {
-//		withContext(ioDispatcher) {
-//			userDao.clear()
-//		}
-//	}
 
 }

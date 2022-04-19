@@ -1,37 +1,35 @@
-package com.shoppingapp.info.remote
+package com.shoppingapp.info.repository.product
 
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ktx.storage
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.local.ProductDataSource
-import com.shoppingapp.info.Result
+import com.shoppingapp.info.utils.Result
 import kotlinx.coroutines.tasks.await
 
-class ProductsRemoteDataSource : ProductDataSource {
-	private val firebaseDb: FirebaseFirestore = Firebase.firestore
-	private val firebaseStorage: FirebaseStorage = Firebase.storage
+class RemoteProductRepository() {
+
+
+	private val rootStore = Firebase.firestore
+	private val rootStorage = Firebase.storage
 
 	private val observableProducts = MutableLiveData<Result<List<Product>>?>()
 
-	private fun storageRef() = firebaseStorage.reference
-	private fun productsCollectionRef() = firebaseDb.collection(PRODUCT_COLLECTION)
+	private val storageRef = rootStorage.reference
 
-	override suspend fun refreshProducts() {
+	private fun productsCollectionRef() = rootStore.collection(PRODUCT_COLLECTION)
+
+	suspend fun refreshProducts() {
 		observableProducts.value = getAllProducts()
 	}
 
-	override fun observeProducts(): LiveData<Result<List<Product>>?> {
-		return observableProducts
-	}
+	fun observeProducts() = observableProducts
 
-	override suspend fun getAllProducts(): Result<List<Product>> {
+
+	suspend fun getAllProducts(): Result<List<Product>> {
 		val resRef = productsCollectionRef().get().await()
 		return if (!resRef.isEmpty) {
 			Result.Success(resRef.toObjects(Product::class.java))
@@ -40,11 +38,11 @@ class ProductsRemoteDataSource : ProductDataSource {
 		}
 	}
 
-	override suspend fun insertProduct(newProduct: Product) {
+	suspend fun insertProduct(newProduct: Product) {
 		productsCollectionRef().add(newProduct.toHashMap()).await()
 	}
 
-	override suspend fun updateProduct(proData: Product) {
+	suspend fun updateProduct(proData: Product) {
 		val resRef =
 			productsCollectionRef().whereEqualTo(PRODUCT_ID_FIELD, proData.productId).get().await()
 		if (!resRef.isEmpty) {
@@ -55,7 +53,7 @@ class ProductsRemoteDataSource : ProductDataSource {
 		}
 	}
 
-	override suspend fun getProductById(productId: String): Result<Product> {
+	suspend fun getProductById(productId: String): Result<Product> {
 		val resRef = productsCollectionRef().whereEqualTo(PRODUCT_ID_FIELD, productId).get().await()
 		return if (!resRef.isEmpty) {
 			Result.Success(resRef.toObjects(Product::class.java)[0])
@@ -64,7 +62,7 @@ class ProductsRemoteDataSource : ProductDataSource {
 		}
 	}
 
-	override suspend fun deleteProduct(productId: String) {
+	suspend fun deleteProduct(productId: String) {
 		Log.d(TAG, "onDeleteProduct: delete product with Id: $productId initiated")
 		val resRef = productsCollectionRef().whereEqualTo(PRODUCT_ID_FIELD, productId).get().await()
 		if (!resRef.isEmpty) {
@@ -88,8 +86,8 @@ class ProductsRemoteDataSource : ProductDataSource {
 		}
 	}
 
-	override suspend fun uploadImage(uri: Uri, fileName: String): Uri? {
-		val imgRef = storageRef().child("$SHOES_STORAGE_PATH/$fileName")
+	suspend fun uploadImage(uri: Uri, fileName: String): Uri? {
+		val imgRef = storageRef.child("$SHOES_STORAGE_PATH/$fileName")
 		val uploadTask = imgRef.putFile(uri)
 		val uriRef = uploadTask.continueWithTask { task ->
 			if (!task.isSuccessful) {
@@ -100,8 +98,8 @@ class ProductsRemoteDataSource : ProductDataSource {
 		return uriRef.await()
 	}
 
-	override fun deleteImage(imgUrl: String) {
-		val ref = firebaseStorage.getReferenceFromUrl(imgUrl)
+	fun deleteImage(imgUrl: String) {
+		val ref = rootStorage.getReferenceFromUrl(imgUrl)
 		ref.delete().addOnSuccessListener {
 			Log.d(TAG, "onDelete: image deleted successfully!")
 		}.addOnFailureListener { e ->
@@ -109,8 +107,8 @@ class ProductsRemoteDataSource : ProductDataSource {
 		}
 	}
 
-	override fun revertUpload(fileName: String) {
-		val imgRef = storageRef().child("$SHOES_STORAGE_PATH/$fileName")
+	fun revertUpload(fileName: String) {
+		val imgRef = storageRef.child("$SHOES_STORAGE_PATH/$fileName")
 		imgRef.delete().addOnSuccessListener {
 			Log.d(TAG, "onRevert: File with name: $fileName deleted successfully!")
 		}.addOnFailureListener { e ->
@@ -124,4 +122,5 @@ class ProductsRemoteDataSource : ProductDataSource {
 		private const val SHOES_STORAGE_PATH = "Shoes"
 		private const val TAG = "ProductsRemoteSource"
 	}
+
 }

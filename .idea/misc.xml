@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/bottom_nav_selector.xml" value="0.2703125" />
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/ic_filled_logout_24.xml" value="0.2703125" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/ic_outline_library_books_24.xml" value="0.2703125" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/login_bg_img.xml" value="0.2703125" />
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/signout_account_drawable.xml" value="0.2703125" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/sl_favourite_24dp.xml" value="0.2703125" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/font/nunito_sans.xml" value="0.284375" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/account.xml" value="0.264" />
@@ -37,7 +40,7 @@
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/product_image_item.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/product_item.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/profile.xml" value="0.264" />
-        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/registration.xml" value="0.264" />
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/registration.xml" value="0.4" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/select_payment.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/shipping_card_layout.xml" value="0.4" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/menu/app_bar_menu.xml" value="0.25416666666666665" />

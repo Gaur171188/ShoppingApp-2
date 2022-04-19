@@ -2,15 +2,15 @@ package com.shoppingapp.info
 
 import android.app.Application
 import android.content.Context
-import com.shoppingapp.info.repository.AuthRepoInterface
-import com.shoppingapp.info.repository.ProductsRepoInterface
-
+import com.shoppingapp.info.repository.product.ProductRepository
+import com.shoppingapp.info.repository.user.UserRepository
 
 class ShoppingApplication(private val context: Context) : Application() {
-	val authRepository: AuthRepoInterface
+
+	val userRepository: UserRepository
 		get() = ServiceLocator.provideAuthRepository(context)
 
-	val productsRepository: ProductsRepoInterface
+	val productRepository: ProductRepository
 		get() = ServiceLocator.provideProductsRepository(context)
 
 	fun removeDB(){

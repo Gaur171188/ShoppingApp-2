@@ -14,7 +14,7 @@ import kotlin.collections.ArrayList
 
 @Parcelize
 @Entity(tableName = "user")
-data class UserData(
+data class User(
     @PrimaryKey
     var userId: String = "",
     var name: String = "",

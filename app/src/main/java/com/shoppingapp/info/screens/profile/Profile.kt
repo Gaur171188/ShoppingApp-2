@@ -10,10 +10,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
-import com.shoppingapp.info.databinding.ProductDetailsBinding
 import com.shoppingapp.info.databinding.ProfileBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
-import com.shoppingapp.info.screens.product_details.ProductDetailsViewModel
 import com.shoppingapp.info.utils.StoreDataStatus
 
 
@@ -33,7 +31,6 @@ class Profile: Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.profile, container, false)
         viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
 
-//        homeViewModel.getUserData()
         setObserves()
 
 
@@ -66,7 +63,7 @@ class Profile: Fragment() {
     private fun setObserves() {
 
         /** live data user data **/
-        homeViewModel.userData.observe(viewLifecycleOwner) {
+        homeViewModel.user.observe(viewLifecycleOwner) {
             if (it != null) {
                 binding.userName.text = it.name
                 binding.email.text = it.email

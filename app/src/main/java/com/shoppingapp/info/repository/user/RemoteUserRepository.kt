@@ -1,42 +1,121 @@
-package com.shoppingapp.info.remote
+package com.shoppingapp.info.repository.user
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shoppingapp.info.R
-import com.shoppingapp.info.Result
-import com.shoppingapp.info.UserDataSource
-import com.shoppingapp.info.data.UserData
+import com.shoppingapp.info.utils.Result
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.OrderStatus
 import kotlinx.coroutines.tasks.await
 
+class RemoteUserRepository (val context: Context) {
 
-class AuthRemoteDataSource(val context: Context) : UserDataSource {
+    private val _root by lazy { FirebaseFirestore.getInstance() }
+    private val mAuth by lazy { FirebaseAuth.getInstance() }
 
-    private val TAG = "AuthRemoteDataSource"
-
-    private val _root by lazy {
-        FirebaseFirestore.getInstance()
-    }
+    enum class SignStatus{ LOADING, ERROR, DONE}
 
     private fun usersCollectionRef() = _root.collection(USERS_COLLECTION)
 
-    override suspend fun getUserById(userId: String, onComplete:(UserData?) -> Unit){
+    suspend fun signOut(){ mAuth.signOut() }
+
+//    private fun signWithEmailAndPassword(email: String, password: String, sharePre: SharePrefManager , isRem: Boolean): Result<Boolean> {
+//        return supervisorScope {
+//            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+//                    if (task.isComplete) {
+//                        val userId = mAuth.currentUser?.uid
+//                        if (userId != null) {
+//                                if (isEmailVerified()) {
+//                                    checkPassByUserId(userId, password){ isTypicalPass ->
+//                                        if (isTypicalPass){
+//                                            val user = getUser(userId)
+//                                            if (user != null){
+//                                                sharePre.createLoginSession(userId,user.name,user.phone,isRem,user.userType)
+//                                                Result.Success(true)
+//                                            }
+//                                        }else{
+//                                            Result.Error()
+//
+//                                        }
+//
+//                                    }
+//                                } else {
+//                                    withContext(Dispatchers.Main) {
+//                                        setLoginError("email is not verify!")
+//                                        Log.i(LoginViewModel.TAG, "email is not verify!")
+//                                    }
+//                                }
+//
+//                        } else {
+//                            val error = task.exception!!.message.toString()
+//                            setLoginError("password is not correct!")
+//                            Log.i(LoginViewModel.TAG, error)
+//                        }
+//
+//                    } else {
+//                        val error = task.exception!!.message.toString()
+//                        _inProgress.value = StoreDataStatus.ERROR
+//                        Log.i(LoginViewModel.TAG, error)
+//                    }
+//                }
+//
+//        }
+//    }
+//
+//
+
+
+    fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential, isUserLoggedIn: MutableLiveData<Boolean>) {
+        try {
+            mAuth.signInWithCredential(credential)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d(TAG, "signInWithCredential:success")
+                        val user = task.result?.user
+                        if (user != null) {
+                            isUserLoggedIn.postValue(true)
+                        }
+
+                    } else {
+                        Log.w(TAG, "signInWithCredential:failure", task.exception)
+                        if (task.exception is FirebaseAuthInvalidCredentialsException) {
+                            Log.d(TAG, "createUserWithMobile:failure", task.exception)
+                            isUserLoggedIn.postValue(false)
+
+                        }
+                    }
+                }.addOnFailureListener {
+                    Log.d(TAG, "createUserWithMobile:failure", it)
+                    isUserLoggedIn.postValue(false)
+
+                }
+        } catch (e: Exception) {
+
+        }
+    }
+
+    suspend fun getUserById(userId: String, onComplete:(User?) -> Unit){
         val resRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
         if (resRef != null){
-            val user = resRef.toObjects(UserData::class.java)[0]
+            val user = resRef.toObjects(User::class.java)[0]
             onComplete(user)
         }else{
             onComplete(null)
         }
     }
 
-    override suspend fun checkPassByUserId(userId: String ,password: String,onComplete: (Boolean) -> Unit) {
+    suspend fun isEmailVerified() = mAuth.currentUser?.isEmailVerified
+
+    suspend fun checkPassByUserId(userId: String ,password: String,onComplete: (Boolean) -> Unit) {
         val ref = usersCollectionRef().whereEqualTo(USER_ID_FIELD,userId).get().await()
         if (ref != null){
-            val user = ref.toObjects(UserData::class.java)[0]
+            val user = ref.toObjects(User::class.java)[0]
             Log.i("Login","email: ${user.email}")
             if (user.password == password){
                 onComplete(true)
@@ -46,8 +125,7 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
         }
     }
 
-
-    override suspend fun checkUserIsExist(email: String, isExist:(Boolean) -> Unit, onError:(String) -> Unit) {
+    suspend fun checkUserIsExist(email: String, isExist:(Boolean) -> Unit, onError:(String) -> Unit) {
             FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email).addOnCompleteListener {
                 try {
                     val isUserExist = it.result.signInMethods?.isEmpty()
@@ -63,11 +141,10 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
             }
     }
 
-
-    override suspend fun addUser(userData: UserData) {
+    suspend fun addUser(user: User) {
         usersCollectionRef()
-            .document(userData.userId)
-            .set(userData)
+            .document(user.userId)
+            .set(user)
             .addOnSuccessListener {
                 Log.d(TAG, "Doc added")
             }
@@ -76,50 +153,40 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
             }
     }
 
-    // TODO: use this function if you want to remove the user from the remote data source
-    override suspend fun deleteUser() {
-    }
+    suspend fun deleteUser(userId: String) { usersCollectionRef().document(userId).delete().await() }
 
-    override suspend fun getUser(userId: String): UserData? {
+    suspend fun getUser(userId: String): User? {
         return null
     }
 
+    suspend fun getUserById(userId: String) = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
+            .toObjects(User::class.java)[0]
 
-    override suspend fun getUserById(userId: String): UserData =
-        usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-            .toObjects(UserData::class.java)[0]
-
-
-    override suspend fun getOrdersByUserId(userId: String): Result<List<UserData.OrderItem>?> {
+    suspend fun getOrdersByUserId(userId: String): Result<List<User.OrderItem>?> {
         val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
         return if (!userRef.isEmpty) {
-            val userData = userRef.documents[0].toObject(UserData::class.java)
+            val userData = userRef.documents[0].toObject(User::class.java)
             Result.Success(userData!!.orders)
         } else {
             Result.Error(Exception("User Not Found!"))
         }
     }
 
-    override suspend fun getLikesByUserId(userId: String): Result<List<String>?> {
+    suspend fun getLikesByUserId(userId: String): Result<List<String>?> {
         val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
         return if (!userRef.isEmpty) {
-            val userData = userRef.documents[0].toObject(UserData::class.java)
+            val userData = userRef.documents[0].toObject(User::class.java)
             Result.Success(userData!!.likes)
         } else {
             Result.Error(Exception("User Not Found!"))
         }
     }
 
-    override suspend fun getUserByMobileAndPassword(
-        mobile: String,
-        password: String): MutableList<UserData> =
-        usersCollectionRef().whereEqualTo(PHONE_FIELD, mobile)
-            .whereEqualTo(PASSWORD_FIELD, password).get().await().toObjects(UserData::class.java)
+    suspend fun getUserByMobileAndPassword(mobile: String, password: String): MutableList<User> = usersCollectionRef().whereEqualTo(
+        PHONE_FIELD, mobile)
+            .whereEqualTo(PASSWORD_FIELD, password).get().await().toObjects(User::class.java)
 
-
-
-
-    override suspend fun likeProduct(productId: String, userId: String) {
+    suspend fun likeProduct(productId: String, userId: String) {
         val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
         if (!userRef.isEmpty) {
             val docId = userRef.documents[0].id
@@ -128,7 +195,7 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
         }
     }
 
-    override suspend fun dislikeProduct(productId: String, userId: String) {
+    suspend fun dislikeProduct(productId: String, userId: String) {
         val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
         if (!userRef.isEmpty) {
             val docId = userRef.documents[0].id
@@ -137,8 +204,7 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
         }
     }
 
-
-    override suspend fun insertCartItem(newItem: UserData.CartItem, userId: String) {
+    suspend fun insertCartItem(newItem: User.CartItem, userId: String) {
         val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
         if (!userRef.isEmpty) {
             val docId = userRef.documents[0].id
@@ -147,12 +213,12 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
         }
     }
 
-    override suspend fun updateCartItem(item: UserData.CartItem, userId: String) {
+    suspend fun updateCartItem(item: User.CartItem, userId: String) {
         val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
         if (!userRef.isEmpty) {
             val docId = userRef.documents[0].id
             val oldCart =
-                userRef.documents[0].toObject(UserData::class.java)?.cart?.toMutableList()
+                userRef.documents[0].toObject(User::class.java)?.cart?.toMutableList()
             val idx = oldCart?.indexOfFirst { it.itemId == item.itemId } ?: -1
             if (idx != -1) {
                 oldCart?.set(idx, item)
@@ -162,12 +228,12 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
         }
     }
 
-    override suspend fun deleteCartItem(itemId: String, userId: String) {
+    suspend fun deleteCartItem(itemId: String, userId: String) {
         val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
         if (!userRef.isEmpty) {
             val docId = userRef.documents[0].id
             val oldCart =
-                userRef.documents[0].toObject(UserData::class.java)?.cart?.toMutableList()
+                userRef.documents[0].toObject(User::class.java)?.cart?.toMutableList()
             val idx = oldCart?.indexOfFirst { it.itemId == itemId } ?: -1
             if (idx != -1) {
                 oldCart?.removeAt(idx)
@@ -177,11 +243,11 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
         }
     }
 
-    override suspend fun placeOrder(newOrder: UserData.OrderItem, userId: String) {
+    suspend fun placeOrder(newOrder: User.OrderItem, userId: String) {
         // add order to customer and
         // specific items to their owners
         // empty customers cart
-        val ownerProducts: MutableMap<String, MutableList<UserData.CartItem>> = mutableMapOf()
+        val ownerProducts: MutableMap<String, MutableList<User.CartItem>> = mutableMapOf()
         for (item in newOrder.items) {
             if (!ownerProducts.containsKey(item.ownerId)) {
                 ownerProducts[item.ownerId] = mutableListOf()
@@ -194,7 +260,7 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
                 items.forEach { item ->
                     itemPrices[item.itemId] = newOrder.itemsPrices[item.itemId] ?: 0.0
                 }
-                val ownerOrder = UserData.OrderItem(
+                val ownerOrder = User.OrderItem(
                     newOrder.orderId,
                     userId,
                     items,
@@ -219,17 +285,17 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
             usersCollectionRef().document(docId)
                 .update(ORDERS_FIELD, FieldValue.arrayUnion(newOrder.toHashMap()))
             usersCollectionRef().document(docId)
-                .update(CART_FIELD, ArrayList<UserData.CartItem>())
+                .update(CART_FIELD, ArrayList<User.CartItem>())
         }
     }
 
-    override suspend fun setStatusOfOrderByUserId(orderId: String, userId: String, status: String) {
+    suspend fun setStatusOfOrderByUserId(orderId: String, userId: String, status: String) {
         // update on customer and owner
         val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
         if (!userRef.isEmpty) {
             val docId = userRef.documents[0].id
             val ordersList =
-                userRef.documents[0].toObject(UserData::class.java)?.orders?.toMutableList()
+                userRef.documents[0].toObject(User::class.java)?.orders?.toMutableList()
             val idx = ordersList?.indexOfFirst { it.orderId == orderId } ?: -1
             if (idx != -1) {
                 val orderData = ordersList?.get(idx)
@@ -247,7 +313,7 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
                     if (!custRef.isEmpty) {
                         val did = custRef.documents[0].id
                         val orders =
-                            custRef.documents[0].toObject(UserData::class.java)?.orders?.toMutableList()
+                            custRef.documents[0].toObject(User::class.java)?.orders?.toMutableList()
                         val pos = orders?.indexOfFirst { it.orderId == orderId } ?: -1
                         if (pos != -1) {
                             val order = orders?.get(pos)
@@ -269,15 +335,15 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
         }
     }
 
-
-    override suspend fun clearUser(userId: String) {
+    suspend fun clearUser(userId: String) {
         usersCollectionRef().document(userId).delete()
     }
 
 
-
-
     companion object {
+
+        private const val TAG = "RemoteUserRepository"
+
         private const val USERS_COLLECTION = "users"
         private const val USER_ID_FIELD = "userId"
         private const val LIKES_FIELD = "likes"
@@ -287,7 +353,5 @@ class AuthRemoteDataSource(val context: Context) : UserDataSource {
         private const val PHONE_FIELD = "phone"
         private const val PASSWORD_FIELD = "password"
         private const val EMAIL_MOBILE_DOC = "emailAndMobiles"
-
-        private const val TAG = "AuthRemoteDataSource"
     }
 }

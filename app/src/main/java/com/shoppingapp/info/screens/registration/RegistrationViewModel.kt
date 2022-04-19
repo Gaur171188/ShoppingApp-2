@@ -7,10 +7,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
-import com.shoppingapp.info.remote.AuthRemoteDataSource
 import com.shoppingapp.info.R
 import com.shoppingapp.info.ShoppingApplication
-import com.shoppingapp.info.data.UserData
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.*
 
@@ -25,12 +24,10 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
 
 
     private val shopApp = ShoppingApplication(application.applicationContext)
-    private val authRepository by lazy{ shopApp.authRepository }
+//    private val authRepository by lazy{ shopApp.userRepository }
 
 
-    private val _authRemoteDataSource by lazy {
-        AuthRemoteDataSource(app)
-    }
+    private val userRepository by lazy { shopApp.userRepository }
 
 //    private val repository = UserRepositoryOnline()
     private val scopeIO = CoroutineScope(Dispatchers.IO + Job())
@@ -48,8 +45,8 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
 
 
     /** live data **/
-    private val _isRegistered = MutableLiveData<UserData?>()
-    val isRegistered: LiveData<UserData?> = _isRegistered
+    private val _isRegistered = MutableLiveData<User?>()
+    val isRegistered: LiveData<User?> = _isRegistered
 
 
 
@@ -69,13 +66,13 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
         _inProgress.value = StoreDataStatus.ERROR
     }
 
-    fun registration(user: UserData){
+    fun registration(user: User){
         initRegister()
         scopeIO.launch {
             withContext(Dispatchers.Main){
                 _inProgress.value = StoreDataStatus.LOADING
             }
-            _authRemoteDataSource.checkUserIsExist(user.email,
+            userRepository.remoteUserRepository.checkUserIsExist(user.email,
             isExist = { isExist ->
                 if (!isExist){ // user is not exist
                     createUserAccount(user)
@@ -94,7 +91,7 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
 
 
 
-    private fun createUserAccount(user: UserData){
+    private fun createUserAccount(user: User){
         scopeIO.launch {
                 _auth.createUserWithEmailAndPassword(user.email, user.password).addOnCompleteListener { it->
                     if (it.isComplete){
@@ -104,7 +101,7 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
                                 scopeIO.launch {
                                     Log.i(TAG,"send email verify has been done!")
                                     user.userId = FirebaseAuth.getInstance().currentUser!!.uid
-                                    authRepository.signUp(user)
+                                    userRepository.signUp(user)
 //                                    _authRemoteDataSource.addUser(user)
                                     withContext(Dispatchers.Main){
                                         _isRegistered.value = user

@@ -141,17 +141,10 @@ class Favorites : Fragment() {
 
 
     private fun removeLike(product: Product){
-        val isConnected = homeViewModel.isConnected.value
-        if (isConnected != null){
-            if (isConnected){
-                viewModel.toggleLikeByProductId(product,
-                    onError = { error ->
-                        Toast.makeText(requireContext(),error,Toast.LENGTH_SHORT).show()
-                    })
-            }else{
-                Toast.makeText(requireContext(),"error connection!",Toast.LENGTH_SHORT).show()
-            }
-        }
+        viewModel.toggleLikeByProductId(product,
+            onError = { error ->
+                Toast.makeText(requireContext(),error,Toast.LENGTH_SHORT).show()
+            })
     }
 
 

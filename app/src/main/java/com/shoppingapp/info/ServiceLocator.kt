@@ -2,17 +2,14 @@ package com.shoppingapp.info
 
 import android.content.Context
 import androidx.annotation.VisibleForTesting
-import com.shoppingapp.info.local.ProductDataSource
-import com.shoppingapp.info.repository.AuthRepoInterface
-import com.shoppingapp.info.repository.AuthRepository
-import com.shoppingapp.info.utils.ShoppingAppSessionManager
-import com.shoppingapp.info.local.ProductsLocalDataSource
-import com.shoppingapp.info.local.ShoppingAppDatabase
-import com.shoppingapp.info.local.UserLocalDataSource
-import com.shoppingapp.info.remote.AuthRemoteDataSource
-import com.shoppingapp.info.remote.ProductsRemoteDataSource
-import com.shoppingapp.info.repository.ProductsRepoInterface
-import com.shoppingapp.info.repository.ProductsRepository
+import com.shoppingapp.info.local.*
+import com.shoppingapp.info.repository.product.LocalProductRepository
+import com.shoppingapp.info.repository.product.ProductRepository
+import com.shoppingapp.info.repository.product.RemoteProductRepository
+import com.shoppingapp.info.repository.user.LocalUserRepository
+import com.shoppingapp.info.repository.user.RemoteUserRepository
+import com.shoppingapp.info.repository.user.UserRepository
+import com.shoppingapp.info.utils.SharePrefManager
 
 
 object ServiceLocator {
@@ -20,22 +17,22 @@ object ServiceLocator {
 	private val lock = Any()
 
 	@Volatile
-	var authRepository: AuthRepoInterface? = null
+	var userRepository: UserRepository? = null
 		@VisibleForTesting set
 
 	@Volatile
-	var productsRepository: ProductsRepoInterface? = null
+	var productRepository: ProductRepository? = null
 		@VisibleForTesting set
 
-	fun provideAuthRepository(context: Context): AuthRepoInterface {
+	fun provideAuthRepository(context: Context): UserRepository {
 		synchronized(this) {
-			return authRepository ?: createAuthRepository(context)
+			return userRepository ?: createAuthRepository(context)
 		}
 	}
 
-	fun provideProductsRepository(context: Context): ProductsRepoInterface {
+	fun provideProductsRepository(context: Context): ProductRepository {
 		synchronized(this) {
-			return productsRepository ?: createProductsRepository(context)
+			return productRepository ?: createProductsRepository(context)
 		}
 	}
 
@@ -47,32 +44,32 @@ object ServiceLocator {
 				close()
 			}
 			database = null
-			authRepository = null
+			userRepository = null
 		}
 	}
 
-	private fun createProductsRepository(context: Context): ProductsRepoInterface {
+	private fun createProductsRepository(context: Context): ProductRepository {
 		val newRepo =
-			ProductsRepository(ProductsRemoteDataSource(), createProductsLocalDataSource(context))
-		productsRepository = newRepo
+			ProductRepository(RemoteProductRepository(), createProductsLocalDataSource(context))
+		productRepository = newRepo
 		return newRepo
 	}
 
-	private fun createAuthRepository(context: Context): AuthRepoInterface {
-		val appSession = ShoppingAppSessionManager(context.applicationContext)
+	private fun createAuthRepository(context: Context): UserRepository {
+		val appSession = SharePrefManager(context.applicationContext)
 		val newRepo =
-			AuthRepository(createUserLocalDataSource(context), AuthRemoteDataSource(context), appSession)
-		authRepository = newRepo
+			UserRepository(createUserLocalDataSource(context), RemoteUserRepository(context), appSession)
+		userRepository = newRepo
 		return newRepo
 	}
 
-	private fun createProductsLocalDataSource(context: Context): ProductDataSource {
+	private fun createProductsLocalDataSource(context: Context): LocalProductRepository {
 		val database = database ?: ShoppingAppDatabase.getInstance(context.applicationContext)
-		return ProductsLocalDataSource(database.productsDao())
+		return LocalProductRepository(database.productsDao())
 	}
 
-	private fun createUserLocalDataSource(context: Context): UserDataSource {
+	private fun createUserLocalDataSource(context: Context): LocalUserRepository {
 		val database = database ?: ShoppingAppDatabase.getInstance(context.applicationContext)
-		return UserLocalDataSource(database.userDao())
+		return LocalUserRepository(database.userDao())
 	}
 }

@@ -9,12 +9,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.shoppingapp.info.remote.AuthRemoteDataSource
 import com.shoppingapp.info.R
 import com.shoppingapp.info.ShoppingApplication
-import com.shoppingapp.info.local.UserLocalDataSource
-import com.shoppingapp.info.screens.registration.RegistrationViewModel
-import com.shoppingapp.info.utils.ShoppingAppSessionManager
+import com.shoppingapp.info.repository.user.RemoteUserRepository
+
+import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.StoreDataStatus
 import com.shoppingapp.info.utils.UserType
 import kotlinx.coroutines.*
@@ -23,18 +22,20 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val app = application
 //    val userPref = SharePref(app.applicationContext, SharePref.FILE_USER)
-    private val appSessionManager = ShoppingAppSessionManager(application.applicationContext)
+    private val appSessionManager = SharePrefManager(application.applicationContext)
 
     companion object {
         const val TAG = "Login"
     }
 
     private val shopApp = ShoppingApplication(application.applicationContext)
-    private val authRepository by lazy{ shopApp.authRepository }
+    private val authRepository by lazy{ shopApp.userRepository }
 
-    private val _authRemoteDataSource by lazy {
-        AuthRemoteDataSource(application)
-    }
+
+//    private val userRepository by lazy { shopApp.userRepository }
+
+    private val remoteUserRepository by lazy { RemoteUserRepository(app) }
+
 //    private val _userLocalDataSource by lazy {
 //        UserLocalDataSource(authRepository.in)
 //    }
@@ -84,7 +85,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             withContext(Dispatchers.Main){
                 _inProgress.value = StoreDataStatus.LOADING
             }
-            _authRemoteDataSource.checkUserIsExist(email,
+            remoteUserRepository.checkUserIsExist(email,
                 isExist = { isExist ->
                     if (!isExist) { // user is not exist
                         Log.i(TAG, "user is not exist")
@@ -95,11 +96,13 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 },
                 onError = { error -> // error network
-                    Log.i(RegistrationViewModel.TAG, error)
+                    Log.i(TAG, error)
                     setLoginError(error)
                 })
         }
     }
+
+
 
 // TODO: enhance the function
 
@@ -113,14 +116,16 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                         if (userId != null) {
                             scopeIO.launch {
                                 if (_auth.currentUser?.isEmailVerified!!) {
-                                    _authRemoteDataSource.checkPassByUserId(userId, password){ isTypicalPass ->
+                                    remoteUserRepository.checkPassByUserId(userId, password){ isTypicalPass ->
                                         if (isTypicalPass){
                                             viewModelScope.launch {
-                                                    _authRemoteDataSource.getUserById(userId){user ->
+                                                    remoteUserRepository.getUserById(userId){user ->
                                                         if (user != null){
                                                           viewModelScope.launch {
                                                               withContext(Dispatchers.Main){
-                                                                  authRepository.login(user,isRemOn)
+//                                                                  authRepository.login(user,isRemOn)
+                                                                  val isSeller = user.userType == UserType.SELLER.name
+                                                                  appSessionManager.createLoginSession(user.userId,user.name,user.phone,isRemOn,isSeller)
                                                                   _inProgress.value = StoreDataStatus.DONE
                                                                   _isLogged.value = true
                                                               }

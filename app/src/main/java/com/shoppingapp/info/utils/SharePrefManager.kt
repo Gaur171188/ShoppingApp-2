@@ -3,7 +3,7 @@ package com.shoppingapp.info.utils
 import android.content.Context
 import android.content.SharedPreferences
 
-class ShoppingAppSessionManager(context: Context) {
+class SharePrefManager(context: Context) {
 
 	var userSession: SharedPreferences =
 		context.getSharedPreferences("userSessionData", Context.MODE_PRIVATE)
@@ -45,11 +45,11 @@ class ShoppingAppSessionManager(context: Context) {
 	}
 
 
-	fun getUserIdFromSession(): String? = userSession.getString(KEY_ID, null)
+	fun getUserIdFromSession(): String? = userSession.getString(KEY_ID, "")
 
 	fun isLoggedIn(): Boolean = userSession.getBoolean(IS_LOGIN, false)
 
-	fun logoutFromSession() {
+	fun signOut() {
 		editor.clear()
 		editor.commit()
 	}

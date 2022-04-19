@@ -13,7 +13,7 @@ import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.utils.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import com.shoppingapp.info.Result
+import com.shoppingapp.info.utils.Result
 
 
 
@@ -25,9 +25,9 @@ class AddEditProductViewModel(application: Application) : AndroidViewModel(appli
 
     private val appShop = ShoppingApplication(application)
 
-    private val productsRepository by lazy { appShop.productsRepository }
+    private val productsRepository by lazy { appShop.productRepository }
 
-    private val sessionManager = ShoppingAppSessionManager(application.applicationContext)
+    private val sessionManager = SharePrefManager(application.applicationContext)
 
     private val currentUserId = sessionManager.getUserIdFromSession()
 
@@ -72,7 +72,7 @@ class AddEditProductViewModel(application: Application) : AndroidViewModel(appli
         viewModelScope.launch {
             Log.d(TAG, "onLoad: Getting product Data")
             _dataStatus.value = StoreDataStatus.LOADING
-            val res = async { productsRepository.getProductById(productId) }
+            val res = async { productsRepository.getProductById(productId, forceUpdate = false) }
             val proRes = res.await()
             if (proRes is Result.Success) {
                 val proData = proRes.data

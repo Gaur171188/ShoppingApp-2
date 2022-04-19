@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -14,8 +13,7 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shoppingapp.info.R
-import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.data.UserData
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.*
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.screens.orders.OrdersViewModel
@@ -142,7 +140,7 @@ class Cart : Fragment() {
         binding.cartProductsRecyclerView.adapter?.notifyDataSetChanged()
     }
 
-    private fun setItemsAdapter(itemList: List<UserData.CartItem>?) {
+    private fun setItemsAdapter(itemList: List<User.CartItem>?) {
         val items = itemList ?: emptyList()
         val likesList = homeViewModel.userLikes.value ?: emptyList()
         val proList = viewModel.cartProducts.value ?: emptyList()
@@ -152,7 +150,6 @@ class Cart : Fragment() {
             // TODO: make the like require network
             override fun onLikeClick(productId: String) {
                 Log.d(TAG, "onToggle Like Clicked")
-                val isConnected = homeViewModel.isConnected.value
 
                 homeViewModel.toggleLikeByProductId(productId)
 //                viewModel.toggleLikeProduct(productId)

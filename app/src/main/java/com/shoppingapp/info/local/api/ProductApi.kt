@@ -1,4 +1,4 @@
-package com.shoppingapp.info.local
+package com.shoppingapp.info.local.api
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
@@ -8,8 +8,13 @@ import androidx.room.Query
 import com.shoppingapp.info.data.Product
 
 
+/**
+  the function of this interface is interactive with room data base.
+ * **/
+
 @Dao
-interface ProductsDao {
+interface ProductApi {
+
 	@Insert(onConflict = OnConflictStrategy.REPLACE)
 	suspend fun insert(product: Product)
 

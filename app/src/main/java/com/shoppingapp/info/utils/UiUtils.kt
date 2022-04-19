@@ -10,12 +10,10 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.view.View
 import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shoppingapp.info.MainActivity
-import com.shoppingapp.info.data.UserData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

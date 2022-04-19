@@ -5,16 +5,14 @@ import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.shoppingapp.info.databinding.ActivityMainBinding
 import com.shoppingapp.info.receiver.NetworkReceiver
 import com.shoppingapp.info.screens.home.HomeViewModel
-import com.shoppingapp.info.utils.ShoppingAppSessionManager
+import com.shoppingapp.info.utils.SharePrefManager
 
 class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverListener {
 
@@ -77,7 +75,7 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
             }
         }
 
-        val sessionManager = ShoppingAppSessionManager(this.applicationContext)
+        val sessionManager = SharePrefManager(this.applicationContext)
         if (sessionManager.isUserSeller()) { // Seller
             binding.homeBottomNavigation.menu.removeItem(R.id.cart)
         }else { // customer
@@ -92,7 +90,7 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
 
     // this function with listen if there is any change in network
     override fun onNetworkConnectionChanged(isConnect: Boolean) {
-        homeViewModel.setConnectivityState(isConnect)
+//        homeViewModel.setConnectivityState(isConnect)
         isConnected = isConnect
         if (isConnect){
 //            binding.mainActivity.visibility = View.VISIBLE
@@ -116,8 +114,5 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
         unregisterReceiver(networkReceiver)
     }
 
-    // TODO: display a toast message the connection is not exist.
-
-    // TODO: make broadcast receiver to check from the connection of network
 
 }
