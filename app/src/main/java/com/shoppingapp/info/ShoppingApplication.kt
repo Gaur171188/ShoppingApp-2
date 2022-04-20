@@ -5,6 +5,7 @@ import android.content.Context
 import com.shoppingapp.info.di.*
 import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.repository.user.UserRepository
+import com.shoppingapp.info.utils.x
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
@@ -15,6 +16,7 @@ class ShoppingApplication() : Application() {
 
 	override fun onCreate() {
 		super.onCreate()
+		x.context = this
 
 		startKoin {
 			androidContext(this@ShoppingApplication)

@@ -79,7 +79,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/order_details_pro_label_tv"
                     tools:itemCount="2"
-                    tools:listitem="@layout/cart_item">
+                    tools:listitem="@layout/item_cart">
 
                 </androidx.recyclerview.widget.RecyclerView>
 

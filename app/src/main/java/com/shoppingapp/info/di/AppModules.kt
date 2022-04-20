@@ -58,7 +58,7 @@ val viewModelsModules = module {
         AddEditProductViewModel(productRepository = get())
     }
     viewModel {
-        CartViewModel()
+        CartViewModel(userRepository = get(), productRepository = get(), allProducts = get())
     }
     viewModel {
         FavoritesViewModel(userRepository = get(), productRepository = get(), allProducts = get())
@@ -70,7 +70,7 @@ val viewModelsModules = module {
         OrderSuccessViewModel()
     }
     viewModel {
-        OrdersViewModel(userRepository = get(), productRepository = get(), user = get())
+        OrdersViewModel(userRepository = get(), productRepository = get(), allProducts = get())
     }
 //    viewModel {
 //

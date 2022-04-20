@@ -5,6 +5,34 @@
 
     <data>
 
+        <variable
+            name="cartData"
+            type="com.shoppingapp.info.data.User.CartItem" />
+
+        <variable
+            name="isLike"
+            type="Boolean" />
+
+        <variable
+            name="productData"
+            type="com.shoppingapp.info.data.Product" />
+
+        <variable
+            name="onLikeClick"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="onDeleteClick"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="onItemPlusClick"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="onItemMinusClick"
+            type="android.view.View.OnClickListener" />
+
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -23,6 +51,7 @@
             layout="@layout/circular_loader_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,6 +72,7 @@
                 android:background="@drawable/round_outline_rect"
                 android:contentDescription="@string/image_item"
                 android:scaleType="centerCrop"
+                setImage="@{productData.images}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -56,6 +86,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:lines="2"
+                setTitle="@{productData.name}"
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@+id/cart_product_like_btn"
@@ -68,6 +99,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
+                android:onClick="@{onLikeClick}"
+                setLike="@{isLike}"
                 android:background="@drawable/round_button"
                 android:backgroundTint="#FFFFFF"
                 android:contentDescription="@string/like_button"
@@ -83,6 +116,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginEnd="8dp"
+                android:onClick="@{onDeleteClick}"
                 android:background="@drawable/round_button"
                 android:contentDescription="@string/remove_product_button"
                 android:scaleType="fitXY"
@@ -102,6 +136,7 @@
                 android:textAppearance="@style/TextAppearance.MyTheme.Body2"
                 android:textColor="@color/blue_accent_300"
                 android:textStyle="bold"
+                setPrice="@{productData.price}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/product_image_view"
                 app:layout_constraintTop_toBottomOf="@+id/cart_product_title"
@@ -128,6 +163,7 @@
                     android:layout_width="33dp"
                     android:layout_height="28dp"
                     android:layout_weight="1"
+                    android:onClick="@{onItemMinusClick}"
                     android:background="@null"
                     android:contentDescription="@string/decrease_button"
                     app:srcCompat="@drawable/ic_remove_24" />
@@ -137,6 +173,7 @@
                     android:layout_width="40dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    setQuantity="@{cartData.quantity}"
                     android:background="@color/blue_shadow_color"
                     android:gravity="center_horizontal|center_vertical"
                     android:textAppearance="@style/TextAppearance.MyTheme.Body2"
@@ -149,6 +186,7 @@
                     android:layout_width="33dp"
                     android:layout_height="28dp"
                     android:layout_weight="1"
+                    android:onClick="@{onItemPlusClick}"
                     android:background="@null"
                     android:contentDescription="@string/increase_button"
                     app:srcCompat="@drawable/ic_add_24" />

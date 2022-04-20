@@ -15,16 +15,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.*
 
-
 class OrdersViewModel(
     private val userRepository: UserRepository,
     private val productRepository: ProductRepository,
-    private val user: LiveData<User>,
+    private val allProducts: LiveData<List<Product>>,
 ): ViewModel() {
 
     companion object{
         const val TAG = "OrderViewModel"
     }
+
+
 
 
 //    private val sessionManager = SharePrefManager(application.applicationContext)
@@ -71,20 +72,16 @@ class OrdersViewModel(
             val user = userRepository.getUser()
                 if(user != null){
                     viewModelScope.launch {
-                        withContext(Dispatchers.Main){
-                            _cartItems.value = user.cart
-                        }
+                        _cartItems.value = user.cart
                         val priceRes = async { getAllProductsInCart() }
                         priceRes.await()
                         Log.d(TAG, "Getting Cart Items: Success ${_priceList.value}")
                     }
                 } else {
                     viewModelScope.launch {
-                        withContext(Dispatchers.Main){
-                            _cartItems.value = emptyList()
-                            _dataStatus.value = StoreDataStatus.ERROR
-                            Log.d(TAG, "Getting Cart Items: User Not Found")
-                        }
+                        _cartItems.value = emptyList()
+                        _dataStatus.value = StoreDataStatus.ERROR
+                        Log.d(TAG, "Getting Cart Items: User Not Found")
                     }
 
                 }
@@ -238,7 +235,7 @@ class OrdersViewModel(
         _selectedPaymentMethod.value = method
     }
 
-    fun finalizeOrder() {
+    fun finalizeOrder(userId: String) {
         _orderStatus.value = StoreDataStatus.LOADING
 //        val deliveryAddress = _userAddresses.value?.find { it.addressId == _selectedAddress.value }
         val paymentMethod = _selectedPaymentMethod.value
@@ -250,7 +247,7 @@ class OrdersViewModel(
         if (paymentMethod != null && !items.isNullOrEmpty() && !itemPrices.isNullOrEmpty()) {
             val newOrder = User.OrderItem(
                 orderId,
-                user.value?.userId!!,
+                userId,
                 items,
                 itemPrices,
                 shippingCharges,

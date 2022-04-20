@@ -245,22 +245,18 @@ class Home : Fragment() {
                 navigateToAddEditProductScreen(isEdit = true, productId = productId)
             }
 
-            // TODO: make the set like require network
+
             override fun onLikeClick(productId: String) {
                 Log.d(TAG, "onToggleLike: initiated for $productId")
                 viewModel.toggleLikeByProductId(productId)
             }
 
-            // TODO: make the add product in cart require network
             override fun onAddToCartClick(productData: Product, position: Int) {
-                Log.d(TAG, "onToggleCartAddition: initiated")
-
                 viewModel.toggleProductInCart(productData){
                     if (it is Result.Success){
                         productAdapter.notifyItemChanged(position)
                     }
                 }
-
             }
 
         }

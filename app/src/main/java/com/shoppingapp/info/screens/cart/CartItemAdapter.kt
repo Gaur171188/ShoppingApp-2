@@ -10,8 +10,8 @@ import com.bumptech.glide.Glide
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
-import com.shoppingapp.info.databinding.CartItemBinding
 import com.shoppingapp.info.databinding.CircularLoaderLayoutBinding
+import com.shoppingapp.info.databinding.ItemCartBinding
 
 
 class CartItemAdapter(
@@ -24,7 +24,7 @@ class CartItemAdapter(
 	var proList: List<Product> = products
 	var likesList: List<String> = userLikes
 
-	inner class ViewHolder(private val binding: CartItemBinding) :
+	inner class ViewHolder(private val binding: ItemCartBinding) :
 		RecyclerView.ViewHolder(binding.root) {
 		fun bind(item: User.CartItem) {
 			binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
@@ -77,7 +77,7 @@ class CartItemAdapter(
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return ViewHolder(
-			CartItemBinding.inflate(
+			ItemCartBinding.inflate(
 				LayoutInflater.from(parent.context), parent, false
 			)
 		)
