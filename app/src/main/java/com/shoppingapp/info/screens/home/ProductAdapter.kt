@@ -18,11 +18,16 @@ import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.getOfferPercentage
 
 
-class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val context: Context) :
+class ProductAdapter(
+    proList: List<Any>,
+    userLikes: List<String>,
+    private val context: Context
+) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var data = proList
     var likesList = userLikes
+
 
     lateinit var onClickListener: OnClickListener
     lateinit var bindImageButtons: BindImageButtons
@@ -48,7 +53,7 @@ class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val co
             /** btn product card **/
             productCard.setOnClickListener {
                 if (!isUserSeller){
-                    onClickListener.onClick(productData)
+                    onClickListener.onClick(productData,position)
                 }
             }
 
@@ -82,7 +87,7 @@ class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val co
 
             /** button add product to cart **/
             proCartButton.setOnClickListener {
-                onClickListener.onAddToCartClick(productData)
+                onClickListener.onAddToCartClick(productData,position)
             }
 
             /** button edit product **/
@@ -110,11 +115,11 @@ class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val co
             proLikeButton.isChecked = likesList.contains(productData.productId)
 
 
-
             bindImageButtons.setLikeButton(productData.productId, proLikeButton)
 
 
             bindImageButtons.setCartButton(productData.productId, proCartButton)
+
 
             if (isUserSeller) {
                 proLikeButton.visibility = View.GONE
@@ -133,6 +138,7 @@ class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val co
     inner class AdViewHolder(binding: HomeAdLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
         val adImageView: ImageView = binding.adImageView
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -181,10 +187,10 @@ class ProductAdapter(proList: List<Any>, userLikes: List<String>, private val co
     }
 
     interface OnClickListener {
-        fun onClick(productData: Product)
+        fun onClick(productData: Product, position: Int)
         fun onDeleteClick(productData: Product)
         fun onEditClick(productId: String) {}
         fun onLikeClick(productId: String) {}
-        fun onAddToCartClick(productData: Product) {}
+        fun onAddToCartClick(productData: Product, position: Int) {}
     }
 }

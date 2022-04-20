@@ -1,11 +1,17 @@
 package com.shoppingapp.info.repository.user
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
+import androidx.room.Query
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.local.api.UserApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.shoppingapp.info.utils.Result
+import com.shoppingapp.info.utils.Result.Success
+import com.shoppingapp.info.utils.Result.Error
 
 // this class to fitch the data from local database UserLocalDataSource
 
@@ -26,6 +32,20 @@ class LocalUserRepository(private val userApi: UserApi) {
 	}
 
 	suspend fun getUser(userId: String) = userApi.getUserById(userId)
+
+
+	fun observeUser(userId: String): LiveData<Result<User>?> {
+		return try {
+			Transformations.map(userApi.observeUser(userId)) {
+				Success(it)
+			}
+		} catch (e: Exception) {
+			Transformations.map(MutableLiveData(e)) {
+				Error(e)
+			}
+		}
+	}
+
 
 	suspend fun getUserById(userId: String): User? = withContext(ioDispatcher) {
 		try {

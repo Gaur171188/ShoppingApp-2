@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.User
@@ -19,7 +20,7 @@ import com.shoppingapp.info.utils.UserType
 class Registration : Fragment() {
 
 
-    private lateinit var viewModel: RegistrationViewModel
+    private val viewModel by activityViewModels<RegistrationViewModel>()
     private lateinit var binding : RegistrationBinding
 
     private var email = ""
@@ -31,7 +32,7 @@ class Registration : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
 
-        viewModel = ViewModelProvider(this)[RegistrationViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[RegistrationViewModel::class.java]
 
         binding = DataBindingUtil.inflate(inflater, R.layout.registration,container,false)
 

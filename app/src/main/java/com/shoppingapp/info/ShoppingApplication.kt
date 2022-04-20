@@ -2,23 +2,36 @@ package com.shoppingapp.info
 
 import android.app.Application
 import android.content.Context
+import com.shoppingapp.info.di.*
 import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.repository.user.UserRepository
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.loadKoinModules
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 
-class ShoppingApplication(private val context: Context) : Application() {
+class ShoppingApplication() : Application() {
 
-	val userRepository: UserRepository
-		get() = ServiceLocator.provideAuthRepository(context)
-
-	val productRepository: ProductRepository
-		get() = ServiceLocator.provideProductsRepository(context)
-
-	fun removeDB(){
-		ServiceLocator.resetRepository()
-	}
 
 	override fun onCreate() {
 		super.onCreate()
+
+		startKoin {
+			androidContext(this@ShoppingApplication)
+
+//			loadKoinModules(
+//				module(override = true){ userLiveDataModule} ,
+//			)
+
+			modules(listOf(
+				productLiveDataModule,
+				viewModelsModules,
+				userRepositoryModule,
+				productRepositoryModule,
+				localDataBase,
+			))
+		}
+
 	}
 
 }

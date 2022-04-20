@@ -1,43 +1,48 @@
 package com.shoppingapp.info.screens.favorites
 
-import android.app.Application
+
 import androidx.lifecycle.*
 import com.shoppingapp.info.utils.Result
-import com.shoppingapp.info.ShoppingApplication
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.utils.SharePrefManager
+import com.shoppingapp.info.repository.product.ProductRepository
+import com.shoppingapp.info.repository.user.UserRepository
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
-class FavoritesViewModel(application: Application): AndroidViewModel(application) {
+class FavoritesViewModel(
+    private val userRepository: UserRepository,
+    private val productRepository: ProductRepository,
+    private val allProducts: LiveData<List<Product>>
+): ViewModel() {
 
     companion object{
         const val TAG = "FavoritesViewModel"
     }
 
+//    private val sessionManager = SharePrefManager(application.applicationContext)
+//    private val currentUser = sessionManager.getUserIdFromSession()
+//    private val appShop = ShoppingApplication(application.applicationContext)
 
 
-
-    private val sessionManager = SharePrefManager(application.applicationContext)
-    private val currentUser = sessionManager.getUserIdFromSession()
-    private val appShop = ShoppingApplication(application.applicationContext)
-
-
-    private val productsRepository by lazy { appShop.productRepository }
-    private val authRepository by lazy { appShop.userRepository }
+//    private val productsRepository by lazy { appShop.productRepository }
+//    private val userRepository by lazy { appShop.userRepository }
 
     private val _dataStatus = MutableLiveData<StoreDataStatus>()
     val dataStatus: LiveData<StoreDataStatus> = _dataStatus
 
+
+    private var _products = MutableLiveData<List<Product>>()
+    val products: LiveData<List<Product>> get() = _products
 
 
     private var _likedProducts = MutableLiveData<List<Product>>()
     val likedProducts: LiveData<List<Product>> get() = _likedProducts
 
 
-
-
+    init {
+        _products = allProducts as MutableLiveData<List<Product>>
+    }
 
     fun initData(likes: List<Product>){
         _dataStatus.value = StoreDataStatus.LOADING
@@ -101,9 +106,9 @@ class FavoritesViewModel(application: Application): AndroidViewModel(application
             val allLikes = _likedProducts.value?.toMutableList() ?: mutableListOf()
             val deferredRes = async {
                 if (isLiked) {
-                    authRepository.removeProductFromLikes(product.productId)
+                    userRepository.removeProductFromLikes(product.productId)
                 } else {
-                    authRepository.insertProductToLikes(product.productId)
+                    userRepository.insertProductToLikes(product.productId)
                 }
             }
             val res = deferredRes.await()

@@ -19,6 +19,7 @@ import com.shoppingapp.info.databinding.FavoritiesBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.screens.home.RecyclerViewPaddingItemDecoration
 import com.shoppingapp.info.utils.StoreDataStatus
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class Favorites : Fragment() {
 
@@ -27,8 +28,8 @@ class Favorites : Fragment() {
     }
 
 
-    private lateinit var viewModel: FavoritesViewModel
-    private val homeViewModel: HomeViewModel by activityViewModels()
+    private val viewModel by sharedViewModel<FavoritesViewModel>()
+    private val homeViewModel: HomeViewModel by sharedViewModel()
     private lateinit var binding: FavoritiesBinding
     private lateinit var productsAdapter: LikedProductAdapter
 
@@ -38,7 +39,7 @@ class Favorites : Fragment() {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.favorities, container, false)
 
-        viewModel = ViewModelProvider(this)[FavoritesViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[FavoritesViewModel::class.java]
         binding.favTopAppBar.topAppBar.title = "Favorite Products"
 
 

@@ -9,12 +9,14 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
 import com.shoppingapp.info.databinding.OrdersBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.StoreDataStatus
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
 class Orders : Fragment() {
@@ -23,13 +25,13 @@ class Orders : Fragment() {
         const val TAG = "Orders"
     }
 
-    private lateinit var viewModel: HomeViewModel
+    private val homeViewModel by sharedViewModel<HomeViewModel>()
     private lateinit var binding: OrdersBinding
     private lateinit var ordersAdapter: OrdersAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.orders, container, false)
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
         setViews()
         setObservers()
@@ -39,7 +41,7 @@ class Orders : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getAllOrders()
+        homeViewModel.getAllOrders()
     }
 
 
@@ -67,7 +69,7 @@ class Orders : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun setObservers() {
-        viewModel.storeDataStatus.observe(viewLifecycleOwner) { status ->
+        homeViewModel.storeDataStatus.observe(viewLifecycleOwner) { status ->
             when (status) {
                 StoreDataStatus.LOADING -> {
                     binding.orderAllOrdersRecyclerView.visibility = View.GONE
@@ -82,7 +84,7 @@ class Orders : Fragment() {
             }
 
             if (status != null && status != StoreDataStatus.LOADING) {
-                viewModel.userOrders.observe(viewLifecycleOwner) { orders ->
+                homeViewModel.userOrders.observe(viewLifecycleOwner) { orders ->
                     if (orders.isNotEmpty()) {
                         ordersAdapter.data = orders.sortedByDescending { it.orderDate }
                         binding.orderAllOrdersRecyclerView.adapter?.notifyDataSetChanged()

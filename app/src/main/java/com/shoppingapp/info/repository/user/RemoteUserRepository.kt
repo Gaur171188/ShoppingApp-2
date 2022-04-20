@@ -14,7 +14,7 @@ import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.OrderStatus
 import kotlinx.coroutines.tasks.await
 
-class RemoteUserRepository (val context: Context) {
+class RemoteUserRepository () {
 
     private val _root by lazy { FirebaseFirestore.getInstance() }
     private val mAuth by lazy { FirebaseAuth.getInstance() }
@@ -136,7 +136,7 @@ class RemoteUserRepository (val context: Context) {
                     }
                 }
                 catch (ex: Exception){ // maybe there is another error..
-                    onError(context.resources.getString(R.string.no_connection))
+//                    onError(context.resources.getString(R.string.no_connection))
                 }
             }
     }

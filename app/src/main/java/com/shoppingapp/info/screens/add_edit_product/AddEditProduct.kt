@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
@@ -25,6 +26,7 @@ import com.shoppingapp.info.utils.AddProductErrors
 import com.shoppingapp.info.utils.AddProductViewErrors
 import com.shoppingapp.info.utils.MyOnFocusChangeListener
 import com.shoppingapp.info.utils.StoreDataStatus
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import kotlin.properties.Delegates
 
 
@@ -36,7 +38,7 @@ class AddEditProduct : Fragment() {
     }
 
     private lateinit var binding: AddEditProductBinding
-    private lateinit var viewModel: AddEditProductViewModel
+    private val viewModel by sharedViewModel<AddEditProductViewModel>()
     private val focusChangeListener = MyOnFocusChangeListener()
 
     // arguments
@@ -62,7 +64,7 @@ class AddEditProduct : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.add_edit_product,container,false)
-        viewModel = ViewModelProvider(this)[AddEditProductViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[AddEditProductViewModel::class.java]
 
 
         isEdit = arguments?.getBoolean("isEdit") == true

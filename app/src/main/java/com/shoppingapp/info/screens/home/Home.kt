@@ -12,14 +12,10 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.CheckBox
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -28,8 +24,10 @@ import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.HomeBinding
 import com.shoppingapp.info.utils.MyOnFocusChangeListener
+import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.*
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
 class Home : Fragment() {
@@ -39,7 +37,7 @@ class Home : Fragment() {
     }
 
     private lateinit var binding: HomeBinding
-    private val viewModel: HomeViewModel by activityViewModels()
+    private val viewModel by sharedViewModel<HomeViewModel>()
     private val focusChangeListener = MyOnFocusChangeListener()
     private lateinit var productAdapter: ProductAdapter
 
@@ -130,10 +128,11 @@ class Home : Fragment() {
                 }
             }
         }
-        viewModel.allProducts.observe(viewLifecycleOwner) {
+
+        viewModel.products.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
                 viewModel.setDataLoaded()
-                viewModel.filterProducts("All")
+//                viewModel.filterProducts("All")
             }
         }
         viewModel.userLikes.observe(viewLifecycleOwner) {
@@ -224,13 +223,16 @@ class Home : Fragment() {
 
     private fun setProductsAdapter(productsList: List<Product>?) {
         val likesList = viewModel.userLikes.value ?: emptyList()
-        productAdapter = ProductAdapter(productsList ?: emptyList(), likesList, requireContext())
+        productAdapter = ProductAdapter(productsList ?: emptyList(), likesList,requireContext())
+
         productAdapter.onClickListener = object : ProductAdapter.OnClickListener {
-            override fun onClick(productData: Product) {
+            override fun onClick(productData: Product,position: Int) {
+
                 findNavController().navigate(
                     R.id.action_home_to_productDetails,
                     bundleOf("productId" to productData.productId)
                 )
+
             }
 
             override fun onDeleteClick(productData: Product) {
@@ -250,9 +252,14 @@ class Home : Fragment() {
             }
 
             // TODO: make the add product in cart require network
-            override fun onAddToCartClick(productData: Product) {
+            override fun onAddToCartClick(productData: Product, position: Int) {
                 Log.d(TAG, "onToggleCartAddition: initiated")
-                viewModel.toggleProductInCart(productData)
+
+                viewModel.toggleProductInCart(productData){
+                    if (it is Result.Success){
+                        productAdapter.notifyItemChanged(position)
+                    }
+                }
 
             }
 
@@ -268,14 +275,15 @@ class Home : Fragment() {
 
             override fun setCartButton(productId: String, imgView: ImageView) {
 
-                Log.i("setImageButton","product Id: $productId , In Cart: ${viewModel.isProductInCart(productId)}")
+                viewModel.isProductInCart(productId){
+                    if (it) {
+                        imgView.setImageResource(R.drawable.ic_remove_shopping_cart_24)
+                    } else {
+                        imgView.setImageResource(R.drawable.ic_add_shopping_cart_24)
+                    }
 
-                if (viewModel.isProductInCart(productId)) {
-
-                    imgView.setImageResource(R.drawable.ic_remove_shopping_cart_24)
-                } else {
-                    imgView.setImageResource(R.drawable.ic_add_shopping_cart_24)
                 }
+
             }
 
         }

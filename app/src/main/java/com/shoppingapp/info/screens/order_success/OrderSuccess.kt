@@ -18,7 +18,7 @@ class OrderSuccess: Fragment() {
         const val TAG = "Order Success"
     }
 
-    private lateinit var viewModel: OrderSuccessViewModel
+
     private lateinit var binding: OrderDetailsBinding
 
 
@@ -26,7 +26,7 @@ class OrderSuccess: Fragment() {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.order_success, container, false)
 
-        viewModel = ViewModelProvider(this)[OrderSuccessViewModel::class.java]
+
 
 
 

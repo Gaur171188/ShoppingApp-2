@@ -1,33 +1,34 @@
 package com.shoppingapp.info.screens.registration
 
 
-import android.app.Application
+
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.shoppingapp.info.R
-import com.shoppingapp.info.ShoppingApplication
 import com.shoppingapp.info.data.User
+import com.shoppingapp.info.repository.user.UserRepository
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.*
 
 
-class RegistrationViewModel(application: Application) : AndroidViewModel(application) {
+class RegistrationViewModel(
+    private val userRepository: UserRepository
+): ViewModel() {
 
     companion object{
         const val TAG = "Registration"
     }
 
-    private val app = application
-
-
-    private val shopApp = ShoppingApplication(application.applicationContext)
+//    private val app = application
+//
+//
+//    private val shopApp = ShoppingApplication(application.applicationContext)
 //    private val authRepository by lazy{ shopApp.userRepository }
 
 
-    private val userRepository by lazy { shopApp.userRepository }
+//    private val userRepository by lazy { shopApp.userRepository }
 
 //    private val repository = UserRepositoryOnline()
     private val scopeIO = CoroutineScope(Dispatchers.IO + Job())
@@ -79,7 +80,7 @@ class RegistrationViewModel(application: Application) : AndroidViewModel(applica
                     Log.i(TAG,"user is not exist")
                 }else{// user is exist
                     Log.i(TAG,"user is exist")
-                    setRegistrationError(app.resources.getString(R.string.user_exist))
+//                    setRegistrationError(app.resources.getString(R.string.user_exist))
                 }
             },
             onError = {error ->

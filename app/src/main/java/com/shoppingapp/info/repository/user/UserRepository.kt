@@ -11,6 +11,7 @@ import com.shoppingapp.info.utils.UserType
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import com.shoppingapp.info.utils.Result
+import kotlin.coroutines.suspendCoroutine
 
 class UserRepository(
 	private val localUserRepository: LocalUserRepository,
@@ -55,6 +56,10 @@ class UserRepository(
 
 		localUserRepository.addUser(user)
 	}
+
+
+	fun observeLocalUser() = localUserRepository.observeUser(userId)
+
 
 	suspend fun checkLogin(mobile: String, password: String): User? {
 		Log.d(TAG, "on Login: checking mobile and password")
@@ -165,13 +170,14 @@ class UserRepository(
 		}
 	}
 
-	suspend fun insertCartItemByUserId(cartItem: User.CartItem, userId: String): Result<Boolean> {
+	suspend fun insertCartItemByUserId(cartItem: User.CartItem): Result<Boolean> {
+		Log.d(TAG,"inserting item in cart ...")
 		return supervisorScope {
-			val remoteRes = async {
+			val localRes = async {
 				Log.d(TAG, "onInsertCartItem: adding item to remote source")
 				remoteUserRepository.insertCartItem(cartItem, userId)
 			}
-			val localRes = async {
+			val remoteRes = async {
 				Log.d(TAG, "onInsertCartItem: updating item to local source")
 				localUserRepository.insertCartItem(cartItem, userId)
 			}
@@ -182,10 +188,21 @@ class UserRepository(
 			} catch (e: Exception) {
 				Result.Error(e)
 			}
+
+		}
+
+	}
+
+
+
+	suspend fun isItemInCart(item: User.CartItem): Boolean {
+		return supervisorScope {
+			val cart  = getUser()!!.cart
+			return@supervisorScope cart.contains(item)
 		}
 	}
 
-	suspend fun updateCartItemByUserId(cartItem: User.CartItem, userId: String): Result<Boolean> {
+	suspend fun updateCartItemByUserId(cartItem: User.CartItem): Result<Boolean> {
 		return supervisorScope {
 			val remoteRes = async {
 				Log.d(TAG, "onUpdateCartItem: updating cart item on remote source")
@@ -202,10 +219,11 @@ class UserRepository(
 			} catch (e: Exception) {
 				Result.Error(e)
 			}
+
 		}
 	}
 
-	suspend fun deleteCartItemByUserId(itemId: String, userId: String): Result<Boolean> {
+	suspend fun deleteCartItemByUserId(itemId: String): Result<Boolean> {
 		return supervisorScope {
 			val remoteRes = async {
 				Log.d(TAG, "onDelete: deleting cart item from remote source")

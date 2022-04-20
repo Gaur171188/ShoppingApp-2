@@ -3,10 +3,7 @@ package com.shoppingapp.info.screens.login
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shoppingapp.info.R
@@ -18,23 +15,25 @@ import com.shoppingapp.info.utils.StoreDataStatus
 import com.shoppingapp.info.utils.UserType
 import kotlinx.coroutines.*
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
+class LoginViewModel(
+    private val remoteUserRepository: RemoteUserRepository,
+    private val sharePrefManager: SharePrefManager ): ViewModel() {
 
-    private val app = application
-//    val userPref = SharePref(app.applicationContext, SharePref.FILE_USER)
-    private val appSessionManager = SharePrefManager(application.applicationContext)
+//    private val app = application
+////    val userPref = SharePref(app.applicationContext, SharePref.FILE_USER)
+//    private val appSessionManager = SharePrefManager(application.applicationContext)
 
     companion object {
         const val TAG = "Login"
     }
 
-    private val shopApp = ShoppingApplication(application.applicationContext)
-    private val authRepository by lazy{ shopApp.userRepository }
+//    private val shopApp = ShoppingApplication(application.applicationContext)
+//    private val authRepository by lazy{ shopApp.userRepository }
 
 
 //    private val userRepository by lazy { shopApp.userRepository }
 
-    private val remoteUserRepository by lazy { RemoteUserRepository(app) }
+//    private val remoteUserRepository by lazy { RemoteUserRepository() }
 
 //    private val _userLocalDataSource by lazy {
 //        UserLocalDataSource(authRepository.in)
@@ -89,7 +88,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                 isExist = { isExist ->
                     if (!isExist) { // user is not exist
                         Log.i(TAG, "user is not exist")
-                        setLoginError(app.resources.getString(R.string.user_is_not_exist))
+//                        setLoginError(app.resources.getString(R.string.user_is_not_exist))
                     } else {// user is exist
                         Log.i(TAG, "user is exist")
                         signWithEmailAndPassword(email, password,isRemOn)
@@ -125,7 +124,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
                                                               withContext(Dispatchers.Main){
 //                                                                  authRepository.login(user,isRemOn)
                                                                   val isSeller = user.userType == UserType.SELLER.name
-                                                                  appSessionManager.createLoginSession(user.userId,user.name,user.phone,isRemOn,isSeller)
+                                                                  sharePrefManager.createLoginSession(user.userId,user.name,user.phone,isRemOn,isSeller)
                                                                   _inProgress.value = StoreDataStatus.DONE
                                                                   _isLogged.value = true
                                                               }

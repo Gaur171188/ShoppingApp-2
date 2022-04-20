@@ -20,15 +20,13 @@ class OrderDetails : Fragment() {
         const val TAG = "Order Details"
     }
 
-    private lateinit var viewModel: OrderDetailsViewModel
+
     private lateinit var binding: OrderDetailsBinding
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.order_details, container, false)
-
-        viewModel = ViewModelProvider(this)[OrderDetailsViewModel::class.java]
 
 
 

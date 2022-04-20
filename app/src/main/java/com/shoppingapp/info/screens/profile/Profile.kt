@@ -22,14 +22,13 @@ class Profile: Fragment() {
     }
 
     private lateinit var binding: ProfileBinding
-    private lateinit var viewModel: ProfileViewModel
     private val homeViewModel: HomeViewModel by activityViewModels()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.profile, container, false)
-        viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
+
 
         setObserves()
 

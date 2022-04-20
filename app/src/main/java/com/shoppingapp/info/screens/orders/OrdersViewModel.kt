@@ -1,15 +1,11 @@
 package com.shoppingapp.info.screens.orders
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import com.shoppingapp.info.ShoppingApplication
+import androidx.lifecycle.*
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
-import com.shoppingapp.info.utils.SharePrefManager
+import com.shoppingapp.info.repository.product.ProductRepository
+import com.shoppingapp.info.repository.user.UserRepository
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -20,24 +16,28 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 
-class OrdersViewModel(application: Application) : AndroidViewModel(application) {
+class OrdersViewModel(
+    private val userRepository: UserRepository,
+    private val productRepository: ProductRepository,
+    private val user: LiveData<User>,
+): ViewModel() {
 
     companion object{
         const val TAG = "OrderViewModel"
     }
 
 
-    private val sessionManager = SharePrefManager(application.applicationContext)
-    private val currentUser = sessionManager.getUserIdFromSession()
-    private val appShop = ShoppingApplication(application.applicationContext)
+//    private val sessionManager = SharePrefManager(application.applicationContext)
+//    private val currentUser = sessionManager.getUserIdFromSession()
+//    private val appShop = ShoppingApplication(application.applicationContext)
 
-    private val userRepository by lazy {
-        appShop.userRepository
-    }
+//    private val userRepository by lazy {
+//        appShop.userRepository
+//    }
 
-    private val productsRepository by lazy {
-        appShop.productRepository
-    }
+//    private val productRepository by lazy {
+//        appShop.productRepository
+//    }
 
 
 //    private val _userLikes = MutableLiveData<List<String>>()
@@ -88,7 +88,6 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
                     }
 
                 }
-
         }
     }
 
@@ -110,28 +109,6 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
 //        }
 //    }
 
-//    fun getUserLikes() {
-//        Log.d(TAG, "Getting Likes")
-////		_dataStatus.value = StoreDataStatus.LOADING
-//        viewModelScope.launch {
-//            val res = authRepository.getLikesByUserId(currentUser!!)
-//            if (res is Result.Success) {
-//                val data = res.data ?: emptyList()
-//                if (data[0] != "") {
-//                    _userLikes.value = data
-//                } else {
-//                    _userLikes.value = emptyList()
-//                }
-//                _dataStatus.value = StoreDataStatus.DONE
-//                Log.d(TAG, "Getting Likes: Success")
-//            } else {
-//                _userLikes.value = emptyList()
-//                _dataStatus.value = StoreDataStatus.ERROR
-//                if (res is Error)
-//                    Log.d(TAG, "Getting Likes: Error Occurred, ${res.message}")
-//            }
-//        }
-//    }
 
 //    fun deleteAddress(addressId: String) {
 //        viewModelScope.launch {
@@ -211,7 +188,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
                 if (item != null) {
                     item.quantity = item.quantity + value
                     val deferredRes = async {
-                        userRepository.updateCartItemByUserId(item, currentUser!!)
+                        userRepository.updateCartItemByUserId(item)
                     }
                     val res = deferredRes.await()
                     if (res is Result.Success) {
@@ -236,7 +213,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
                 val itemPos = items.indexOfFirst { it.itemId == itemId }
                 cartList = items.toMutableList()
                 val deferredRes = async {
-                    userRepository.deleteCartItemByUserId(itemId, currentUser!!)
+                    userRepository.deleteCartItemByUserId(itemId)
                 }
                 val res = deferredRes.await()
                 if (res is Result.Success) {
@@ -263,8 +240,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
 
     fun finalizeOrder() {
         _orderStatus.value = StoreDataStatus.LOADING
-//        val deliveryAddress =
-////            _userAddresses.value?.find { it.addressId == _selectedAddress.value }
+//        val deliveryAddress = _userAddresses.value?.find { it.addressId == _selectedAddress.value }
         val paymentMethod = _selectedPaymentMethod.value
         val currDate = Date()
         val orderId = getRandomString(6, currDate.time.toString(), 1)
@@ -274,27 +250,27 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
         if (paymentMethod != null && !items.isNullOrEmpty() && !itemPrices.isNullOrEmpty()) {
             val newOrder = User.OrderItem(
                 orderId,
-                currentUser!!,
+                user.value?.userId!!,
                 items,
                 itemPrices,
                 shippingCharges,
                 paymentMethod,
                 currDate,
             )
-            newOrderData.value = newOrder
-            insertOrder()
+//            newOrderData.value = newOrder
+            insertOrder(newOrder)
         } else {
             Log.d(TAG, "orFinalizeOrder: Error, data null or empty")
             _orderStatus.value = StoreDataStatus.ERROR
         }
     }
 
-    private fun insertOrder() {
+    private fun insertOrder(newOrder: User.OrderItem) {
         viewModelScope.launch {
-            if (newOrderData.value != null) {
+
                 _orderStatus.value = StoreDataStatus.LOADING
                 val deferredRes = async {
-                    userRepository.placeOrder(newOrderData.value!!)
+                    userRepository.placeOrder(newOrder)
                 }
                 val res = deferredRes.await()
                 if (res is Result.Success) {
@@ -309,10 +285,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
                         Log.d(TAG, "onInsertOrder: Error, ${res.message}")
                     }
                 }
-            } else {
-                Log.d(TAG, "orInsertOrder: Error, newProduct Null")
-                _orderStatus.value = StoreDataStatus.ERROR
-            }
+
         }
     }
 
@@ -325,7 +298,7 @@ class OrdersViewModel(application: Application) : AndroidViewModel(application) 
             _cartItems.value?.let { itemList ->
                 itemList.forEach label@{ item ->
                     val productDeferredRes = async {
-                        productsRepository.getProductById(item.productId, true)
+                        this@OrdersViewModel.productRepository.getProductById(item.productId, true)
                     }
                     val proRes = productDeferredRes.await()
                     if (proRes is Result.Success) {

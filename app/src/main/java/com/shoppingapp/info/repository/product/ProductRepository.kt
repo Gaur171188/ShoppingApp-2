@@ -9,14 +9,17 @@ import com.shoppingapp.info.utils.Result.Error
 import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.utils.ERR_UPLOAD
+import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.*
 import java.util.*
 
 class ProductRepository(
 	private val remoteProductRepository: RemoteProductRepository,
-	private val localProductRepository: LocalProductRepository
-){
+	private val localProductRepository: LocalProductRepository,
+	val sharePrefManager: SharePrefManager) {
+
+	private val userId = sharePrefManager.getUserIdFromSession()!!
 
 	companion object {
 		private const val TAG = "ProductsRepository"
@@ -28,9 +31,7 @@ class ProductRepository(
 		return updateProductsFromRemoteSource()
 	}
 
-	 fun observeProducts(): LiveData<Result<List<Product>>?> {
-		return localProductRepository.observeProducts()
-	}
+	 fun observeProducts() = localProductRepository.observeProducts()
 
 	 suspend fun getProducts(): Result<List<Product>> {
 		return localProductRepository.getAllProducts()

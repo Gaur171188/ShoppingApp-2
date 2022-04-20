@@ -18,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shoppingapp.info.screens.home.HomeViewModel
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
 class Account : Fragment() {
@@ -28,7 +29,7 @@ class Account : Fragment() {
 
 //
 //    private val homeViewModel by activityViewModels<HomeViewModel>()
-    private val viewModel by activityViewModels<AccountViewModel>()
+    private val viewModel by sharedViewModel<AccountViewModel>()
     private lateinit var binding: AccountBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,9 +47,9 @@ class Account : Fragment() {
         binding.accountTopAppBar.topAppBar.title = getString(R.string.account)
 
         // TODO: 4/19/2022   user this after dependency injection
-//        if (viewModel.isUserIsSeller()){
-//            binding.btnOrders.visibility = View.GONE
-//        }
+        if (viewModel.isUserIsSeller()){
+            binding.btnOrders.visibility = View.GONE
+        }
 
 
         binding.btnProfile.setOnClickListener {
@@ -77,7 +78,7 @@ class Account : Fragment() {
                 .setPositiveButton(getString(R.string.dialog_sign_out_btn_text)) { _, _ ->
 
                     // TODO: 4/19/2022 user this after dependency injection
-//                   viewModel.signOut()
+                   viewModel.signOut()
                 }
                 .show()
         }

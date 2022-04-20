@@ -11,11 +11,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.MainActivity
 import com.shoppingapp.info.R
 import com.shoppingapp.info.databinding.LoginBinding
 import com.shoppingapp.info.utils.StoreDataStatus
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
 class Login : Fragment() {
@@ -24,7 +26,7 @@ class Login : Fragment() {
         const val TAG = "Login"
     }
 
-    private lateinit var viewModel: LoginViewModel
+    private val viewModel by sharedViewModel<LoginViewModel>()
     private lateinit var binding: LoginBinding
 
     private var email: String = ""
@@ -34,7 +36,7 @@ class Login : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.login, container, false)
-        viewModel = ViewModelProvider(this)[LoginViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[LoginViewModel::class.java]
 
 
 

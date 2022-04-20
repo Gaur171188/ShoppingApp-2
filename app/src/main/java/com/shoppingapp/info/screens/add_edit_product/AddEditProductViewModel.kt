@@ -4,12 +4,9 @@ import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
-import com.shoppingapp.info.ShoppingApplication
+import androidx.lifecycle.*
 import com.shoppingapp.info.data.Product
+import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.utils.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -17,19 +14,18 @@ import com.shoppingapp.info.utils.Result
 
 
 
-class AddEditProductViewModel(application: Application) : AndroidViewModel(application) {
+class AddEditProductViewModel(private val productRepository: ProductRepository): ViewModel() {
+
+    private val userId = productRepository.sharePrefManager.getUserIdFromSession()!!
 
     companion object{
-        private const val TAG = "AddEditViewModel"
+        private const val TAG = "AddEditProductViewModel"
     }
 
-    private val appShop = ShoppingApplication(application)
+//    private val appShop = ShoppingApplication(application)
+//    private val productsRepository by lazy { appShop.productRepository }
+//    private val sessionManager = SharePrefManager(application.applicationContext)
 
-    private val productsRepository by lazy { appShop.productRepository }
-
-    private val sessionManager = SharePrefManager(application.applicationContext)
-
-    private val currentUserId = sessionManager.getUserIdFromSession()
 
     private val _selectedCategory = MutableLiveData<String>()
     val selectedCategory: LiveData<String> get() = _selectedCategory
@@ -72,7 +68,7 @@ class AddEditProductViewModel(application: Application) : AndroidViewModel(appli
         viewModelScope.launch {
             Log.d(TAG, "onLoad: Getting product Data")
             _dataStatus.value = StoreDataStatus.LOADING
-            val res = async { productsRepository.getProductById(productId, forceUpdate = false) }
+            val res = async { productRepository.getProductById(productId, forceUpdate = false) }
             val proRes = res.await()
             if (proRes is Result.Success) {
                 val proData = proRes.data
@@ -105,12 +101,12 @@ class AddEditProductViewModel(application: Application) : AndroidViewModel(appli
             } else {
                 _errorStatus.value = AddProductViewErrors.NONE
                 val proId = if (_isEdit.value == true) _productId.value!! else
-                    getProductId(currentUserId!!, selectedCategory.value!!)
+                    getProductId(userId, selectedCategory.value!!)
                 val newProduct =
                     Product(
                         proId,
                         name.trim(),
-                        currentUserId!!,
+                        userId,
                         desc.trim(),
                         _selectedCategory.value!!,
                         price,
@@ -136,7 +132,7 @@ class AddEditProductViewModel(application: Application) : AndroidViewModel(appli
             if (newProductData.value != null && _productData.value != null) {
                 _addProductErrors.value = AddProductErrors.ADDING
                 val resImg =
-                    async { productsRepository.updateImages(imgList, _productData.value!!.images) }
+                    async { productRepository.updateImages(imgList, _productData.value!!.images) }
                 val imagesPaths = resImg.await()
                 newProductData.value?.images = imagesPaths
                 if (newProductData.value?.images?.isNotEmpty() == true) {
@@ -145,7 +141,7 @@ class AddEditProductViewModel(application: Application) : AndroidViewModel(appli
                         _addProductErrors.value = AddProductErrors.ERR_ADD_IMG
                     } else {
                         val updateRes =
-                            async { productsRepository.updateProduct(newProductData.value!!) }
+                            async { productRepository.updateProduct(newProductData.value!!) }
                         val res = updateRes.await()
                         if (res is Result.Success) {
                             Log.d(TAG, "onUpdate: Success")
@@ -170,7 +166,7 @@ class AddEditProductViewModel(application: Application) : AndroidViewModel(appli
         viewModelScope.launch {
             if (newProductData.value != null) {
                 _addProductErrors.value = AddProductErrors.ADDING
-                val resImg = async { productsRepository.insertImages(imgList) }
+                val resImg = async { productRepository.insertImages(imgList) }
                 val imagesPaths = resImg.await()
                 newProductData.value?.images = imagesPaths
                 if (newProductData.value?.images?.isNotEmpty() == true) {
@@ -179,7 +175,7 @@ class AddEditProductViewModel(application: Application) : AndroidViewModel(appli
                         _addProductErrors.value = AddProductErrors.ERR_ADD_IMG
                     } else {
                         val deferredRes = async {
-                            productsRepository.insertProduct(newProductData.value!!)
+                            productRepository.insertProduct(newProductData.value!!)
                         }
                         val res = deferredRes.await()
                         if (res is Result.Success) {

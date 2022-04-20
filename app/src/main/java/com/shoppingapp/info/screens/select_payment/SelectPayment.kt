@@ -19,7 +19,7 @@ class SelectPayment: Fragment() {
         const val TAG = "Profile"
     }
 
-    private lateinit var viewModel: SelectPaymentViewModel
+
     private lateinit var binding: SelectPaymentBinding
 
 
@@ -27,7 +27,7 @@ class SelectPayment: Fragment() {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.select_payment, container, false)
 
-        viewModel = ViewModelProvider(this)[SelectPaymentViewModel::class.java]
+
 
 
 
