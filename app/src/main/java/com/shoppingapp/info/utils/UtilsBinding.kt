@@ -40,7 +40,7 @@ fun setProductTitle(tv: TextView, title: String){
 }
 
 
-@BindingAdapter("setPrice")
+@BindingAdapter("setProductPrice")
 fun setProductPrice(tv: TextView, price: Double){
     tv.text = context.getString(R.string.price_text,price.toString())
 }
@@ -59,8 +59,8 @@ fun setQuantity(tv: TextView, quantity: Int){
     tv.text = "Quantity: $quantity"
 }
 
-@BindingAdapter("setTotalPrice")
-fun setTotalPrice(tv: TextView,v: Double){
+@BindingAdapter("setPrice")
+fun setPrice(tv: TextView, v: Double){
     tv.text = "$v"
 }
 

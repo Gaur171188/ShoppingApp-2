@@ -13,6 +13,12 @@
             name="itemsCount"
             type="Integer" />
 
+        <variable
+            name="totalPrice"
+            type="Double" />
+
+
+
 
     </data>
 
@@ -49,7 +55,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textColor="@color/black"
-                setTotalPrice="@{itemsPriceTotal}"
+                setPrice="@{itemsPriceTotal}"
                 app:layout_constraintBottom_toBottomOf="@+id/price_items_label_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/price_items_label_tv"
@@ -131,10 +137,12 @@
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textColor="@color/blue_accent_300"
                 android:textStyle="bold"
+                setPrice="${totalPrice}"
                 app:layout_constraintBottom_toBottomOf="@+id/price_total_label_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/price_total_label_tv"
                 tools:text="$123.45" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>

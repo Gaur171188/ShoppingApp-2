@@ -8,15 +8,12 @@ import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.repository.user.UserRepository
 import com.shoppingapp.info.screens.orders.OrdersViewModel
-import com.shoppingapp.info.utils.AddItemErrors
 import com.shoppingapp.info.utils.AddObjectStatus
 import com.shoppingapp.info.utils.StoreDataStatus
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.utils.Result.Error
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 
@@ -101,42 +98,96 @@ class ProductDetailsViewModel(
         }
     }
 
+//    fun setQuantityOfItem(productId: String, value: Int) {
+//        viewModelScope.launch {
+//
+//            val user = userRepository.getUser()
+//            if (user != null){
+//                val itemId = user.cart.find { it.productId == productId }?.itemId
+//                var cartList: MutableList<User.CartItem>
+//                var q = 0
+//                _cartItems.value?.let { items ->
+//                    val item = items.find { it.itemId == itemId }
+//
+//                    val itemPos = items.indexOfFirst { it.itemId == itemId }
+////                cartList = items.toMutableList()
+//                    if (item != null) {
+//                        q = item.quantity + value
+//                        _quantity.value = q
+//                        item.quantity = q
+//                        val deferredRes = async { userRepository.updateCartItemByUserId(item) }
+//                        val res = deferredRes.await()
+//                        if (res is Result.Success) {
+////                        cartList[itemPos] = item
+////                        _cartItems.value = cartList
+//
+//                        } else {
+//                            if (res is Error)
+//                                Log.d(OrdersViewModel.TAG, "onUpdateQuantity: Error Occurred: ${res}")
+//                        }
+//
+//                    }
+//                }
+//            }
+//        }
+////
+//    }
 
-    // TODO: 4/22/2022 fix issue if the value == 1 don't decrease..
+
     fun setQuantityOfItem(productId: String, value: Int) {
         viewModelScope.launch {
 
+            val newQuantity = value + _quantity.value!!
+            _quantity.value = newQuantity
+
+
             val user = userRepository.getUser()
-            if (user != null){
-                val itemId = user.cart.find { it.productId == productId }?.itemId
-                var cartList: MutableList<User.CartItem>
-                var q = 0
-                _cartItems.value?.let { items ->
-                    val item = items.find { it.itemId == itemId }
+            if (user != null) {
+                val item = user.cart.find { it.productId == productId }
+                if (item != null){
+                    item.quantity = newQuantity
 
-                    val itemPos = items.indexOfFirst { it.itemId == itemId }
-//                cartList = items.toMutableList()
-                    if (item != null) {
-                        q = item.quantity + value
-                        _quantity.value = q
-                        item.quantity = q
-                        val deferredRes = async { userRepository.updateCartItemByUserId(item) }
-                        val res = deferredRes.await()
-                        if (res is Result.Success) {
-//                        cartList[itemPos] = item
-//                        _cartItems.value = cartList
-
-                        } else {
-                            if (res is Error)
-                                Log.d(OrdersViewModel.TAG, "onUpdateQuantity: Error Occurred: ${res}")
-                        }
-
-                    }
+                    // if the item exist in cart it will be updated and save the cart value.
+                    val deferredRes = async { userRepository.updateCartItemByUserId(item) }
+                    deferredRes.await()
                 }
             }
-            }
-//
+
+
+        }
     }
+//
+//
+////            val user = userRepository.getUser()
+//            if (user != null){
+//                val itemId = user.cart.find { it.productId == productId }?.itemId
+//                var cartList: MutableList<User.CartItem>
+//                var q = 0
+//                _cartItems.value?.let { items ->
+//                    val item = items.find { it.itemId == itemId }
+//
+//                    val itemPos = items.indexOfFirst { it.itemId == itemId }
+////                cartList = items.toMutableList()
+//                    if (item != null) {
+//                        q = item.quantity + value
+//                        _quantity.value = q
+//                        item.quantity = q
+//                        val deferredRes = async { userRepository.updateCartItemByUserId(item) }
+//                        val res = deferredRes.await()
+//                        if (res is Result.Success) {
+////                        cartList[itemPos] = item
+////                        _cartItems.value = cartList
+//
+//                        } else {
+//                            if (res is Error)
+//                                Log.d(OrdersViewModel.TAG, "onUpdateQuantity: Error Occurred: ${res}")
+//                        }
+//
+//                    }
+//                }
+//            }
+//            }
+//
 
 
 
@@ -243,7 +294,7 @@ class ProductDetailsViewModel(
 
         Log.d(TAG, "item is adding to cart ..")
         val itemId = UUID.randomUUID().toString()
-        val newItem = User.CartItem(itemId, productId, productData.value!!.owner, 1, color, size)
+        val newItem = User.CartItem(itemId, productId, productData.value!!.owner, _quantity.value!!, color, size)
         insertCartItem(newItem)
 
     }

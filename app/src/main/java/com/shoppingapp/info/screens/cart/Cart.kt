@@ -251,10 +251,9 @@ class Cart : Fragment() {
             val totalItemsPrice = viewModel.getItemsPriceTotal(data)
             val itemsCount = viewModel.getItemsCount()
 
-
-            val shippingPrice = 0
-            val importCharges = 0
-            val totalPrice = 0
+            val shippingPrice = 0.0
+            val importCharges = 0.0
+            val totalPrice = 0.0
 
 
 
@@ -262,7 +261,9 @@ class Cart : Fragment() {
                 id("price")
                 itemsPriceTotal(totalItemsPrice)
                 itemsCount(itemsCount)
+                totalPrice(totalPrice)
             }
+
 
 
         }

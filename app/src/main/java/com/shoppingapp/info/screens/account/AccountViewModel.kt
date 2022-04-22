@@ -18,7 +18,7 @@ class AccountViewModel(private val userRepository: UserRepository): ViewModel() 
 
 
 
-    // TODO: make the sign out function inside work manager and require network
+
     fun signOut() {
         viewModelScope.launch {
             val res = userRepository.signOut()

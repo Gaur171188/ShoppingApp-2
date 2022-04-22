@@ -28,7 +28,6 @@ import com.shoppingapp.info.utils.AddItemErrors
 import com.shoppingapp.info.utils.AddObjectStatus
 import com.shoppingapp.info.utils.DotsIndicatorDecoration
 import com.shoppingapp.info.utils.StoreDataStatus
-import org.koin.android.ext.android.bind
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -82,12 +81,19 @@ class ProductDetails: Fragment() {
 
         /** button plus quantity **/
         binding.btnCartProductPlus.setOnClickListener {
-            viewModel.setQuantityOfItem(productId, +1)
+            val quantity = viewModel.quantity.value!!
+            if (quantity >= 1){
+                viewModel.setQuantityOfItem(productId, +1)
+            }
+
         }
 
         /** button minus quantity **/
         binding.btnCartProductMinus.setOnClickListener {
-            viewModel.setQuantityOfItem(productId, -1)
+            val quantity = viewModel.quantity.value!!
+            if (quantity >= 2){
+                viewModel.setQuantityOfItem(productId, -1)
+            }
         }
 
 

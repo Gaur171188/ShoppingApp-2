@@ -39,15 +39,26 @@ class Account : Fragment() {
 
 
         setViews()
+        setObserves()
 
         return binding.root
+    }
+
+    private fun setObserves() {
+
+        /** isSignOut live data **/
+        viewModel.isSignOut.observe(viewLifecycleOwner){
+            if (it != null){
+                navigateToSignUpActivity()
+            }
+        }
     }
 
     private fun setViews() {
         binding.accountTopAppBar.topAppBar.title = getString(R.string.account)
 
         // TODO: 4/19/2022   user this after dependency injection
-        if (viewModel.isUserIsSeller()){
+        if (!viewModel.isUserIsSeller()){
             binding.btnOrders.visibility = View.GONE
         }
 
@@ -65,6 +76,11 @@ class Account : Fragment() {
             Log.d(TAG, "Sign Out Selected")
             showSignOutDialog()
         }
+
+
+
+
+
     }
 
     private fun showSignOutDialog() {
@@ -76,8 +92,6 @@ class Account : Fragment() {
                     dialog.cancel()
                 }
                 .setPositiveButton(getString(R.string.dialog_sign_out_btn_text)) { _, _ ->
-
-                    // TODO: 4/19/2022 user this after dependency injection
                    viewModel.signOut()
                 }
                 .show()
