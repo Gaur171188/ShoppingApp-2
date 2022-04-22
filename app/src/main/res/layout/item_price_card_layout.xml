@@ -5,6 +5,15 @@
 
     <data>
 
+        <variable
+            name="itemsPriceTotal"
+            type="Double" />
+
+        <variable
+            name="itemsCount"
+            type="Integer" />
+
+
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -27,6 +36,7 @@
                 android:id="@+id/price_items_label_tv"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                setItemsCount="@{itemsCount}"
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textColor="@color/dark_gray"
                 app:layout_constraintStart_toStartOf="parent"
@@ -39,6 +49,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textColor="@color/black"
+                setTotalPrice="@{itemsPriceTotal}"
                 app:layout_constraintBottom_toBottomOf="@+id/price_items_label_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/price_items_label_tv"
@@ -64,7 +75,8 @@
                 app:layout_constraintBottom_toBottomOf="@+id/price_shipping_label_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/price_shipping_label_tv"
-                tools:text="$123.45" />
+                tools:text="$0"
+                android:text="$0"/>
 
             <TextView
                 android:id="@+id/price_charges_label_tv"
@@ -86,7 +98,8 @@
                 app:layout_constraintBottom_toBottomOf="@+id/price_charges_label_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/price_charges_label_tv"
-                tools:text="$123.45" />
+                tools:text="$0"
+                android:text="$0" />
 
             <ImageView
                 android:id="@+id/card_dotted_divider"

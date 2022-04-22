@@ -18,13 +18,18 @@ object x{
 
 
 @BindingAdapter("setImage")
-fun setImage(image: ImageView, images: List<String>){
-    val imgUrl = images[0].toUri().buildUpon().scheme("https").build()
-    Glide.with(context)
-        .asBitmap()
-        .load(imgUrl)
-        .into(image)
-    image.clipToOutline = true
+fun setImage(image: ImageView, images: List<String>?){
+    try {
+        val imgUrl = images?.get(0)?.toUri()?.buildUpon()?.scheme("https")?.build()
+        Glide.with(context)
+            .asBitmap()
+            .load(imgUrl)
+            .into(image)
+    }catch (ex: Exception){
+
+    }
+
+//    image.clipToOutline = true
 }
 
 
@@ -51,5 +56,16 @@ fun setProductLike(image: ImageView , isLike: Boolean){
 
 @BindingAdapter("setQuantity")
 fun setQuantity(tv: TextView, quantity: Int){
-    tv.text = quantity.toString()
+    tv.text = "Quantity: $quantity"
+}
+
+@BindingAdapter("setTotalPrice")
+fun setTotalPrice(tv: TextView,v: Double){
+    tv.text = "$v"
+}
+
+
+@BindingAdapter("setItemsCount")
+fun setItemsCount(tv: TextView,v: Int){
+    tv.text = "Items($v)"
 }

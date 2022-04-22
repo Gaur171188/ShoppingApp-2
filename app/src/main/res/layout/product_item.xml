@@ -18,133 +18,161 @@
         app:strokeColor="#CCCCCC"
         app:strokeWidth="1dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="12dp">
+            android:orientation="vertical"
+            android:layout_margin="5dp">
 
-            <ImageView
-                android:id="@+id/product_image_view"
-                android:layout_width="0dp"
-                android:layout_height="150dp"
-                android:background="@drawable/round_outline_rect"
-                android:contentDescription="@string/image_item"
-                android:scaleType="centerCrop"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:srcCompat="@tools:sample/backgrounds/scenic" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/product_delete_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/round_button"
-                android:contentDescription="@string/remove_product_button"
-                android:scaleType="centerCrop"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_delete_24"
-                app:tint="@color/gray" />
 
-            <CheckBox
-                android:id="@+id/product_like_checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:button="@drawable/sl_favourite_24dp"
-                android:gravity="end|top"
-                android:layoutDirection="rtl"
-                app:buttonTint="@color/red_600"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/product_image_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:background="@drawable/round_outline_rect"
+                    android:contentDescription="@string/image_item"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+
+                <CheckBox
+                    android:id="@+id/product_like_checkbox"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginStart="5dp"
+                    android:button="@drawable/sl_favourite_24dp"
+                    android:gravity="start|top"
+                    app:buttonTint="@color/red_600" />
+
+
+            </FrameLayout>
+
+<!--            <ImageView-->
+<!--                android:id="@+id/product_delete_button"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@drawable/round_button"-->
+<!--                android:contentDescription="@string/remove_product_button"-->
+<!--                android:scaleType="centerCrop"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent"-->
+<!--                app:srcCompat="@drawable/ic_delete_24"-->
+<!--                app:tint="@color/gray" />-->
+
+
+            <!--            <RatingBar-->
+<!--                android:id="@+id/product_rating_bar"-->
+<!--                style="@style/Widget.AppCompat.RatingBar.Small"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:progressTint="@color/gold"-->
+<!--                android:rating="4.25"-->
+<!--                android:secondaryProgressTint="#FFFFFF"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@id/product_name_tv" />-->
 
             <TextView
                 android:id="@+id/product_name_tv"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:lines="2"
+                android:textSize="15sp"
                 android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
-                android:textStyle="bold"
+                android:textStyle="normal"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/product_image_view"
                 tools:text="Item Name name name wofe348" />
 
-            <RatingBar
-                android:id="@+id/product_rating_bar"
-                style="@style/Widget.AppCompat.RatingBar.Small"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:progressTint="@color/gold"
-                android:rating="4.25"
-                android:secondaryProgressTint="#FFFFFF"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/product_name_tv" />
 
-            <TextView
-                android:id="@+id/product_price_tv"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
-                android:textColor="@color/blue_accent_300"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/product_rating_bar"
-                tools:text="$2000" />
+                android:orientation="vertical"
+                app:layout_constraintStart_toEndOf="parent" />
 
-            <TextView
-                android:id="@+id/product_actual_price"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/product_price_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
+                    android:textColor="@color/blue_accent_300"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="visible"
+                    tools:text="$2000" />
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/product_price_tv"
-                tools:text="@string/product_actual_price_text" />
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/product_offer_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:textColor="@android:color/holo_red_light"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@+id/product_actual_price"
-                app:layout_constraintStart_toEndOf="@+id/product_actual_price"
-                app:layout_constraintTop_toTopOf="@+id/product_actual_price"
-                tools:text="25% off" />
+                <TextView
+                    android:id="@+id/product_actual_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="@string/product_actual_price_text" />
 
-            <ImageView
-                android:id="@+id/btn_product_edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/round_button"
-                android:contentDescription="@string/edit_product_button"
-                android:scaleType="centerCrop"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/ic_edit_24"
-                app:tint="@color/gray" />
+                <TextView
+                    android:id="@+id/product_offer_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@android:color/holo_red_light"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="25% off" />
 
-            <ImageView
-                android:id="@+id/product_add_to_cart_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/round_button"
-                android:contentDescription="@string/product_add_to_cart_button"
-                android:scaleType="centerCrop"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/ic_add_shopping_cart_24"
-                app:tint="@color/gray" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+
+
+        </LinearLayout>
+
+
+<!--            <ImageView-->
+<!--                android:id="@+id/btn_product_edit"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@drawable/round_button"-->
+<!--                android:contentDescription="@string/edit_product_button"-->
+<!--                android:scaleType="centerCrop"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:srcCompat="@drawable/ic_edit_24"-->
+<!--                app:tint="@color/gray" />-->
+
+<!--            <ImageView-->
+<!--                android:id="@+id/product_add_to_cart_button"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@drawable/round_button"-->
+<!--                android:contentDescription="@string/product_add_to_cart_button"-->
+<!--                android:scaleType="centerCrop"-->
+<!--                app:layout_constraintBottom_toBottomOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:srcCompat="@drawable/ic_add_shopping_cart_24"-->
+<!--                app:tint="@color/gray" />-->
+
+        </com.google.android.material.card.MaterialCardView>
 </layout>
+

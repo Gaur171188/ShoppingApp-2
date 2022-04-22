@@ -42,35 +42,21 @@ class CartItemAdapter(
 			}
 			binding.cartProductQuantity.text = item.quantity.toString()
 
-			if (likesList.contains(proData.productId)) {
-				binding.cartProductLikeBtn.setImageResource(R.drawable.liked_heart_drawable)
-			} else {
-				binding.cartProductLikeBtn.setImageResource(R.drawable.heart_icon_drawable)
-			}
 
-			binding.cartProductLikeBtn.setOnClickListener {
-				binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
-				if (!likesList.contains(proData.productId)) {
-					binding.cartProductLikeBtn.setImageResource(R.drawable.liked_heart_drawable)
-				} else {
-					binding.cartProductLikeBtn.setImageResource(R.drawable.heart_icon_drawable)
-				}
-				onClickListener.onLikeClick(proData.productId)
-//				onClickListener.onLikeClick(proData.productId)
-			}
+
 
 			binding.cartProductDeleteBtn.setOnClickListener {
 				binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
 				onClickListener.onDeleteClick(item.itemId, binding.loaderLayout)
 			}
-			binding.btnCartProductPlus.setOnClickListener {
-				binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
-				onClickListener.onPlusClick(item.itemId)
-			}
-			binding.btnCartProductMinus.setOnClickListener {
-				binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
-				onClickListener.onMinusClick(item.itemId, item.quantity, binding.loaderLayout)
-			}
+//			binding.btnCartProductPlus.setOnClickListener {
+//				binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
+//				onClickListener.onPlusClick(item.itemId)
+//			}
+//			binding.btnCartProductMinus.setOnClickListener {
+//				binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
+//				onClickListener.onMinusClick(item.itemId, item.quantity, binding.loaderLayout)
+//			}
 
 		}
 	}

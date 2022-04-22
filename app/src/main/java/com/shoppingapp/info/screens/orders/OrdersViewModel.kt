@@ -26,6 +26,10 @@ class OrdersViewModel(
     }
 
 
+    init {
+
+    }
+
 
 
 //    private val sessionManager = SharePrefManager(application.applicationContext)
@@ -45,19 +49,19 @@ class OrdersViewModel(
 //    val userLikes: LiveData<List<String>> get() = _userLikes
 
     private val _cartItems = MutableLiveData<List<User.CartItem>>()
-    val cartItems: LiveData<List<User.CartItem>> get() = _cartItems
+    val cartItems: LiveData<List<User.CartItem>> = _cartItems
 
     private val _priceList = MutableLiveData<Map<String, Double>>()
-    val priceList: LiveData<Map<String, Double>> get() = _priceList
+    val priceList: LiveData<Map<String, Double>> = _priceList
 
     private val _cartProducts = MutableLiveData<List<Product>>()
-    val cartProducts: LiveData<List<Product>> get() = _cartProducts
+    val cartProducts: LiveData<List<Product>> = _cartProducts
 
     private val _dataStatus = MutableLiveData<StoreDataStatus>()
-    val dataStatus: LiveData<StoreDataStatus> get() = _dataStatus
+    val dataStatus: LiveData<StoreDataStatus> = _dataStatus
 
     private val _orderStatus = MutableLiveData<StoreDataStatus>()
-    val orderStatus: LiveData<StoreDataStatus> get() = _orderStatus
+    val orderStatus: LiveData<StoreDataStatus> = _orderStatus
 
     private val _selectedAddress = MutableLiveData<String>()
     private val _selectedPaymentMethod = MutableLiveData<String>()
@@ -66,27 +70,18 @@ class OrdersViewModel(
 
     // TODO: 4/19/2022 enhance this function
     fun getCartItems() {
-        Log.d(TAG, "Getting Cart Items")
-        _dataStatus.value = StoreDataStatus.LOADING
         viewModelScope.launch {
             val user = userRepository.getUser()
                 if(user != null){
-                    viewModelScope.launch {
-                        _cartItems.value = user.cart
-                        val priceRes = async { getAllProductsInCart() }
-                        priceRes.await()
-                        Log.d(TAG, "Getting Cart Items: Success ${_priceList.value}")
-                    }
+                    _cartItems.value = user.cart
+                    val priceRes = async { getAllProductsInCart() }
+                    priceRes.await()
                 } else {
-                    viewModelScope.launch {
-                        _cartItems.value = emptyList()
-                        _dataStatus.value = StoreDataStatus.ERROR
-                        Log.d(TAG, "Getting Cart Items: User Not Found")
-                    }
-
+                    _cartItems.value = emptyList()
                 }
         }
     }
+
 
 //    fun getUserAddresses() {
 //        Log.d(TAG, "Getting Addresses")

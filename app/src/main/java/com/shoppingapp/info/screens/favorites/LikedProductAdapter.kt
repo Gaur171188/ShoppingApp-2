@@ -31,7 +31,7 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 			}
 			binding.productNameTv.text = product.name
 			binding.productPriceTv.text = context.getString(R.string.pro_details_price_value, product.price.toString())
-			binding.productRatingBar.rating = product.rating.toFloat()
+//			binding.productRatingBar.rating = product.rating.toFloat()
 			binding.productActualPrice.apply {
 				paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
 				text = context.getString(
@@ -53,19 +53,19 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 			}
 
 			//hiding unnecessary button
-			binding.productAddToCartButton.visibility = View.GONE
-			binding.productDeleteButton.visibility = View.GONE
+//			binding.productAddToCartButton.visibility = View.GONE
+//			binding.productDeleteButton.visibility = View.GONE
 			binding.productLikeCheckbox.visibility = View.GONE
 
-			// setting edit button as delete button
-			binding.btnProductEdit.setImageResource(R.drawable.ic_delete_24)
-			binding.btnProductEdit.setOnClickListener {
-				onClickListener.onDeleteClick(product)
-
-//				notifyItemRemoved(adapterPosition)
-//				notifyDataSetChanged()
-
-			}
+//			// setting edit button as delete button
+//			binding.btnProductEdit.setImageResource(R.drawable.ic_delete_24)
+//			binding.btnProductEdit.setOnClickListener {
+//				onClickListener.onDeleteClick(product)
+//
+////				notifyItemRemoved(adapterPosition)
+////				notifyDataSetChanged()
+//
+//			}
 		}
 	}
 

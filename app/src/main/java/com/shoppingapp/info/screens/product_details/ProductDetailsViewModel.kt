@@ -7,6 +7,7 @@ import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.repository.user.UserRepository
+import com.shoppingapp.info.screens.orders.OrdersViewModel
 import com.shoppingapp.info.utils.AddItemErrors
 import com.shoppingapp.info.utils.AddObjectStatus
 import com.shoppingapp.info.utils.StoreDataStatus
@@ -32,6 +33,13 @@ class ProductDetailsViewModel(
     }
 
     private val _productId = MutableLiveData<String>()
+
+    private val _cartItems = MutableLiveData<List<User.CartItem>>()
+    val cartItems: LiveData<List<User.CartItem>> = _cartItems
+
+
+    private val _quantity = MutableLiveData<Int?>()
+    val quantity: LiveData<Int?> = _quantity
 
     private val _productData = MutableLiveData<Product?>()
     val productData: LiveData<Product?> get() = _productData
@@ -62,13 +70,9 @@ class ProductDetailsViewModel(
         _isProductLiked.value = false
         _errorStatus.value = null
 
-        viewModelScope.launch {
-//            Log.d(TAG, "init: productId: $productId")
-//            getProductDetails()
 
-//            checkIfInCart()
-//            setLike()
-        }
+
+
 
     }
 
@@ -96,6 +100,68 @@ class ProductDetailsViewModel(
             }
         }
     }
+
+
+    // TODO: 4/22/2022 fix issue if the value == 1 don't decrease..
+    fun setQuantityOfItem(productId: String, value: Int) {
+        viewModelScope.launch {
+
+            val user = userRepository.getUser()
+            if (user != null){
+                val itemId = user.cart.find { it.productId == productId }?.itemId
+                var cartList: MutableList<User.CartItem>
+                var q = 0
+                _cartItems.value?.let { items ->
+                    val item = items.find { it.itemId == itemId }
+
+                    val itemPos = items.indexOfFirst { it.itemId == itemId }
+//                cartList = items.toMutableList()
+                    if (item != null) {
+                        q = item.quantity + value
+                        _quantity.value = q
+                        item.quantity = q
+                        val deferredRes = async { userRepository.updateCartItemByUserId(item) }
+                        val res = deferredRes.await()
+                        if (res is Result.Success) {
+//                        cartList[itemPos] = item
+//                        _cartItems.value = cartList
+
+                        } else {
+                            if (res is Error)
+                                Log.d(OrdersViewModel.TAG, "onUpdateQuantity: Error Occurred: ${res}")
+                        }
+
+                    }
+                }
+            }
+            }
+//
+    }
+
+
+
+
+    fun getCartItems(productId: String) {
+        viewModelScope.launch {
+            val user = userRepository.getUser()
+            if(user != null){
+                viewModelScope.launch {
+                    _cartItems.value = user.cart
+                    val quantity = user.cart.find { it.productId == productId }?.quantity
+                    if (quantity != null){
+                        _quantity.value = quantity!!
+                    }else{
+                        _quantity.value = 1
+                    }
+
+                }
+            } else {
+                _cartItems.value = emptyList()
+                Log.d(OrdersViewModel.TAG, "Getting Cart Items: User Not Found")
+            }
+        }
+    }
+
 
     fun setLike(productId: String) {
         viewModelScope.launch {
@@ -149,7 +215,6 @@ class ProductDetailsViewModel(
             } else {
                 _isItemInCart.value = false
             }
-
         }
     }
 

@@ -7,7 +7,7 @@
 
     </data>
 
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -38,14 +38,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="72dp">
 
-                <androidx.constraintlayout.widget.Group
-                    android:id="@+id/layout_views_group"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="pro_details_images_recyclerview,
-                product_details_title,btn_product_details_like,pro_details_rating_bar,
-                product_price,pro_details_select_size_label,pro_details_select_color_label,
-                pro_details_specifications_label" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/pro_details_images_recyclerview"
@@ -87,18 +79,6 @@
                     app:layout_constraintTop_toTopOf="@+id/product_details_title"
                     app:srcCompat="@drawable/heart_icon_drawable" />
 
-                <RatingBar
-                    android:id="@+id/pro_details_rating_bar"
-                    style="@style/Widget.AppCompat.RatingBar.Small"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:progressTint="@color/gold"
-                    android:rating="3.5"
-                    android:secondaryProgressTint="#FFFFFF"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/product_details_title" />
 
                 <TextView
                     android:id="@+id/product_price"
@@ -111,7 +91,7 @@
                     android:textSize="18sp"
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/pro_details_rating_bar"
+                    app:layout_constraintTop_toBottomOf="@+id/product_details_title"
                     tools:text="$ 200.99" />
 
                 <TextView
@@ -132,6 +112,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scrollbars="none"
+
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/pro_details_select_size_label">
@@ -207,20 +188,84 @@
 
         </androidx.core.widget.NestedScrollView>
 
-        <Button
-            android:id="@+id/btn_add_product_to_cart"
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:backgroundTint="@color/blue_accent_300"
-            android:padding="16dp"
-            android:text="@string/add_to_cart"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:translationY="-8dp" />
-    </RelativeLayout>
+            android:gravity="center"
+            android:padding="8dp"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom">
+
+
+            <Button
+                android:id="@+id/btn_add_product_to_cart"
+                android:layout_width="0dp"
+                android:layout_weight="4"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:backgroundTint="@color/blue_accent_300"
+                android:padding="16dp"
+                android:text="@string/add_to_cart"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="10dp"/>
+
+
+            <ImageButton
+                android:id="@+id/btn_cart_product_minus"
+                android:layout_width="33dp"
+                android:layout_height="28dp"
+                android:background="@null"
+                android:contentDescription="@string/decrease_button"
+                app:srcCompat="@drawable/ic_remove_24"
+                app:tint="@color/black" />
+
+            <TextView
+                android:id="@+id/cart_product_quantity"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:background="@color/blue_shadow_color"
+                android:gravity="center_horizontal|center_vertical"
+                android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="123" />
+
+            <ImageButton
+                android:id="@+id/btn_cart_product_plus"
+                android:layout_width="33dp"
+                android:layout_height="28dp"
+                android:background="@null"
+                android:contentDescription="@string/increase_button"
+                app:srcCompat="@drawable/ic_add_24"
+                app:tint="@color/black" />
+
+
+
+        </LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </FrameLayout>
+
+
 </layout>

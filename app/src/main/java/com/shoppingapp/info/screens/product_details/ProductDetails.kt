@@ -23,10 +23,12 @@ import com.shoppingapp.info.R
 import com.shoppingapp.info.ShoeColors
 import com.shoppingapp.info.ShoeSizes
 import com.shoppingapp.info.databinding.ProductDetailsBinding
+import com.shoppingapp.info.screens.orders.OrdersViewModel
 import com.shoppingapp.info.utils.AddItemErrors
 import com.shoppingapp.info.utils.AddObjectStatus
 import com.shoppingapp.info.utils.DotsIndicatorDecoration
 import com.shoppingapp.info.utils.StoreDataStatus
+import org.koin.android.ext.android.bind
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -41,6 +43,7 @@ class ProductDetails: Fragment() {
     private val viewModel by sharedViewModel<ProductDetailsViewModel> {
         parametersOf(arguments?.getString("productId") as String) // the argument will be fixed in parameter of view model
     }
+    private val ordersViewModel by sharedViewModel<OrdersViewModel>()
 
     private lateinit var productId: String
 
@@ -53,7 +56,6 @@ class ProductDetails: Fragment() {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.product_details, container, false)
         productId = arguments?.getString("productId") as String
-
 
 
         if (viewModel.isUserSeller()) {
@@ -74,39 +76,56 @@ class ProductDetails: Fragment() {
                         }
                     }
 
-
-
                 }
             }
         }
 
+        /** button plus quantity **/
+        binding.btnCartProductPlus.setOnClickListener {
+            viewModel.setQuantityOfItem(productId, +1)
+        }
+
+        /** button minus quantity **/
+        binding.btnCartProductMinus.setOnClickListener {
+            viewModel.setQuantityOfItem(productId, -1)
+        }
+
+
         binding.loaderLayout.loaderFrameLayout.background =
             ResourcesCompat.getDrawable(resources, R.color.white, null)
 
-        binding.layoutViewsGroup.visibility = View.GONE
+//        binding.layoutViewsGroup.visibility = View.GONE
         binding.btnAddProductToCart.visibility = View.GONE
+
         setObservers()
         viewModel.getProductDetails(productId)
+
+//      ordersViewModel.getCartItems()
+
+
+
         return binding.root
     }
+
 
     override fun onResume() {
         super.onResume()
         viewModel.setLike(productId)
-
         viewModel.checkIfInCart(productId)
+        viewModel.getCartItems(productId)
+
         selectedSize = null
         selectedColor = null
+
     }
+
 
     private fun setObservers() {
 
         /** live data data status **/
         viewModel.dataStatus.observe(viewLifecycleOwner) {
             when (it) {
-                StoreDataStatus.LOADING ->{
-
-                }
+                StoreDataStatus.LOADING ->{}
                 StoreDataStatus.DONE -> {
                     binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
                     binding.proDetailsLayout.visibility = View.VISIBLE
@@ -120,6 +139,8 @@ class ProductDetails: Fragment() {
             }
         }
 
+
+
         /** live data is liked **/
         viewModel.isProductLiked.observe(viewLifecycleOwner) {
             if (it == true) {
@@ -128,6 +149,15 @@ class ProductDetails: Fragment() {
                 binding.btnProductDetailsLike.setImageResource(R.drawable.heart_icon_drawable)
             }
         }
+
+
+        /** quantity **/
+        viewModel.quantity.observe(viewLifecycleOwner){ quantity ->
+            if (quantity != null){
+                binding.cartProductQuantity.text = quantity.toString()
+            }
+        }
+
 
         /** live data item in cart **/
         viewModel.isItemInCart.observe(viewLifecycleOwner) {
@@ -140,12 +170,10 @@ class ProductDetails: Fragment() {
             }else{
                    binding.btnAddProductToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
             }
-
         }
 
-        viewModel.errorStatus.observe(viewLifecycleOwner) {
 
-        }
+
 
 
     }
@@ -168,7 +196,7 @@ class ProductDetails: Fragment() {
     }
 
     private fun setViews() {
-        binding.layoutViewsGroup.visibility = View.VISIBLE
+//        binding.layoutViewsGroup.visibility = View.VISIBLE
         binding.btnAddProductToCart.visibility = View.VISIBLE
         binding.addProAppBar.topAppBar.title = viewModel.productData.value?.name
 
@@ -195,8 +223,8 @@ class ProductDetails: Fragment() {
             }
         }
 
-        /** set rating data **/
-        binding.proDetailsRatingBar.rating = (viewModel.productData.value?.rating ?: 0.0).toFloat()
+//        /** set rating data **/
+//        binding.proDetailsRatingBar.rating = (viewModel.productData.value?.rating ?: 0.0).toFloat()
 
         /** set price data **/
         binding.productPrice.text = resources.getString(
@@ -209,6 +237,11 @@ class ProductDetails: Fragment() {
 
         /** set product description  **/
         binding.productDescription.text = viewModel.productData.value?.description ?: ""
+
+//        val cart = ordersViewModel.cartItems.value?.find { it.productId == productId }
+//        val item = cart?.quantity
+//        binding.cartProductQuantity.text = item.toString()
+
     }
 
     private fun onAddToCart() {

@@ -40,13 +40,10 @@ class ProductAdapter(
         private val proPrice = binding.productPriceTv
         private val productCard = binding.productCard
         private val productImage = binding.productImageView
-        private val proDeleteButton = binding.productDeleteButton
-        private val proEditBtn = binding.btnProductEdit
         private val proMrp = binding.productActualPrice
         private val proOffer = binding.productOfferValue
-        private val proRatingBar = binding.productRatingBar
         private val proLikeButton = binding.productLikeCheckbox
-        private val proCartButton = binding.productAddToCartButton
+
 
         fun bind(productData: Product) {
 
@@ -63,8 +60,8 @@ class ProductAdapter(
             /** price data **/
             proPrice.text = context.getString(R.string.pro_details_price_value, productData.price.toString())
 
-            /** rating data **/
-            proRatingBar.rating = productData.rating.toFloat()
+//            /** rating data **/
+//            proRatingBar.rating = productData.rating.toFloat()
 
             /** actual price **/
             proMrp.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
@@ -85,20 +82,20 @@ class ProductAdapter(
                 onClickListener.onLikeClick(productData.productId)
             }
 
-            /** button add product to cart **/
-            proCartButton.setOnClickListener {
-                onClickListener.onAddToCartClick(productData,position)
-            }
+//            /** button add product to cart **/
+//            proCartButton.setOnClickListener {
+//                onClickListener.onAddToCartClick(productData,position)
+//            }
 
-            /** button edit product **/
-            proEditBtn.setOnClickListener {
-                onClickListener.onEditClick(productData.productId)
-            }
-
-            /** button delete product **/
-            proDeleteButton.setOnClickListener {
-                onClickListener.onDeleteClick(productData)
-            }
+//            /** button edit product **/
+//            proEditBtn.setOnClickListener {
+//                onClickListener.onEditClick(productData.productId)
+//            }
+//
+//            /** button delete product **/
+//            proDeleteButton.setOnClickListener {
+//                onClickListener.onDeleteClick(productData)
+//            }
 
             /** product image **/
             if (productData.images.isNotEmpty()) {
@@ -118,17 +115,11 @@ class ProductAdapter(
             bindImageButtons.setLikeButton(productData.productId, proLikeButton)
 
 
-            bindImageButtons.setCartButton(productData.productId, proCartButton)
-
+//            bindImageButtons.setCartButton(productData.productId, proCartButton)
+//
 
             if (isUserSeller) {
                 proLikeButton.visibility = View.GONE
-                proCartButton.visibility = View.GONE
-
-            } else {
-                proEditBtn.visibility = View.GONE
-                proDeleteButton.visibility = View.GONE
-
 
 
             }
