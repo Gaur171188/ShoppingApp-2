@@ -35,7 +35,7 @@
     <string name="check_out">Check Out</string>
     <string name="no_product_liked_yet">No product liked yet!</string>
 
-    <string name="product_actual_price_text"><strike>$1000.00</strike></string>
+    <string name="product_actual_price_text"><strike>$3000.00</strike></string>
     <string name="edit_product_button">Edit Product Button</string>
     <string name="product_add_to_cart_button">Product add to cart button</string>
     <string name="add_product">Add Product</string>

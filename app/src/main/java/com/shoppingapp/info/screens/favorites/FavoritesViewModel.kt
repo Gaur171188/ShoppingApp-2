@@ -1,11 +1,13 @@
 package com.shoppingapp.info.screens.favorites
 
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.repository.user.UserRepository
+import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -52,6 +54,49 @@ class FavoritesViewModel(
     fun loadingIsDone(){
         _dataStatus.value = StoreDataStatus.DONE
     }
+
+
+    // TODO: 4/23/2022 make function for remove all likes from favorites
+
+//
+//    fun toggleLikeByProductId(productId: String) {
+//
+//        viewModelScope.launch {
+//
+//            val isLiked = isProductLiked(productId)
+//            val allLikes = _userLikes.value?.toMutableList() ?: mutableListOf()
+//            val deferredRes = async {
+//                if (isLiked) {
+//                    userRepository.removeProductFromLikes(productId)
+//                } else {
+//                    userRepository.insertProductToLikes(productId)
+//                }
+//            }
+//            val res = deferredRes.await()
+//            if (res is Result.Success) {
+//                if (isLiked) {
+//                    allLikes.remove(productId)
+//                } else {
+//                    allLikes.add(productId)
+//                }
+//                _userLikes.value = allLikes
+//                val proList = _likedProducts.value?.toMutableList() ?: mutableListOf()
+//                val pro = proList.find { it.productId == productId }
+//                if (pro != null) {
+//                    proList.remove(pro)
+//                }
+//                _likedProducts.value = proList
+//                Log.d(TAG, "onToggleLike: Success")
+//            } else {
+//                if (res is Error) {
+//                    Log.d(TAG, "onToggleLike: Error, ${res.message}")
+//                }
+//            }
+//
+//        }
+//
+//    }
+//
 
 //    private fun getProducts() {
 //        _dataStatus.value = StoreDataStatus.LOADING

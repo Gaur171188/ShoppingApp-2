@@ -90,8 +90,6 @@ class HomeViewModel(
 
         if (isUserSeller()) {
             Log.i(TAG,"Seller")
-//            val products = allProducts as MutableLiveData<List<Product>>
-
          getProductByOwner()
 
         }else{
@@ -118,7 +116,8 @@ class HomeViewModel(
     }
 
 
-    fun refreshProduct(){
+    // TODO: 4/23/2022  make this function work on swipe to refresh data
+    fun refreshProduct() {
         viewModelScope.launch {
             productRepository.refreshProducts()
         }

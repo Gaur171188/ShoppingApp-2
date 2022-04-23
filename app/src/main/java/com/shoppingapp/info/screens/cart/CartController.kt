@@ -51,7 +51,6 @@ class CartController(): TypedEpoxyController<List<CartItem>>() {
     }
 
     interface OnClickListener {
-
         fun onDeleteClick(cartItem: CartItem, position: Int)
         fun onItemClick(cartItem: CartItem, position: Int)
     }

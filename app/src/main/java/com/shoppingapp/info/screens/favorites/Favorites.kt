@@ -15,6 +15,7 @@ import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.FavoritiesBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
+import com.shoppingapp.info.screens.home.ProductController
 import com.shoppingapp.info.screens.home.RecyclerViewPaddingItemDecoration
 import com.shoppingapp.info.utils.StoreDataStatus
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -29,7 +30,12 @@ class Favorites : Fragment() {
     private val viewModel by sharedViewModel<FavoritesViewModel>()
     private val homeViewModel: HomeViewModel by sharedViewModel()
     private lateinit var binding: FavoritiesBinding
-    private lateinit var productsAdapter: LikedProductAdapter
+    private val favoritesController by lazy { FavoritesController() }
+//    private lateinit var productsAdapter: LikedProductAdapter
+    private lateinit var likedProducts: List<Product>
+
+
+
 
 
 
@@ -39,6 +45,7 @@ class Favorites : Fragment() {
 
 //        viewModel = ViewModelProvider(this)[FavoritesViewModel::class.java]
         binding.favTopAppBar.topAppBar.title = "Favorite Products"
+        likedProducts = arguments?.get("userLikes") as List<Product>
 
 
         // TODO: fix issue the favorites data does not displayed in first time.
@@ -49,9 +56,11 @@ class Favorites : Fragment() {
         setViews()
         setObserves()
 
+        viewModel.initData(likedProducts)
 
         return binding.root
     }
+
 
 
 
@@ -61,81 +70,124 @@ class Favorites : Fragment() {
         viewModel.likedProducts.observe(viewLifecycleOwner){ likedProducts ->
             Log.i(TAG,"liked products: ${likedProducts.size}")
             if (likedProducts != null){
-                refreshAdapter(likedProducts)
+                favoritesController.setData(likedProducts)
             }else{
+                favoritesController.setData(emptyList())
                 binding.favoritesEmptyMessage.visibility = View.VISIBLE
             }
         }
 
 
-        /** live data store status **/
-        viewModel.dataStatus.observe(viewLifecycleOwner){ status->
-            if (status != null){
-                when(status){
-                    StoreDataStatus.LOADING ->{
-                        binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
-                        binding.loaderLayout.circularLoader.showAnimationBehavior
-                        binding.favoritesEmptyMessage.visibility = View.GONE
-                    }
-
-                    StoreDataStatus.DONE ->{
-                        binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
-                        binding.loaderLayout.circularLoader.hideAnimationBehavior
-                        binding.favoritesEmptyMessage.visibility = View.GONE
-
-                    }
-
-                    StoreDataStatus.ERROR ->{
-                        binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
-                        binding.loaderLayout.circularLoader.hideAnimationBehavior
-                        binding.favoritesEmptyMessage.visibility = View.VISIBLE
-                    }
-                }
-            }
-
-        }
+//        /** live data store status **/
+//        viewModel.dataStatus.observe(viewLifecycleOwner){ status->
+//            if (status != null){
+//                when(status){
+//                    StoreDataStatus.LOADING ->{
+//                        binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
+//                        binding.loaderLayout.circularLoader.showAnimationBehavior
+//                        binding.favoritesEmptyMessage.visibility = View.GONE
+//                    }
+//
+//                    StoreDataStatus.DONE ->{
+//                        binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
+//                        binding.loaderLayout.circularLoader.hideAnimationBehavior
+//                        binding.favoritesEmptyMessage.visibility = View.GONE
+//
+//                    }
+//
+//                    StoreDataStatus.ERROR ->{
+//                        binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
+//                        binding.loaderLayout.circularLoader.hideAnimationBehavior
+//                        binding.favoritesEmptyMessage.visibility = View.VISIBLE
+//                    }
+//                }
+//            }
+//
+//        }
 
     }
 
 
 
-    @SuppressLint("NotifyDataSetChanged")
-    private fun refreshAdapter(likedProducts: List<Product>){
-        productsAdapter.data = likedProducts
-        binding.favoriteProductsRecyclerView.adapter = productsAdapter
+//    @SuppressLint("NotifyDataSetChanged")
+//    private fun refreshAdapter(likedProducts: List<Product>){
+//        productsAdapter.data = likedProducts
+//        binding.favoriteProductsRecyclerView.adapter = productsAdapter
+//
+//        binding.favoriteProductsRecyclerView.adapter?.apply {
+//            notifyDataSetChanged()
+//            viewModel.loadingIsDone()
+//        }
+//    }
 
-        binding.favoriteProductsRecyclerView.adapter?.apply {
-            notifyDataSetChanged()
-            viewModel.loadingIsDone()
-        }
-    }
+
+    private fun setProductsAdapter() {
 
 
-    private fun setViews(){
-        val likedProducts = arguments?.get("userLikes") as List<Product>
-        viewModel.initData(likedProducts )
-        productsAdapter = LikedProductAdapter(likedProducts, requireContext())
-        productsAdapter.onClickListener = object : LikedProductAdapter.OnClickListener {
-            override fun onClick(product: Product) {
-                Log.d(TAG, "Product: ${product.productId} clicked")
+        favoritesController.setData(emptyList())
+
+
+        /** click listener **/
+        favoritesController.clickListener = object : FavoritesController.OnClickListener{
+
+            override fun onProductClick(product: Product) {
+
                 findNavController().navigate(
                     R.id.action_favorites_to_productDetails,
                     bundleOf("productId" to product.productId)
                 )
+
             }
 
-            override fun onDeleteClick(product: Product) {
-                removeLike(product)
+
+            override fun onLikeClick(product: Product) {
+
+                viewModel.toggleLikeByProductId(product){
+                    Toast.makeText(requireContext(),"liked",Toast.LENGTH_SHORT).show()
+                }
+
             }
+
+
         }
+
+
+    }
+
+
+
+    private fun setViews(){
+
+
+        setProductsAdapter()
 
         binding.favoriteProductsRecyclerView.apply {
             val itemDecoration = RecyclerViewPaddingItemDecoration(requireContext())
             if (itemDecorationCount == 0) {
                 addItemDecoration(itemDecoration)
             }
+            adapter = favoritesController.adapter
         }
-        viewModel.loadingIsDone()
+
+//        productsAdapter = LikedProductAdapter(likedProducts, requireContext())
+//
+//        productsAdapter.onClickListener = object : LikedProductAdapter.OnClickListener {
+//            override fun onClick(product: Product) {
+//                Log.d(TAG, "Product: ${product.productId} clicked")
+//                findNavController().navigate(
+//                    R.id.action_favorites_to_productDetails,
+//                    bundleOf("productId" to product.productId)
+//                )
+//            }
+//
+//            override fun onDeleteClick(product: Product) {
+//                removeLike(product)
+//            }
+//
+//        }
+
+
+//        viewModel.loadingIsDone()
     }
 
 

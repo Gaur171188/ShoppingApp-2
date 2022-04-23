@@ -3,6 +3,8 @@ package com.shoppingapp.info.utils
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.view.View
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
@@ -33,11 +35,23 @@ fun setImage(image: ImageView, images: List<String>?){
 }
 
 
+@BindingAdapter("isSeller")
+fun isSeller(checkBox: CheckBox , isSeller: Boolean){
+    if (isSeller){
+        checkBox.visibility = View.GONE
+    }else{
+        checkBox.visibility = View.VISIBLE
+    }
+}
+
+
+
 
 @BindingAdapter("setTitle")
 fun setProductTitle(tv: TextView, title: String){
     tv.text = title
 }
+
 
 
 @BindingAdapter("setProductPrice")
@@ -46,12 +60,17 @@ fun setProductPrice(tv: TextView, price: Double){
 }
 
 @BindingAdapter("setLike")
-fun setProductLike(image: ImageView , isLike: Boolean){
-    if (isLike) {
-       image.setImageResource(R.drawable.liked_heart_drawable)
-    } else {
-        image.setImageResource(R.drawable.heart_icon_drawable)
-    }
+fun setProductLike(checkBox: CheckBox , isLike: Boolean){
+    checkBox.isChecked = isLike
+}
+
+
+@BindingAdapter("setAdImage")
+fun setAdImage(image: ImageView,v: Int){
+    Glide.with(context)
+        .asBitmap()
+        .load(v)
+        .into(image)
 }
 
 @BindingAdapter("setQuantity")

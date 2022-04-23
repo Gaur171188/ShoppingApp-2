@@ -5,6 +5,14 @@
 
     <data>
 
+        <variable
+            name="image"
+            type="Integer" />
+
+        <variable
+            name="onItemClick"
+            type="android.view.View.OnClickListener" />
+
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -13,6 +21,7 @@
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="true"
+        android:onClick="@{onItemClick}"
         app:cardElevation="0dp"
         app:strokeColor="#CCCCCC"
         app:strokeWidth="1dp">
@@ -28,11 +37,13 @@
                 android:background="@drawable/round_outline_rect"
                 android:contentDescription="@string/image_item"
                 android:scaleType="fitXY"
+                setAdImage="@{image}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@drawable/ad_ex_1" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 </layout>

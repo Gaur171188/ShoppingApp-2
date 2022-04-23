@@ -6,6 +6,28 @@
 
     <data>
 
+
+        <variable
+            name="productData"
+            type="com.shoppingapp.info.data.Product" />
+
+        <variable
+            name="isLiked"
+            type="Boolean" />
+
+        <variable
+            name="isSeller"
+            type="Boolean" />
+
+
+        <variable
+            name="onItemClick"
+            type="android.view.View.OnClickListener" />
+
+        <variable
+            name="onItemLiked"
+            type="android.view.View.OnClickListener" />
+
     </data>
 
 
@@ -23,6 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:onClick="@{onItemClick}"
             android:layout_margin="5dp">
 
             <FrameLayout
@@ -37,6 +60,7 @@
                     android:background="@drawable/round_outline_rect"
                     android:contentDescription="@string/image_item"
                     android:scaleType="centerCrop"
+                    setImage="@{productData.images}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -49,9 +73,16 @@
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginStart="5dp"
+                    setLike="@{isLiked}"
+                    isSeller="@{isSeller}"
+                    android:visibility="visible"
+                    tools:checked="true"
+                    android:onClick="@{onItemLiked}"
                     android:button="@drawable/sl_favourite_24dp"
                     android:gravity="start|top"
                     app:buttonTint="@color/red_600" />
+
+
 
 
             </FrameLayout>
@@ -87,6 +118,7 @@
                 android:layout_marginTop="4dp"
                 android:lines="2"
                 android:textSize="15sp"
+                setTitle="@{productData.name}"
                 android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
                 android:textStyle="normal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -108,6 +140,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
+                    setProductPrice="@{productData.price}"
                     android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
                     android:textColor="@color/blue_accent_300"
                     android:textSize="16sp"
@@ -122,6 +155,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+
                 <TextView
                     android:id="@+id/product_actual_price"
                     android:layout_width="wrap_content"
@@ -130,6 +164,7 @@
                     android:textSize="12sp"
                     android:textStyle="bold"
                     tools:text="@string/product_actual_price_text" />
+
 
                 <TextView
                     android:id="@+id/product_offer_value"

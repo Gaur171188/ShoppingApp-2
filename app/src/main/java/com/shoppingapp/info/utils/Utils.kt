@@ -20,6 +20,8 @@ enum class AddProductErrors { NONE, ERR_ADD, ERR_ADD_IMG, ADDING }
 enum class AddItemErrors { ERROR_SIZE, ERROR_COLOR }
 enum class AddObjectStatus { DONE, ERR_ADD, ADDING }
 
+
+
 class MyOnFocusChangeListener : View.OnFocusChangeListener {
     override fun onFocusChange(v: View?, hasFocus: Boolean) {
         if (v != null) {
