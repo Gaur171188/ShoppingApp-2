@@ -11,6 +11,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.shoppingapp.info.databinding.ActivityMainBinding
 import com.shoppingapp.info.receiver.NetworkReceiver
+import com.shoppingapp.info.repository.product.RemoteProductRepository
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.SharePrefManager
 
@@ -19,7 +20,8 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
     private lateinit var binding: ActivityMainBinding
     private val networkReceiver = NetworkReceiver()
     private var isConnected: Boolean? = null
-    private val homeViewModel by viewModels<HomeViewModel>()
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +47,8 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
                     setBottomNavVisibility(View.VISIBLE)
                 }
             }
+
+
 
 
 

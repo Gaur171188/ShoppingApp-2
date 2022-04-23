@@ -3,12 +3,10 @@ package com.shoppingapp.info.screens.home
 import android.util.Log
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
-import com.shoppingapp.info.ShoppingApplication
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.repository.user.UserRepository
-import com.shoppingapp.info.screens.product_details.ProductDetailsViewModel
 import com.shoppingapp.info.utils.StoreDataStatus
 import java.time.Month
 import com.shoppingapp.info.utils.Result
@@ -21,7 +19,7 @@ import java.util.*
 class HomeViewModel(
     private val userRepository: UserRepository,
     private val productRepository: ProductRepository,
-    private val allProducts: LiveData<List<Product>>,
+    private val allProducts: LiveData<List<Product>>
 //    private val ownerProducts: LiveData<List<Product>>,
 ): ViewModel() {
 
@@ -33,7 +31,7 @@ class HomeViewModel(
 //    private val userRepository by lazy{ shopApp.userRepository }
 //    private val productsRepository by lazy { shopApp.productRepository }
 
-    private val userId by lazy {FirebaseAuth.getInstance().uid}
+    private val userId = userRepository.getUserId()
 
 
     private var _products = MutableLiveData<List<Product>>()
@@ -82,7 +80,7 @@ class HomeViewModel(
 
 
     init {
-        _products = allProducts as MutableLiveData<List<Product>>
+
 
         viewModelScope.launch {
             userRepository.hardRefreshUserData()
@@ -91,22 +89,39 @@ class HomeViewModel(
         }
 
         if (isUserSeller()) {
-//            _products = ownerProducts as MutableLiveData<List<Product>>
-//            getProductsByOwner()
             Log.i(TAG,"Seller")
+//            val products = allProducts as MutableLiveData<List<Product>>
+
+         getProductByOwner()
+
         }else{
-//            getProducts()
-//            _products = allProducts as MutableLiveData<List<Product>>
             Log.i(TAG,"customer")
+            _products = allProducts as MutableLiveData<List<Product>>
         }
 
-
     }
+
+    fun getProductByOwner(){
+        viewModelScope.launch {
+            val res = productRepository.getAllProductsByOwner()
+            if (res is Result.Success){
+                _products.value = res.data!!
+            }
+        }
+    }
+
 
     fun isUserSeller() = userRepository.isUserSeller()
 
     fun setConnectivityState(b: Boolean) {
         _isConnected.value = b
+    }
+
+
+    fun refreshProduct(){
+        viewModelScope.launch {
+            productRepository.refreshProducts()
+        }
     }
 
     fun setDataLoaded() {

@@ -2,6 +2,7 @@ package com.shoppingapp.info.repository.product
 
 import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -28,6 +29,10 @@ class RemoteProductRepository() {
 
 	fun observeProducts() = observableProducts
 
+
+	// here you must update all the user data check if the product is still in remote database then update the user cart.
+	suspend fun hardRefreshData(){
+	}
 
 	suspend fun getAllProducts(): Result<List<Product>> {
 		val resRef = productsCollectionRef().get().await()
@@ -97,6 +102,8 @@ class RemoteProductRepository() {
 		}
 		return uriRef.await()
 	}
+
+
 
 	fun deleteImage(imgUrl: String) {
 		val ref = rootStorage.getReferenceFromUrl(imgUrl)

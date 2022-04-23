@@ -14,8 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import com.shoppingapp.info.R
@@ -83,17 +81,22 @@ class AddEditProduct : Fragment() {
     private fun initViewModel() {
         Log.d(TAG, "init view model, isedit = $isEdit")
 
-        viewModel.setIsEdit(isEdit)
+        viewModel.setEditState(isEdit)
         if (isEdit) {
             Log.d(TAG, "init view model, isedit = true, $productId")
             viewModel.setProductData(productId)
+
+            binding.btnAddProduct.text = "Update"
+            binding.btnDeleteProduct.visibility = View.VISIBLE
         } else {
             Log.d(TAG, "init view model, isedit = false, $catName")
             viewModel.setCategory(catName)
+            binding.btnAddProduct.text = "Add Product"
         }
     }
 
     private fun setObservers() {
+
         viewModel.errorStatus.observe(viewLifecycleOwner) { err ->
             modifyErrors(err)
         }
@@ -144,23 +147,26 @@ class AddEditProduct : Fragment() {
     }
 
     private fun fillDataInAllViews() {
-        viewModel.productData.value?.let { product ->
-            Log.d(TAG, "fill data in views")
-            binding.addProAppBar.topAppBar.title = "Edit Product - ${product.name}"
-            binding.productName.setText(product.name)
-            binding.proPriceEditText.setText(product.price.toString())
-            binding.proMrpEditText.setText(product.mrp.toString())
-            binding.productDes.setText(product.description)
+        if(isEdit){
+            viewModel.productData.value?.let { product ->
+                Log.d(TAG, "fill data in views")
+                binding.addProAppBar.topAppBar.title = "Edit Product - ${product.name}"
+                binding.productName.setText(product.name)
+                binding.proPriceEditText.setText(product.price.toString())
+                binding.proMrpEditText.setText(product.mrp.toString())
+                binding.productDes.setText(product.description)
 
-            imgList = product.images.map { it.toUri() } as MutableList<Uri>
-            val adapter = AddProductImagesAdapter(requireContext(), imgList)
-            binding.addProImagesRv.adapter = adapter
+                imgList = product.images.map { it.toUri() } as MutableList<Uri>
+                val adapter = AddProductImagesAdapter(requireContext(), imgList)
+                binding.addProImagesRv.adapter = adapter
 
-            setShoeSizesChips(product.availableSizes)
-            setShoeColorsChips(product.availableColors)
+                setShoeSizesChips(product.availableSizes)
+                setShoeColorsChips(product.availableColors)
 
-            binding.btnAddProduct.setText(R.string.edit_product_btn_text)
+                binding.btnAddProduct.setText(R.string.edit_product_btn_text)
+            }
         }
+
 
     }
 
@@ -168,8 +174,7 @@ class AddEditProduct : Fragment() {
         Log.d(TAG, "set views")
 
         if (!isEdit) { // add new product
-            binding.addProAppBar.topAppBar.title =
-                "Add Product - ${viewModel.selectedCategory.value}"
+            binding.addProAppBar.topAppBar.title = "Add Product - ${viewModel.selectedCategory.value}"
 
             val adapter = AddProductImagesAdapter(requireContext(), imgList)
             binding.addProImagesRv.adapter = adapter
@@ -202,6 +207,19 @@ class AddEditProduct : Fragment() {
                     }
                 }
             }
+        }
+
+
+        // TODO: 4/22/2022 add progress during deleting the product
+
+        /** button delete product **/
+        binding.btnDeleteProduct.setOnClickListener {
+            viewModel.deleteProduct(productId, onSuccess = { isDeleted ->
+                if (isDeleted){
+                    findNavController().navigateUp()
+                    Toast.makeText(requireContext(),"removed",Toast.LENGTH_SHORT).show()
+                }
+            })
         }
     }
 

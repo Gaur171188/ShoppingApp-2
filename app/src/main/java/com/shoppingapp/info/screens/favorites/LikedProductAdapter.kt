@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.databinding.ProductItemBinding
+import com.shoppingapp.info.databinding.ItemProductBinding
 import com.shoppingapp.info.utils.getOfferPercentage
 
 
@@ -22,7 +22,7 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 
 	lateinit var onClickListener: OnClickListener
 
-	inner class ViewHolder(private val binding: ProductItemBinding) :
+	inner class ViewHolder(private val binding: ItemProductBinding) :
 		RecyclerView.ViewHolder(binding.root) {
 		@SuppressLint("NotifyDataSetChanged")
 		fun bind(product: Product) {
@@ -71,7 +71,7 @@ class LikedProductAdapter(proList: List<Product>, private val context: Context) 
 
 	override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 		return ViewHolder(
-			ProductItemBinding.inflate(
+			ItemProductBinding.inflate(
 				LayoutInflater.from(parent.context),
 				parent,
 				false

@@ -41,8 +41,8 @@ class ProductRepository(
 		return localProductRepository.observeProductsByOwner(ownerId)
 	}
 
-	 suspend fun getAllProductsByOwner(ownerId: String): Result<List<Product>> {
-		return localProductRepository.getAllProductsByOwner(ownerId)
+	 suspend fun getAllProductsByOwner(): Result<List<Product>> {
+		return localProductRepository.getAllProductsByOwner(userId)
 	}
 
 	 suspend fun getProductById(productId: String, forceUpdate: Boolean): Result<Product> {
@@ -73,6 +73,8 @@ class ProductRepository(
 			}
 		}
 	}
+
+
 
 	 suspend fun insertImages(imgList: List<Uri>): List<String> {
 		var urlList = mutableListOf<String>()

@@ -98,6 +98,8 @@ class ProductDetailsViewModel(
         }
     }
 
+
+
 //    fun setQuantityOfItem(productId: String, value: Int) {
 //        viewModelScope.launch {
 //

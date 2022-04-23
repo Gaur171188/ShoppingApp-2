@@ -1,6 +1,5 @@
 package com.shoppingapp.info.screens.profile
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,6 +12,7 @@ import com.shoppingapp.info.R
 import com.shoppingapp.info.databinding.ProfileBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.StoreDataStatus
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
 class Profile: Fragment() {
@@ -22,7 +22,7 @@ class Profile: Fragment() {
     }
 
     private lateinit var binding: ProfileBinding
-    private val homeViewModel: HomeViewModel by activityViewModels()
+    private val homeViewModel: HomeViewModel by sharedViewModel()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

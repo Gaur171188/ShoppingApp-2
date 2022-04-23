@@ -7,6 +7,7 @@
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/ic_add_24.xml" value="0.2703125" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/ic_filled_logout_24.xml" value="0.2703125" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/ic_outline_library_books_24.xml" value="0.2703125" />
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/liked_heart_drawable.xml" value="0.14635416666666667" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/login_bg_img.xml" value="0.2703125" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/signout_account_drawable.xml" value="0.2703125" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/drawable/sl_favourite_24dp.xml" value="0.2703125" />
@@ -17,7 +18,7 @@
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/activity_main.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/activity_registration.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/activity_splash.xml" value="0.25416666666666665" />
-        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/add_edit_product.xml" value="0.264" />
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/add_edit_product.xml" value="0.2" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/add_image_to_product_layout.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/app_bar_label_layout.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/cart.xml" value="0.25416666666666665" />
@@ -30,6 +31,7 @@
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/image_item.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/item_cart.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/item_price_card_layout.xml" value="0.4" />
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/item_product.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/layout_top_bar.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/login.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/no_connection_layout.xml" value="0.264" />
@@ -39,7 +41,7 @@
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/orders.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/payment_item.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/price_card_layout.xml" value="0.264" />
-        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/product_details.xml" value="0.264" />
+        <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/product_details.xml" value="0.2" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/product_image_item.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/product_item.xml" value="0.4" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/layout/profile.xml" value="0.264" />

@@ -13,7 +13,7 @@ import com.bumptech.glide.Glide
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.HomeAdLayoutBinding
-import com.shoppingapp.info.databinding.ProductItemBinding
+import com.shoppingapp.info.databinding.ItemProductBinding
 import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.getOfferPercentage
 
@@ -34,7 +34,7 @@ class ProductAdapter(
     private val sessionManager = SharePrefManager(context)
     private val isUserSeller = sessionManager.isUserSeller()
 
-    inner class ItemViewHolder(binding: ProductItemBinding) :
+    inner class ItemViewHolder(binding: ItemProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
         private val proName = binding.productNameTv
         private val proPrice = binding.productPriceTv
@@ -49,9 +49,9 @@ class ProductAdapter(
 
             /** btn product card **/
             productCard.setOnClickListener {
-                if (!isUserSeller){
+
                     onClickListener.onClick(productData,position)
-                }
+
             }
 
             /** product name **/
@@ -141,7 +141,7 @@ class ProductAdapter(
                 )
             )
             else -> ItemViewHolder(
-                ProductItemBinding.inflate(
+                ItemProductBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
@@ -174,14 +174,11 @@ class ProductAdapter(
 
     interface BindImageButtons {
         fun setLikeButton(productId: String, button: CheckBox)
-        fun setCartButton(productId: String, imgView: ImageView)
+//        fun setCartButton(productId: String, imgView: ImageView)
     }
 
     interface OnClickListener {
         fun onClick(productData: Product, position: Int)
-        fun onDeleteClick(productData: Product)
-        fun onEditClick(productId: String) {}
         fun onLikeClick(productId: String) {}
-        fun onAddToCartClick(productData: Product, position: Int) {}
     }
 }

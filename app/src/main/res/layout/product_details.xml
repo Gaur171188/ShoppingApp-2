@@ -7,30 +7,22 @@
 
     </data>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/add_pro_app_bar"
-            layout="@layout/layout_top_bar" />
 
-        <include
-            android:id="@+id/loader_layout"
-            layout="@layout/circular_loader_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
-            android:layout_below="@id/add_pro_app_bar"
-            android:layout_gravity="center" />
+
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/pro_details_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/add_pro_app_bar"
             android:fillViewport="true"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/pro_details_layout"
@@ -39,10 +31,39 @@
                 android:layout_marginBottom="72dp">
 
 
+                <ImageView
+                    android:id="@+id/btn_Back"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="start"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/ic_outline_arrow_back_24"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/black" />
+
+
+                <ImageButton
+                    android:id="@+id/btn_product_details_like"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_margin="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:background="@null"
+                    android:contentDescription="@string/like_button"
+                    android:padding="4dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:src="@drawable/liked_heart_drawable" />
+
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/pro_details_images_recyclerview"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="400dp"
+                    android:layout_marginTop="?attr/actionBarSize"
                     android:orientation="horizontal"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -50,6 +71,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:itemCount="3"
                     tools:listitem="@layout/product_image_item" />
+
 
                 <TextView
                     android:id="@+id/product_details_title"
@@ -61,23 +83,9 @@
                     android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
                     android:textSize="18sp"
                     android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_product_details_like"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/pro_details_images_recyclerview"
                     tools:text="Some Title of The Product van be multiline" />
-
-                <ImageButton
-                    android:id="@+id/btn_product_details_like"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:background="@null"
-                    android:backgroundTint="#FFFFFF"
-                    android:contentDescription="@string/like_button"
-                    android:padding="4dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/product_details_title"
-                    app:srcCompat="@drawable/heart_icon_drawable" />
 
 
                 <TextView
@@ -190,31 +198,35 @@
 
 
         <LinearLayout
+            android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:gravity="center"
-            android:padding="8dp"
             android:orientation="horizontal"
-            android:layout_gravity="bottom">
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
 
             <Button
                 android:id="@+id/btn_add_product_to_cart"
                 android:layout_width="0dp"
-                android:layout_weight="4"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
+                android:layout_weight="4"
                 android:backgroundTint="@color/blue_accent_300"
                 android:padding="16dp"
-                android:text="@string/add_to_cart"
                 android:textAllCaps="false"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="@string/add_to_cart" />
 
 
             <Space
                 android:layout_width="10dp"
-                android:layout_height="10dp"/>
+                android:layout_height="10dp" />
 
 
             <ImageButton
@@ -247,7 +259,6 @@
                 app:tint="@color/black" />
 
 
-
         </LinearLayout>
 
 
@@ -259,13 +270,7 @@
 
 
 
-
-
-
-
-
-
-    </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </layout>

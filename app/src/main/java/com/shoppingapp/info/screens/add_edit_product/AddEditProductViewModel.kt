@@ -1,6 +1,5 @@
 package com.shoppingapp.info.screens.add_edit_product
 
-import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.annotation.VisibleForTesting
@@ -55,13 +54,29 @@ class AddEditProductViewModel(private val productRepository: ProductRepository):
         _errorStatus.value = AddProductViewErrors.NONE
     }
 
-    fun setIsEdit(state: Boolean) {
+    fun setEditState(state: Boolean) {
         _isEdit.value = state
     }
 
     fun setCategory(catName: String) {
         _selectedCategory.value = catName
     }
+
+
+    fun deleteProduct(productId: String,onSuccess:(Boolean)-> Unit) {
+        viewModelScope.launch {
+            val delRes = async { productRepository.deleteProductById(productId) }
+            when (val res = delRes.await()) {
+                is Result.Success ->{
+                    Log.d(TAG, "onDelete: Success")
+                    onSuccess(true)
+                }
+                is Error -> Log.d(TAG, "onDelete: Error, ${res.message}")
+                else -> Log.d(TAG, "onDelete: Some error occurred!")
+            }
+        }
+    }
+
 
     fun setProductData(productId: String) {
         _productId.value = productId

@@ -13,11 +13,8 @@ import com.shoppingapp.info.databinding.AccountBinding
 import android.content.Intent
 
 import android.util.Log
-import android.widget.Toast
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.shoppingapp.info.screens.home.HomeViewModel
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 

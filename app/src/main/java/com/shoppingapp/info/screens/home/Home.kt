@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.CheckBox
-import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.DataBindingUtil
@@ -24,7 +23,6 @@ import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.HomeBinding
 import com.shoppingapp.info.utils.MyOnFocusChangeListener
-import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -44,9 +42,12 @@ class Home : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(layoutInflater,R.layout.home,container,false)
-//        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         setViews()
         setObservers()
+
+
+        viewModel.refreshProduct()
+
         return binding.root
     }
 
@@ -55,15 +56,24 @@ class Home : Fragment() {
         viewModel.getUserLikes(0L)
     }
 
-//	override fun onResume() {
-//		super.onResume()
-//		viewModel.getUserLikes(0L)
-//	}
+    override fun onResume() {
+        super.onResume()
+        // to refresh the data
+        if (viewModel.isUserSeller()){
+            viewModel.getProductByOwner()
+        }
+
+    }
+
+
+    // TODO: 4/22/2022 update the local data base before app is open ..
+    // TODO: 4/22/2022 you can update the database in backend using work manager
 
     private fun setViews() {
         setHomeTopAppBar()
         if (context != null) {
             setProductsAdapter(viewModel.products.value)
+
             binding.productsRecyclerView.apply {
                 val gridLayoutManager = GridLayoutManager(context, 2)
                 gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
@@ -128,6 +138,11 @@ class Home : Fragment() {
                 }
             }
         }
+
+        viewModel.products.observe(viewLifecycleOwner){
+
+        }
+
 
         viewModel.products.observe(viewLifecycleOwner) {
             if (it.isNotEmpty()) {
@@ -199,8 +214,7 @@ class Home : Fragment() {
         binding.homeTopAppBar.homeSearchEditText.setOnEditorActionListener { textView, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 textView.clearFocus()
-                val inputManager =
-                    requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val inputManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 inputManager.hideSoftInputFromWindow(textView.windowToken, 0)
                 performSearch(textView.text.toString())
                 true
@@ -227,37 +241,43 @@ class Home : Fragment() {
 
         productAdapter.onClickListener = object : ProductAdapter.OnClickListener {
             override fun onClick(productData: Product,position: Int) {
+//                Toast.makeText(requireContext(),"clicked",Toast.LENGTH_SHORT).show()
 
-                findNavController().navigate(
-                    R.id.action_home_to_productDetails,
-                    bundleOf("productId" to productData.productId)
-                )
-
+                if (viewModel.isUserSeller()){
+                    navigateToAddEditProductScreen(isEdit = true, productId = productData.productId)
+                }else {
+                    findNavController().navigate(
+                        R.id.action_home_to_productDetails,
+                        bundleOf("productId" to productData.productId)
+                    )
+                }
             }
-
-            override fun onDeleteClick(productData: Product) {
-                Log.d(TAG, "onDeleteProduct: initiated for ${productData.productId}")
-                showDeleteDialog(productData.name, productData.productId)
-            }
-
-            override fun onEditClick(productId: String) {
-                Log.d(TAG, "onEditProduct: initiated for $productId")
-                navigateToAddEditProductScreen(isEdit = true, productId = productId)
-            }
-
 
             override fun onLikeClick(productId: String) {
                 Log.d(TAG, "onToggleLike: initiated for $productId")
                 viewModel.toggleLikeByProductId(productId)
             }
 
-            override fun onAddToCartClick(productData: Product, position: Int) {
-                viewModel.toggleProductInCart(productData){
-                    if (it is Result.Success){
-                        productAdapter.notifyItemChanged(position)
-                    }
-                }
-            }
+
+//            override fun onDeleteClick(productData: Product) {
+//                Log.d(TAG, "onDeleteProduct: initiated for ${productData.productId}")
+//                showDeleteDialog(productData.name, productData.productId)
+//            }
+//
+//            override fun onEditClick(productId: String) {
+//                Log.d(TAG, "onEditProduct: initiated for $productId")
+//                navigateToAddEditProductScreen(isEdit = true, productId = productId)
+//            }
+
+
+
+//            override fun onAddToCartClick(productData: Product, position: Int) {
+//                viewModel.toggleProductInCart(productData){
+//                    if (it is Result.Success){
+//                        productAdapter.notifyItemChanged(position)
+//                    }
+//                }
+//            }
 
         }
         productAdapter.bindImageButtons = object : ProductAdapter.BindImageButtons {
@@ -269,38 +289,23 @@ class Home : Fragment() {
             }
 
 
-            override fun setCartButton(productId: String, imgView: ImageView) {
-
-                viewModel.isProductInCart(productId){
-                    if (it) {
-                        imgView.setImageResource(R.drawable.ic_remove_shopping_cart_24)
-                    } else {
-                        imgView.setImageResource(R.drawable.ic_add_shopping_cart_24)
-                    }
-
-                }
-
-            }
+////            override fun setCartButton(productId: String, imgView: ImageView) {
+//
+//                viewModel.isProductInCart(productId){
+//                    if (it) {
+//                        imgView.setImageResource(R.drawable.ic_remove_shopping_cart_24)
+//                    } else {
+//                        imgView.setImageResource(R.drawable.ic_add_shopping_cart_24)
+//                    }
+//
+//                }
+//
+//            }
 
         }
     }
 
-    private fun showDeleteDialog(productName: String, productId: String) {
-        context?.let {
-            MaterialAlertDialogBuilder(it)
-                .setTitle(getString(R.string.delete_dialog_title_text))
-                .setMessage(getString(R.string.delete_dialog_message_text, productName))
-                .setNegativeButton(getString(R.string.pro_cat_dialog_cancel_btn)) { dialog, _ ->
-                    dialog.cancel()
-                }
-                .setPositiveButton(getString(R.string.delete_dialog_delete_btn_text)) { dialog, _ ->
-                    // TODO: make the remove product require network
-                    viewModel.deleteProduct(productId)
-                    dialog.cancel()
-                }
-                .show()
-        }
-    }
+
 
     private fun showDialogWithItems(
         categoryItems: Array<String>,

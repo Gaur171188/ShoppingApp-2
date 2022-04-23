@@ -25,6 +25,8 @@ class UserRepository(
 	}
 
 
+	fun getUserId() = sharePrefManager.getUserIdFromSession()
+
 	fun isRememberMeOn() = sharePrefManager.isRememberMeOn()
 
 	// TODO: 4/19/2022 add the result

@@ -329,8 +329,7 @@
 
         </androidx.core.widget.NestedScrollView>
 
-        <Button
-            android:id="@+id/btn_add_product"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|bottom"
@@ -338,12 +337,45 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            android:backgroundTint="@color/blue_accent_300"
-            android:padding="16dp"
-            android:text="Add Product"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal">
+
+
+            <Button
+                android:id="@+id/btn_add_product"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/blue_accent_300"
+                android:padding="16dp"
+                tools:text="Add Product"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"/>
+
+            <Button
+                android:id="@+id/btn_delete_product"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/holo_red_light"
+                android:padding="16dp"
+                android:text="Delete"
+                android:visibility="gone"
+                tools:visibility="visible"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+
+
+        </LinearLayout>
+
+
+
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

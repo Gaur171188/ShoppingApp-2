@@ -19,7 +19,7 @@
             style="@style/Widget.MaterialComponents.Toolbar.Primary"
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:background="@color/white"
+            android:background="@null"
             app:buttonGravity="center_vertical"
             app:contentInsetStartWithNavigation="0dp"
             app:navigationIcon="@drawable/ic_outline_arrow_back_24"

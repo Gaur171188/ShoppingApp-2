@@ -28,6 +28,7 @@ import com.shoppingapp.info.utils.AddItemErrors
 import com.shoppingapp.info.utils.AddObjectStatus
 import com.shoppingapp.info.utils.DotsIndicatorDecoration
 import com.shoppingapp.info.utils.StoreDataStatus
+import org.koin.android.ext.android.bind
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -79,6 +80,10 @@ class ProductDetails: Fragment() {
             }
         }
 
+        binding.btnBack.setOnClickListener {
+           findNavController().navigateUp()
+        }
+
         /** button plus quantity **/
         binding.btnCartProductPlus.setOnClickListener {
             val quantity = viewModel.quantity.value!!
@@ -97,11 +102,10 @@ class ProductDetails: Fragment() {
         }
 
 
-        binding.loaderLayout.loaderFrameLayout.background =
-            ResourcesCompat.getDrawable(resources, R.color.white, null)
-
-//        binding.layoutViewsGroup.visibility = View.GONE
-        binding.btnAddProductToCart.visibility = View.GONE
+//        binding.loaderLayout.loaderFrameLayout.background =
+//            ResourcesCompat.getDrawable(resources, R.color.white, null)
+//
+//        binding.btnAddProductToCart.visibility = View.GONE
 
         setObservers()
         viewModel.getProductDetails(productId)
@@ -133,14 +137,14 @@ class ProductDetails: Fragment() {
             when (it) {
                 StoreDataStatus.LOADING ->{}
                 StoreDataStatus.DONE -> {
-                    binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
+//                    binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
                     binding.proDetailsLayout.visibility = View.VISIBLE
                     setViews()
                 }
                 StoreDataStatus.ERROR ->{}
                 else -> {
                     binding.proDetailsLayout.visibility = View.GONE
-                    binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
+//                    binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
                 }
             }
         }
@@ -204,20 +208,20 @@ class ProductDetails: Fragment() {
     private fun setViews() {
 //        binding.layoutViewsGroup.visibility = View.VISIBLE
         binding.btnAddProductToCart.visibility = View.VISIBLE
-        binding.addProAppBar.topAppBar.title = viewModel.productData.value?.name
+//        binding.addProAppBar.topAppBar.title = viewModel.productData.value?.name
 
-        /** back button **/
-        binding.addProAppBar.topAppBar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
+//        /** back button **/
+//        binding.addProAppBar.topAppBar.setNavigationOnClickListener {
+//            findNavController().navigateUp()
+//        }
 
-        binding.addProAppBar.topAppBar.inflateMenu(R.menu.app_bar_menu)
-        binding.addProAppBar.topAppBar.overflowIcon?.setTint(
-            ContextCompat.getColor(
-                requireContext(),
-                R.color.gray
-            )
-        )
+//        binding.addProAppBar.topAppBar.inflateMenu(R.menu.app_bar_menu)
+//        binding.addProAppBar.topAppBar.overflowIcon?.setTint(
+//            ContextCompat.getColor(
+//                requireContext(),
+//                R.color.gray
+//            )
+//        )
 
         // set images and dots
         setImagesView()
