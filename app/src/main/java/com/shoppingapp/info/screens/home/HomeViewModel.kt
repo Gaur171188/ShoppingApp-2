@@ -94,7 +94,7 @@ class HomeViewModel(
         }else{
             Log.i(TAG,"customer")
             _products = allProducts as MutableLiveData<List<Product>>
-            refreshUserProductLikes()
+            refreshStuckData()
 
         }
 
@@ -128,12 +128,12 @@ class HomeViewModel(
         }
     }
 
-    private fun refreshUserProductLikes(){
+    private fun refreshStuckData(){
         viewModelScope.launch {
             val res = productRepository.getProducts()
             if (res is Result.Success){
-                val oldLikes = userRepository.refreshProductLikes(res.data)
-                userRepository.deleteAllUserLikes(oldLikes)
+                userRepository.refreshProductLikes(res.data)
+                userRepository.refreshCartItems(res.data)
             }
         }
     }

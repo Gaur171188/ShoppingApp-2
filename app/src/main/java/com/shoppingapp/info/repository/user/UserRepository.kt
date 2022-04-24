@@ -12,7 +12,6 @@ import com.shoppingapp.info.utils.UserType
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 import com.shoppingapp.info.utils.Result
-import kotlin.coroutines.suspendCoroutine
 
 class UserRepository(
 	private val localUserRepository: LocalUserRepository,
@@ -31,10 +30,16 @@ class UserRepository(
 	}
 
 
-	suspend fun refreshProductLikes(products: List<Product>): List<String> {
-		val diff = remoteUserRepository.refreshUserLikes(userId,products)
-		Log.d(TAG,"diff likes = ${diff.size}")
-		return diff
+	suspend fun refreshProductLikes(products: List<Product>){
+		val oldLikes = remoteUserRepository.getStuckLikes(userId,products)
+		deleteAllUserLikes(oldLikes)
+		Log.d(TAG,"diff likes = ${oldLikes.size}")
+	}
+
+	suspend fun refreshCartItems(products: List<Product>) {
+		val oldCartItems = remoteUserRepository.getStuckCartItems(userId,products)
+		Log.d(TAG,"diff cart items = ${oldCartItems.size}")
+		deleteAllCartItems(oldCartItems)
 	}
 
 	fun getUserId() = sharePrefManager.getUserIdFromSession()
@@ -77,6 +82,10 @@ class UserRepository(
 
 	suspend fun deleteAllUserLikes(likes: List<String>){
 		likes.forEach {productId -> removeProductFromLikes(productId)}
+	}
+
+	suspend fun deleteAllCartItems(cartItems: List<String>) {
+		cartItems.forEach { itemId -> deleteCartItemByUserId(itemId) }
 	}
 
 	suspend fun checkLogin(mobile: String, password: String): User? {

@@ -176,7 +176,8 @@ class RemoteUserRepository () {
         }
     }
 
-    suspend fun refreshUserLikes(userId: String,products: List<Product>): List<String> {
+    // return list of product id
+    suspend fun getStuckLikes(userId: String, products: List<Product>): List<String> {
         var diff: List<String> = emptyList()
             val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
              if (!userRef.isEmpty){
@@ -187,7 +188,20 @@ class RemoteUserRepository () {
 
             }
         return diff
+    }
 
+
+    // return list of product id
+    suspend fun getStuckCartItems(userId: String,products: List<Product>): List<String> {
+        var diff: List<String> = emptyList()
+        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
+        if (!userRef.isEmpty){
+            val userData = userRef.documents[0].toObject(User::class.java)
+            val cart = userData?.cart?.map { it.productId }
+            val productsId = products.map { it.productId }
+            diff = cart?.minus(productsId.toSet())!!
+        }
+        return diff
     }
 
     suspend fun getLikesByUserId(userId: String): Result<List<String>?> {
