@@ -8,6 +8,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import com.shoppingapp.info.data.Product
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.Result
 import kotlinx.coroutines.tasks.await
 
@@ -33,6 +34,10 @@ class RemoteProductRepository() {
 	// here you must update all the user data check if the product is still in remote database then update the user cart.
 	suspend fun hardRefreshData(){
 	}
+
+
+
+
 
 	suspend fun getAllProducts(): Result<List<Product>> {
 		val resRef = productsCollectionRef().get().await()

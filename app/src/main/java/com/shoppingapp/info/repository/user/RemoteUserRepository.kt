@@ -9,9 +9,11 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shoppingapp.info.R
+import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.OrderStatus
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.tasks.await
 
 class RemoteUserRepository () {
@@ -24,6 +26,8 @@ class RemoteUserRepository () {
     private fun usersCollectionRef() = _root.collection(USERS_COLLECTION)
 
     suspend fun signOut(){ mAuth.signOut() }
+
+
 
 //    private fun signWithEmailAndPassword(email: String, password: String, sharePre: SharePrefManager , isRem: Boolean): Result<Boolean> {
 //        return supervisorScope {
@@ -170,6 +174,20 @@ class RemoteUserRepository () {
         } else {
             Result.Error(Exception("User Not Found!"))
         }
+    }
+
+    suspend fun refreshUserLikes(userId: String,products: List<Product>): List<String> {
+        var diff: List<String> = emptyList()
+            val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
+             if (!userRef.isEmpty){
+                val userData = userRef.documents[0].toObject(User::class.java)
+                val likes = userData?.likes
+                val productsId = products.map { it.productId }
+                diff = likes?.minus(productsId.toSet())!!
+
+            }
+        return diff
+
     }
 
     suspend fun getLikesByUserId(userId: String): Result<List<String>?> {

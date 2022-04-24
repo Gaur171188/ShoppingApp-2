@@ -108,6 +108,9 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:1.2.1"
 
 
+    // swipe refresh
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
     // koin
     implementation "org.koin:koin-android:$koin_version"
     implementation "org.koin:koin-android-scope:$koin_version"

@@ -2,7 +2,6 @@ package com.shoppingapp.info.screens.home
 
 import android.util.Log
 import androidx.lifecycle.*
-import com.google.firebase.auth.FirebaseAuth
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.product.ProductRepository
@@ -95,6 +94,8 @@ class HomeViewModel(
         }else{
             Log.i(TAG,"customer")
             _products = allProducts as MutableLiveData<List<Product>>
+            refreshUserProductLikes()
+
         }
 
     }
@@ -117,9 +118,23 @@ class HomeViewModel(
 
 
     // TODO: 4/23/2022  make this function work on swipe to refresh data
-    fun refreshProduct() {
+    fun refreshProducts() {
         viewModelScope.launch {
-            productRepository.refreshProducts()
+            val res = productRepository.refreshProducts()
+            if (res is Result.Success){ // data is refreshed
+
+            }
+            getUserLikes(0L)
+        }
+    }
+
+    private fun refreshUserProductLikes(){
+        viewModelScope.launch {
+            val res = productRepository.getProducts()
+            if (res is Result.Success){
+                val oldLikes = userRepository.refreshProductLikes(res.data)
+                userRepository.deleteAllUserLikes(oldLikes)
+            }
         }
     }
 

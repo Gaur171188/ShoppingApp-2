@@ -26,10 +26,12 @@ class ProductRepository(
 	}
 
 
-	suspend fun refreshProducts(): StoreDataStatus? {
+	suspend fun refreshProducts(): Result<Boolean> {
 		Log.d(TAG, "Updating Products in Room")
 		return updateProductsFromRemoteSource()
 	}
+
+
 
 	 fun observeProducts() = localProductRepository.observeProducts()
 
@@ -187,27 +189,41 @@ class ProductRepository(
 		}
 	}
 
-
-	private suspend fun updateProductsFromRemoteSource(): StoreDataStatus? {
-		var res: StoreDataStatus? = null
-		try {
+	// make this function return result ..
+	private suspend fun updateProductsFromRemoteSource(): Result<Boolean> {
+		return supervisorScope {
 			val remoteProducts = remoteProductRepository.getAllProducts()
 			if (remoteProducts is Success) {
 				Log.d(TAG, "pro list = ${remoteProducts.data}")
 				deleteAllProductsFromLocal()
 				localProductRepository.insertMultipleProducts(remoteProducts.data)
-				res = StoreDataStatus.DONE
-			} else {
-				res = StoreDataStatus.ERROR
-				if (remoteProducts is Error)
-					throw remoteProducts.exception
+				Success(true)
+			}else{
+				Success(false)
 			}
-		} catch (e: Exception) {
-			Log.d(TAG, "onUpdateProductsFromRemoteSource: Exception occurred, ${e.message}")
 		}
-
-		return res
 	}
+//
+//	private suspend fun updateProductsFromRemoteSource(): StoreDataStatus? {
+//		var res: StoreDataStatus? = null
+//		try {
+//			val remoteProducts = remoteProductRepository.getAllProducts()
+//			if (remoteProducts is Success) {
+//				Log.d(TAG, "pro list = ${remoteProducts.data}")
+//				deleteAllProductsFromLocal()
+//				localProductRepository.insertMultipleProducts(remoteProducts.data)
+//				res = StoreDataStatus.DONE
+//			} else {
+//				res = StoreDataStatus.ERROR
+//				if (remoteProducts is Error)
+//					throw remoteProducts.exception
+//			}
+//		} catch (e: Exception) {
+//			Log.d(TAG, "onUpdateProductsFromRemoteSource: Exception occurred, ${e.message}")
+//		}
+//
+//		return res
+//	}
 
 
 

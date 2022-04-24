@@ -1,7 +1,6 @@
 package com.shoppingapp.info.screens.favorites
 
 
-import android.util.Log
 import androidx.lifecycle.*
 import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.data.Product

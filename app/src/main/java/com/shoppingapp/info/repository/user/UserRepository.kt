@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.PhoneAuthCredential
+import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.UserType
@@ -24,6 +25,17 @@ class UserRepository(
 		private const val TAG = "UserRepository"
 	}
 
+
+	suspend fun updateUser(user: User){
+
+	}
+
+
+	suspend fun refreshProductLikes(products: List<Product>): List<String> {
+		val diff = remoteUserRepository.refreshUserLikes(userId,products)
+		Log.d(TAG,"diff likes = ${diff.size}")
+		return diff
+	}
 
 	fun getUserId() = sharePrefManager.getUserIdFromSession()
 
@@ -62,6 +74,10 @@ class UserRepository(
 
 	fun observeLocalUser() = localUserRepository.observeUser(userId)
 
+
+	suspend fun deleteAllUserLikes(likes: List<String>){
+		likes.forEach {productId -> removeProductFromLikes(productId)}
+	}
 
 	suspend fun checkLogin(mobile: String, password: String): User? {
 		Log.d(TAG, "on Login: checking mobile and password")
