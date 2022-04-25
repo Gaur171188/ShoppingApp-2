@@ -191,6 +191,7 @@ class ProductDetailsViewModel(
             }
             val res = deferredRes.await()
             if (res is Result.Success) {
+                _isItemInCart.value = true
                 Log.d(TAG, "onAddItem: Success")
             } else {
                 if (res is Error) {

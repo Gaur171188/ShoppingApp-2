@@ -5,8 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ConcatAdapter
 import com.airbnb.epoxy.TypedEpoxyController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -89,7 +91,8 @@ class Cart : Fragment() {
         cartController.clickListener = object : CartController.OnClickListener{
 
             override fun onItemClick(cartItem: User.CartItem, position: Int) {
-                Toast.makeText(requireContext(),"onCartClick",Toast.LENGTH_SHORT).show()
+                val data = bundleOf("productId" to  cartItem.productId)
+                findNavController().navigate(R.id.action_cart_to_product_details,data)
             }
 
             override fun onDeleteClick(cartItem: User.CartItem, position: Int) {
@@ -157,7 +160,6 @@ class Cart : Fragment() {
 
 
     }
-
 
 
 

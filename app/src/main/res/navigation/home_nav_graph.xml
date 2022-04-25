@@ -68,7 +68,8 @@
             app:argType="string" />
         <action
             android:id="@+id/action_productDetails_to_cart"
-            app:destination="@id/cart" />
+            app:destination="@id/cart"
+            app:popUpToInclusive="false" />
         <action
             android:id="@+id/action_productDetailsFragment_to_home"
             app:destination="@id/home"
@@ -95,6 +96,11 @@
         <action
             android:id="@+id/action_cart_to_selectPayment"
             app:destination="@id/selectPayment" />
+        <action
+            android:id="@+id/action_cart_to_product_details"
+            app:destination="@id/productDetails"
+            app:popUpTo="@id/productDetails"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/favorites"

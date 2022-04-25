@@ -47,7 +47,7 @@
                     app:constraint_referenced_ids="order_details_payment_label_tv,
                 order_details_pro_label_tv,order_details_ship_label_tv,
                 order_details_payment_layout,order_details_shipping_add_layout,
-                order_details_pro_recycler_view,order_change_status_btn" />
+                products_RecyclerView,btn_order_change_status" />
 
                 <TextView
                     android:id="@+id/order_details_pro_label_tv"
@@ -65,8 +65,8 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/order_details_pro_recycler_view"
+                <com.airbnb.epoxy.EpoxyRecyclerView
+                    android:id="@+id/products_RecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"
@@ -81,7 +81,7 @@
                     tools:itemCount="2"
                     tools:listitem="@layout/item_cart">
 
-                </androidx.recyclerview.widget.RecyclerView>
+                </com.airbnb.epoxy.EpoxyRecyclerView>
 
                 <TextView
                     android:id="@+id/order_details_ship_label_tv"
@@ -97,10 +97,10 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/order_details_pro_recycler_view" />
+                    app:layout_constraintTop_toBottomOf="@id/products_RecyclerView" />
 
                 <ImageButton
-                    android:id="@+id/order_change_status_btn"
+                    android:id="@+id/btn_order_change_status"
                     android:layout_width="35dp"
                     android:layout_height="40dp"
                     android:layout_marginEnd="16dp"

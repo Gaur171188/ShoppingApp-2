@@ -49,7 +49,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/address"
+                android:text="Address"
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textColor="@color/dark_gray"
                 app:layout_constraintStart_toStartOf="parent"
@@ -69,6 +69,7 @@
                 app:layout_constraintTop_toTopOf="@+id/ship_add_label_tv"
                 app:layout_constraintVertical_bias="0.0"
                 tools:text="123, Sonmwe Soijr, Ouiwy qwei, Uytwuf, India, 208242" />
+
 
             <ImageView
                 android:id="@+id/card_dotted_divider"

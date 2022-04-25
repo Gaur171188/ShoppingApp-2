@@ -13,6 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.setMargins
@@ -67,17 +68,12 @@ class ProductDetails: Fragment() {
             binding.btnAddProductToCart.visibility = View.VISIBLE
 
 
+            /** button add in cart **/
             binding.btnAddProductToCart.setOnClickListener {
                 if (viewModel.isItemInCart.value == true) {
                     navigateToCartFragment()
                 } else {
                     onAddToCart()
-                    viewModel.addItemStatus.observe(viewLifecycleOwner) { status ->
-                        if (status == AddObjectStatus.DONE) {
-                            makeToast("Product Added To Cart")
-                            viewModel.checkIfInCart(productId)
-                        }
-                    }
 
                 }
             }
@@ -89,6 +85,7 @@ class ProductDetails: Fragment() {
 
         /** button plus quantity **/
         binding.btnCartProductPlus.setOnClickListener {
+
             val quantity = viewModel.quantity.value!!
             if (quantity >= 1){
                 viewModel.setQuantityOfItem(productId, +1)
@@ -121,6 +118,7 @@ class ProductDetails: Fragment() {
         selectedColor = null
 
     }
+
 
 
     private fun setObservers() {
