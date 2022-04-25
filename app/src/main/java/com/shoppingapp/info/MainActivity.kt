@@ -22,8 +22,6 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
     private var isConnected: Boolean? = null
 
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
@@ -33,8 +31,8 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
         setUpNav()
 
 
-        registerReceiver(networkReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
-
+//        registerReceiver(networkReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+//
 
         binding.apply {
 

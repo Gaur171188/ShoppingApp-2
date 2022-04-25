@@ -7,94 +7,71 @@
 
     </data>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         tools:context="com.shoppingapp.info.screens.home.Cart">
 
-        <include
-            android:id="@+id/cart_app_bar"
-            layout="@layout/app_bar_label_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
 
         <include
             android:id="@+id/loader_layout"
             layout="@layout/circular_loader_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
-            tools:visibility="gone"
-            android:layout_below="@id/cart_app_bar" />
+            android:visibility="gone" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/cart_app_bar"
-            android:layout_marginBottom="72dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/cart_empty_message"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:fontFamily="@font/nunito_sans"
-                android:text="@string/no_product_added_yet"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.MyTheme.Headline5"
-                android:textColor="@color/blue_accent_300"
-                android:textStyle="bold"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-<!--            <androidx.recyclerview.widget.RecyclerView-->
-<!--                android:id="@+id/cart_products_recycler_view"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:clipToPadding="false"-->
-<!--                android:overScrollMode="never"-->
-<!--                android:padding="8dp"-->
-<!--                app:flow_horizontalAlign="center"-->
-<!--                app:flow_verticalAlign="center"-->
-<!--                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
-<!--                app:layout_constraintEnd_toEndOf="parent"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent"-->
-<!--                tools:itemCount="2"-->
-<!--                tools:listitem="@layout/item_cart" />-->
-
-
-
-            <com.airbnb.epoxy.EpoxyRecyclerView
-                android:id="@+id/cart_RecyclerView"
+            <include
+                android:id="@+id/cart_app_bar"
+                layout="@layout/app_bar_label_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:overScrollMode="never"
-                android:padding="8dp"
-                app:flow_horizontalAlign="center"
-                app:flow_verticalAlign="center"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:itemCount="2"
-                tools:listitem="@layout/item_cart" />
+                android:layout_height="wrap_content" />
+
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshCartItems"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+
+                <com.airbnb.epoxy.EpoxyRecyclerView
+                    android:id="@+id/cart_RecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:overScrollMode="never"
+                    android:padding="8dp"
+                    app:flow_horizontalAlign="center"
+                    app:flow_verticalAlign="center"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:itemCount="2"
+                    tools:listitem="@layout/item_cart" />
+
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <Button
+
+        </LinearLayout>
+
+
+
+
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/cart_check_out_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
@@ -106,5 +83,5 @@
             android:textStyle="bold"
             android:translationY="-8dp" />
 
-    </RelativeLayout>
+    </FrameLayout>
 </layout>

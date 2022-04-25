@@ -2,24 +2,30 @@ package com.shoppingapp.info.screens.cart
 
 
 import android.util.Log
+import com.airbnb.epoxy.EpoxyAttribute
+import com.airbnb.epoxy.EpoxyModelClass
 import com.airbnb.epoxy.TypedEpoxyController
+import com.shoppingapp.info.R
 import com.shoppingapp.info.cart
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User.CartItem
+
 
 
 class CartController(): TypedEpoxyController<List<CartItem>>() {
 
     lateinit var clickListener: OnClickListener
 
-    lateinit var likes: List<String>
-    lateinit var products: List<Product>
+//    lateinit var likes: List<String>
+
+     var products: List<Product> = emptyList()
 
 
 
     companion object{
         private const val TAG = "CartControllerss"
     }
+
 
 
 
@@ -32,13 +38,13 @@ class CartController(): TypedEpoxyController<List<CartItem>>() {
 //            Log.d(TAG,"products: ${products.size}")
 
             val product = products.find { it.productId == cart.productId } ?: Product()
-            val isLiked = likes.contains(product.productId)
+//            val isLiked = likes.contains(product.productId)
 
 
                 cart {
                     id(cart.itemId)
                     cartData(cart)
-                    isLike(isLiked)
+//                    isLike(isLiked)
                     productData(product)
                     onDeleteClick { _ -> clickListener.onDeleteClick(cart,index) }
                     onItemClick { _ -> clickListener.onItemClick(cart,index) }

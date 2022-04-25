@@ -15,6 +15,7 @@ import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.OrderStatus
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.tasks.await
+import java.lang.IndexOutOfBoundsException
 
 class RemoteUserRepository () {
 
@@ -119,13 +120,18 @@ class RemoteUserRepository () {
     suspend fun checkPassByUserId(userId: String ,password: String,onComplete: (Boolean) -> Unit) {
         val ref = usersCollectionRef().whereEqualTo(USER_ID_FIELD,userId).get().await()
         if (ref != null){
-            val user = ref.toObjects(User::class.java)[0]
-            Log.i("Login","email: ${user.email}")
-            if (user.password == password){
-                onComplete(true)
-            }else{
+            try {
+                val user = ref.toObjects(User::class.java)[0]
+                Log.i("Login","email: ${user.email}")
+                if (user.password == password){
+                    onComplete(true)
+                }else{
+                    onComplete(false)
+                }
+            }catch (ex: IndexOutOfBoundsException){
                 onComplete(false)
             }
+
         }
     }
 

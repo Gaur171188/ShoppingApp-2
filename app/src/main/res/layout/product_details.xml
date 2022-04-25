@@ -44,20 +44,25 @@
                     app:tint="@color/black" />
 
 
-                <ImageButton
+
+
+
+                <CheckBox
                     android:id="@+id/btn_product_details_like"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="end"
                     android:layout_margin="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    android:background="@null"
+                    tools:checked="true"
                     android:contentDescription="@string/like_button"
                     android:padding="4dp"
+                    app:buttonTint="@color/red_600"
+                    android:button="@drawable/sl_favourite_24dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:src="@drawable/liked_heart_drawable" />
+                    app:layout_constraintTop_toTopOf="parent" />
+
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/pro_details_images_recyclerview"

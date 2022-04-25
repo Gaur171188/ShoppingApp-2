@@ -51,11 +51,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-<!--                <ScrollView-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent">-->
-
-
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/products_recycler_view"
                         android:layout_width="match_parent"
@@ -70,8 +65,6 @@
                         tools:itemCount="10"
                         tools:listitem="@layout/item_product_home" />
 
-
-<!--                </ScrollView>-->
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

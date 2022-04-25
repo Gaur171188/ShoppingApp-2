@@ -1,7 +1,6 @@
 
 package com.shoppingapp.info.screens.cart
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,9 +24,8 @@ class Cart : Fragment() {
         const val TAG = "Cart"
     }
 
-//    private val ordersViewModel by sharedViewModel<OrdersViewModel>()
-    private val homeViewModel by sharedViewModel<HomeViewModel>()
 
+    private val homeViewModel by sharedViewModel<HomeViewModel>()
 
     private val viewModel by sharedViewModel<CartViewModel>()
 
@@ -37,9 +35,7 @@ class Cart : Fragment() {
     private val priceCartController by lazy {PriceCartController()}
 
 
-//    private lateinit var itemsAdapter: CartItemAdapter
     private lateinit var concatAdapter: ConcatAdapter
-
 
 
 
@@ -48,16 +44,8 @@ class Cart : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.cart, container, false)
 
 
-        // TODO: improve the cart item design.
-
-
-//        cartController = CartController()
-
-
-
         setViews()
         setObservers()
-        viewModel.getCartItems()
 
         return binding.root
     }
@@ -65,10 +53,36 @@ class Cart : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.getCartItems()
+        homeViewModel.refreshCartData()
     }
 
+    fun initAdapter(){
+        val cartProducts = homeViewModel.cartProducts.value ?: emptyList()
+        val itemsPrice = homeViewModel.itemsPrice.value ?: mapOf()
+        val cartItems = homeViewModel.cartItems.value ?: emptyList()
+        val quantityCount = homeViewModel.getQuantityCount()
+
+        cartController.setData(cartItems)
+        cartController.products = cartProducts
+        priceCartController.setData(itemsPrice)
+        priceCartController.itemsCount = quantityCount
+        concatAdapter = ConcatAdapter(cartController.adapter, priceCartController.adapter)
+        binding.cartRecyclerView.adapter = concatAdapter
+
+    }
+
+
     private fun setViews() {
+
+
+        initAdapter()
+
+        /** swipe refresh cart items **/
+        binding.swipeRefreshCartItems.setOnRefreshListener {
+            homeViewModel.refreshCartData()
+            homeViewModel.refreshStuckData()
+        }
+
 
 
         /** controller listener **/
@@ -85,64 +99,62 @@ class Cart : Fragment() {
         }
 
         binding.cartAppBar.topAppBar.title = getString(R.string.cart_fragment_label)
-        binding.cartEmptyMessage.visibility = View.GONE
         binding.cartCheckOutBtn.setOnClickListener {
             navigateToSelectAddress()
         }
 
 
-        if (context != null) {
-            try {
-                concatAdapter = ConcatAdapter(cartController.adapter, priceCartController.adapter)
-                binding.cartRecyclerView.adapter = concatAdapter
-            }catch (ex: Exception){
-
-            }
-
-        }
-
 
 
     }
 
+    private fun resetData(){
+        cartController.products = emptyList()
+        cartController.setData(emptyList())
+        priceCartController.setData(emptyMap())
+        cartController.setData(emptyList())
+    }
     private fun setObservers() {
 
 
         // cart items
-        viewModel.cartItems.observe(viewLifecycleOwner){ cartItems ->
-            if (cartItems != null){
-                val items = viewModel.cartItems.value ?: emptyList()
-                val likeList = homeViewModel.userLikes.value ?: emptyList()
-                val prosList = viewModel.cartProducts.value ?: emptyList()
-                cartController.products = prosList
-                cartController.likes = likeList
-                cartController.setData(items)
-
-//                binding.cartRecyclerView.adapter?.notifyDataSetChanged()
-
-                Log.d(TAG,"cartItems: ${cartItems.size}")
-                Log.d(TAG,"likes: ${likeList.size}")
-                Log.d(TAG,"prosList: ${prosList.size}")
-
+        homeViewModel.cartItems.observe(viewLifecycleOwner){ cartItems ->
+            binding.swipeRefreshCartItems.isRefreshing = false
+            if (!cartItems.isNullOrEmpty()){
+                cartController.setData(cartItems)
             }else{
-                cartController.setData(emptyList())
+                resetData()
             }
         }
+
+
+        // products
+        homeViewModel.cartProducts.observe(viewLifecycleOwner){ cartProducts ->
+            binding.swipeRefreshCartItems.isRefreshing = false
+            if (!cartProducts.isNullOrEmpty()){
+                cartController.products = cartProducts
+            }else{
+                resetData()
+            }
+
+        }
+
 
 
 
         // price list
-        viewModel.priceList.observe(viewLifecycleOwner) { priceList ->
-            if (priceList != null){
-                val items = viewModel.cartItems.value ?: emptyList()
-                val likeList = homeViewModel.userLikes.value ?: emptyList()
-                val prosList = viewModel.cartProducts.value ?: emptyList()
-                cartController.products = prosList
-                cartController.likes = likeList
-                cartController.setData(items)
-                priceCartController.setData(priceList)
+        homeViewModel.itemsPrice.observe(viewLifecycleOwner) { itemsPrice ->
+            binding.swipeRefreshCartItems.isRefreshing = false
+            val quantityCount = homeViewModel.getQuantityCount()
+            if (!itemsPrice.isNullOrEmpty()){
+                priceCartController.itemsCount = quantityCount
+                priceCartController.setData(itemsPrice)
+            }else{
+                resetData()
             }
         }
+
+
 
     }
 
@@ -165,7 +177,7 @@ class Cart : Fragment() {
                 }
                 // TODO: make delete item from cart require network
                 .setPositiveButton(getString(R.string.delete_dialog_delete_btn_text)) { dialog, _ ->
-                    viewModel.deleteItemFromCart(itemId)
+                    homeViewModel.deleteItemFromCart(itemId)
                     dialog.cancel()
                 }
                 .show()
@@ -173,15 +185,15 @@ class Cart : Fragment() {
     }
 
     inner class PriceCartController(): TypedEpoxyController<Map<String, Double>>() {
+        var itemsCount: Int = 0
 
-        override fun buildModels(data: Map<String, Double>) {
-            val totalItemsPrice = viewModel.getItemsPriceTotal(data)
-            val itemsCount = viewModel.getItemsCount()
+        override fun buildModels(data: Map<String, Double>?) {
+            val totalItemsPrice = data?.let { homeViewModel.getItemsPriceTotal(it) }
+//            val itemsCount = homeViewModel.getItemsCount()
 
             val shippingPrice = 0.0
             val importCharges = 0.0
             val totalPrice = 0.0
-
 
             priceCardLayout {
                 id("price")
@@ -189,6 +201,9 @@ class Cart : Fragment() {
                 itemsCount(itemsCount)
                 totalPrice(totalPrice)
             }
+
+
+
 
         }
 

@@ -57,7 +57,7 @@ val viewModelsModules = module {
         AddEditProductViewModel(productRepository = get())
     }
     viewModel {
-        CartViewModel(userRepository = get(), productRepository = get(), allProducts = get())
+        CartViewModel(userRepository = get(), productRepository = get())
     }
     viewModel {
         FavoritesViewModel(userRepository = get(), productRepository = get(), allProducts = get())

@@ -9,9 +9,6 @@
             name="cartData"
             type="com.shoppingapp.info.data.User.CartItem" />
 
-        <variable
-            name="isLike"
-            type="Boolean" />
 
         <variable
             name="productData"

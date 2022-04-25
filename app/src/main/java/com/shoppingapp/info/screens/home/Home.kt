@@ -68,7 +68,7 @@ class Home : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getUserLikes(0L)
+        viewModel.getUserLikes()
     }
 
 
@@ -79,6 +79,7 @@ class Home : Fragment() {
             viewModel.refreshProducts()
         }
     }
+
 
     // TODO: 4/22/2022 update the local data base before app is open ..
     // TODO: 4/22/2022 you can update the database in backend using work manager
@@ -144,6 +145,14 @@ class Home : Fragment() {
         }
 
 
+
+
+//        viewModel.userLikes.observe(viewLifecycleOwner) { likes ->
+//            if (likes != null) {
+//                productController.likes = likes
+//            }
+//            binding.swipeRefreshLayout.isRefreshing = false
+//        }
 
 
 
@@ -232,7 +241,7 @@ class Home : Fragment() {
 
 
         /** click listener **/
-        productController.clickListener = object : ProductController.OnClickListener{
+        productController.clickListener = object: ProductController.OnClickListener{
 
             override fun onAdClicked() {}
 

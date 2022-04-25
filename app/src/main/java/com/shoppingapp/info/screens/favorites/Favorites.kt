@@ -14,6 +14,8 @@ import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.FavoritiesBinding
+import com.shoppingapp.info.screens.home.Home
+import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.screens.home.RecyclerViewPaddingItemDecoration
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -25,6 +27,9 @@ class Favorites : Fragment() {
 
 
     private val viewModel by sharedViewModel<FavoritesViewModel>()
+    private val homeViewModel by sharedViewModel<HomeViewModel>()
+
+
     private lateinit var binding: FavoritiesBinding
     private val favoritesController by lazy { FavoritesController() }
     private lateinit var likedProducts: List<Product>
@@ -41,7 +46,7 @@ class Favorites : Fragment() {
         setViews()
         setObserves()
 
-        viewModel.initData(likedProducts)
+//        viewModel.initData(likedProducts)
 
         return binding.root
 
@@ -54,24 +59,25 @@ class Favorites : Fragment() {
 
     private fun setObserves(){
 
-        /** live data liked products **/
-        viewModel.likedProducts.observe(viewLifecycleOwner){ likedProducts ->
-            Log.i(TAG,"liked products: ${likedProducts.size}")
-            if (likedProducts != null){
-                favoritesController.setData(likedProducts)
-            }else{
-                favoritesController.setData(emptyList())
-                binding.favoritesEmptyMessage.visibility = View.VISIBLE
-            }
-        }
+//        /** live data liked products **/
+//        viewModel.likedProducts.observe(viewLifecycleOwner){ likedProducts ->
+//            Log.i(TAG,"liked products: ${likedProducts.size}")
+//            if (likedProducts != null){
+//                favoritesController.setData(likedProducts)
+//            }else{
+//                favoritesController.setData(emptyList())
+//                binding.favoritesEmptyMessage.visibility = View.VISIBLE
+//            }
+//        }
 
 
     }
 
 
     private fun setProductsAdapter() {
+        val products = likedProducts.toMutableSet()
 
-        favoritesController.setData(emptyList())
+        favoritesController.setData(likedProducts)
 
         /** click listener **/
         favoritesController.clickListener = object : FavoritesController.OnClickListener{
@@ -88,9 +94,14 @@ class Favorites : Fragment() {
 
             override fun onLikeClick(product: Product) {
 
-                viewModel.toggleLikeByProductId(product){
-                    Toast.makeText(requireContext(),"liked",Toast.LENGTH_SHORT).show()
-                }
+                products.remove(product)
+                favoritesController.setData(products.toList())
+                homeViewModel.toggleLikeByProductId(product.productId)
+
+
+//                homeViewModel.toggleLikeByProductId(product){
+//                    Toast.makeText(requireContext(),"liked",Toast.LENGTH_SHORT).show()
+//                }
 
             }
 
