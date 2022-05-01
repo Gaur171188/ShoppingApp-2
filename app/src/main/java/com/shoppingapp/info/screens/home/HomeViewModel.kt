@@ -88,6 +88,8 @@ class HomeViewModel(
     private val _itemsPrice = MutableLiveData<Map<String, Double>>()
     val itemsPrice: LiveData<Map<String, Double>> = _itemsPrice
 
+    private val _orders= MutableLiveData<List<User.OrderItem>?>()
+    val orders: LiveData<List<User.OrderItem>?> = _orders
 
 
 
@@ -729,6 +731,7 @@ fun toggleProductInCart(product: Product,onComplete: (Result<Boolean>) -> Unit) 
             val user = userRepository.getUser()
             if (user != null){
                 _user.value = user
+                _orders.value = user.orders
             }else{
                 _user.value = null
             }

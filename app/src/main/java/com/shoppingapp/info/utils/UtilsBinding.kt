@@ -12,6 +12,8 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.shoppingapp.info.R
 import com.shoppingapp.info.utils.x.context
+import java.text.SimpleDateFormat
+import java.util.*
 
 @SuppressLint("StaticFieldLeak")
 object x{
@@ -80,7 +82,18 @@ fun setQuantity(tv: TextView, quantity: Int){
 
 @BindingAdapter("setPrice")
 fun setPrice(tv: TextView, v: Double){
-    tv.text = "$v"
+    tv.text = "$ $v"
+}
+
+@BindingAdapter("setOrderDate")
+fun setOrderDate(tv: TextView, date: Date){
+    tv.text = SimpleDateFormat("dd/MM/yyyy").format(date)
+}
+
+
+@BindingAdapter("setOrderItemsCount")
+fun setOrderItemsCount(tv: TextView, v: Double){
+    tv.text = "$v items purchased"
 }
 
 

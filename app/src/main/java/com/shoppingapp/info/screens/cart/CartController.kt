@@ -62,8 +62,4 @@ class CartController(): TypedEpoxyController<List<CartItem>>() {
     }
 
 
-//    class CartClickListener(val clickListener: (cart: CartItem) -> Unit) {
-//        fun onClick(cart: CartItem) = clickListener(cart)
-//    }
-
 }
