@@ -5,6 +5,19 @@
 
     <data>
 
+        <variable
+            name="orderDate"
+            type="java.util.Date" />
+
+        <variable
+            name="orderAddress"
+            type="String" />
+
+        <variable
+            name="orderStatus"
+            type="String" />
+
+
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -34,11 +47,11 @@
                 android:text="@string/shipping_date" />
 
             <TextView
-                android:id="@+id/ship_date_value_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textColor="@color/black"
+                setOrderDate="@{orderDate}"
                 app:layout_constraintBottom_toBottomOf="@+id/ship_date_label_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/ship_date_label_tv"
@@ -56,12 +69,13 @@
                 app:layout_constraintTop_toBottomOf="@id/ship_date_label_tv" />
 
             <TextView
-                android:id="@+id/ship_add_value_tv"
+                android:id="@+id/ff"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:textAlignment="textEnd"
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textColor="@color/black"
+                setTitle="@{orderAddress}"
                 app:layout_constraintBottom_toBottomOf="@+id/ship_add_label_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
@@ -79,7 +93,7 @@
                 android:layerType="software"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ship_add_value_tv"
+                app:layout_constraintTop_toBottomOf="@+id/ff"
                 app:srcCompat="@drawable/dotted_line_drawable" />
 
             <TextView
@@ -95,13 +109,14 @@
                 app:layout_constraintTop_toBottomOf="@id/card_dotted_divider" />
 
             <TextView
-                android:id="@+id/ship_current_status_value"
+                android:id="@+id/s"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:textAlignment="textEnd"
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textColor="@color/blue_accent_300"
                 android:textStyle="bold"
+                setOrderStatus="@{orderStatus}"
                 app:layout_constraintBottom_toBottomOf="@+id/ship_curr_status_label_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/ship_curr_status_label_tv"

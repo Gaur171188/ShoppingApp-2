@@ -96,7 +96,7 @@ val viewModelsModules = module {
         SelectPaymentViewModel()
     }
         viewModel {
-        LoginViewModel(remoteUserRepository = get(), sharePrefManager = get())
+        LoginViewModel(remoteUserRepository = get(), sharePrefManager = get(), productRepository = get())
     }
     viewModel {
         RegistrationViewModel(userRepository = get())

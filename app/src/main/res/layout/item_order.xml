@@ -13,7 +13,6 @@
             name="totalPrice"
             type="Double" />
 
-
         <variable
             name="onItemClick"
             type="android.view.View.OnClickListener" />
@@ -150,6 +149,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/order_summary_price_label_tv"
                 tools:text="$123.45" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>

@@ -113,7 +113,7 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(networkReceiver)
+//        unregisterReceiver(networkReceiver)
     }
 
 

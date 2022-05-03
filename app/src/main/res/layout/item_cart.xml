@@ -9,7 +9,6 @@
             name="cartData"
             type="com.shoppingapp.info.data.User.CartItem" />
 
-
         <variable
             name="productData"
             type="com.shoppingapp.info.data.Product" />
@@ -21,6 +20,10 @@
         <variable
             name="onItemClick"
             type="android.view.View.OnClickListener" />
+
+        <variable
+            name="isSeller"
+            type="Boolean" />
 
 
 
@@ -98,6 +101,9 @@
                 android:background="@drawable/round_button"
                 android:contentDescription="@string/remove_product_button"
                 android:onClick="@{onDeleteClick}"
+                setUserState="@{isSeller}"
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:scaleType="fitXY"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

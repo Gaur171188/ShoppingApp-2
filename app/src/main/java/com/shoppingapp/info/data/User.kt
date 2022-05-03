@@ -50,8 +50,9 @@ data class User(
         var itemsPrices: Map<String, Double> = mapOf(),
         var shippingCharges: Double = 0.0,
         var paymentMethod: String = "",
+        var address: Address = Address(),
         var orderDate: Date = Date(),
-        var status: String = OrderStatus.CONFIRMED.name
+        var status: String = OrderStatus.SPOON.name
     ) : Parcelable {
 //        constructor(): this("","",ArrayList(), mapOf(),0.0,"",Date())
 
@@ -71,7 +72,7 @@ data class User(
 
 
     @Parcelize
-    data class CartItem(
+    data class CartItem (
         var itemId: String = "",
         var productId: String = "",
         var ownerId: String = "",
@@ -94,4 +95,29 @@ data class User(
             return hashMap
         }
     }
+
+
+
+
+    @Parcelize
+    data class Address(
+        var addressId: String = "",
+        var firstName: String = "",
+        var lastName: String = "",
+        var streetAddress: String = "",
+        var city: String = "",
+        var phoneNumber: String = ""
+    ) : Parcelable {
+        fun toHashMap(): HashMap<String, String> {
+            return hashMapOf(
+                "addressId" to addressId,
+                "firstName" to firstName,
+                "lastName" to lastName,
+                "streetAddress" to streetAddress,
+                "city" to city,
+                "phoneNumber" to phoneNumber
+            )
+        }
+    }
+
 }

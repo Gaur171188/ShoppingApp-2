@@ -1,6 +1,5 @@
 package com.shoppingapp.info.repository.user
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
@@ -8,12 +7,10 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.OrderStatus
-import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.tasks.await
 import java.lang.IndexOutOfBoundsException
 
@@ -29,51 +26,54 @@ class RemoteUserRepository () {
     suspend fun signOut(){ mAuth.signOut() }
 
 
+    suspend fun getOrdersFromRemote(userId: String): List<User.OrderItem>? {
+            val ref = usersCollectionRef().document(userId).get().await()
+            val orders = if (ref != null) {
+                val user = ref.toObject(User::class.java)
+                return user?.orders
+            } else { null }
+        return orders
+    }
 
-//    private fun signWithEmailAndPassword(email: String, password: String, sharePre: SharePrefManager , isRem: Boolean): Result<Boolean> {
-//        return supervisorScope {
-//            mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-//                    if (task.isComplete) {
-//                        val userId = mAuth.currentUser?.uid
-//                        if (userId != null) {
-//                                if (isEmailVerified()) {
-//                                    checkPassByUserId(userId, password){ isTypicalPass ->
-//                                        if (isTypicalPass){
-//                                            val user = getUser(userId)
-//                                            if (user != null){
-//                                                sharePre.createLoginSession(userId,user.name,user.phone,isRem,user.userType)
-//                                                Result.Success(true)
-//                                            }
-//                                        }else{
-//                                            Result.Error()
-//
-//                                        }
-//
-//                                    }
-//                                } else {
-//                                    withContext(Dispatchers.Main) {
-//                                        setLoginError("email is not verify!")
-//                                        Log.i(LoginViewModel.TAG, "email is not verify!")
-//                                    }
-//                                }
-//
-//                        } else {
-//                            val error = task.exception!!.message.toString()
-//                            setLoginError("password is not correct!")
-//                            Log.i(LoginViewModel.TAG, error)
-//                        }
-//
-//                    } else {
-//                        val error = task.exception!!.message.toString()
-//                        _inProgress.value = StoreDataStatus.ERROR
-//                        Log.i(LoginViewModel.TAG, error)
-//                    }
-//                }
-//
-//        }
-//    }
-//
-//
+
+
+    suspend fun insertOrder(order: User.OrderItem){
+        // owner
+        val ownerId = order.items[0].ownerId
+        val ownerRef = usersCollectionRef().document(ownerId).get().await()
+        if (ownerRef != null){
+            usersCollectionRef().document(ownerId)
+                .update(ORDERS_FIELD, FieldValue.arrayUnion(order))
+        }
+
+        // customer
+        val customer = usersCollectionRef().document(order.customerId).get().await()
+        if (customer != null){
+            usersCollectionRef().document(ownerId)
+                .update(ORDERS_FIELD, FieldValue.arrayUnion(order))
+        }
+
+    }
+
+
+    suspend fun deleteOrder(order: User.OrderItem){
+        // owner
+        val ownerId = order.items[0].ownerId
+        val ownerRef = usersCollectionRef().document(ownerId).get().await()
+        if (ownerRef != null){
+            usersCollectionRef().document(ownerId)
+                .update(ORDERS_FIELD, FieldValue.arrayRemove(order))
+        }
+
+        // customer
+        val customer = usersCollectionRef().document(order.customerId).get().await()
+        if (customer != null){
+            usersCollectionRef().document(ownerId)
+                .update(ORDERS_FIELD, FieldValue.arrayRemove(order))
+        }
+
+    }
+
 
 
     fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential, isUserLoggedIn: MutableLiveData<Boolean>) {
@@ -151,6 +151,8 @@ class RemoteUserRepository () {
             }
     }
 
+
+
     suspend fun addUser(user: User) {
         usersCollectionRef()
             .document(user.userId)
@@ -209,6 +211,20 @@ class RemoteUserRepository () {
         }
         return diff
     }
+
+    // return list of orders id
+    suspend fun getStuckOrdersIds(userId: String,orders: List<User.OrderItem>): List<String> {
+        var diff: List<String> = emptyList()
+        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
+        if (!userRef.isEmpty){
+            val userData = userRef.documents[0].toObject(User::class.java)
+            val order = userData?.orders?.map { it.orderId }
+            val orderId = orders.map { it.orderId }
+            diff = order?.minus(orderId.toSet())!!
+        }
+        return diff
+    }
+
 
     suspend fun getLikesByUserId(userId: String): Result<List<String>?> {
         val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
@@ -281,6 +297,8 @@ class RemoteUserRepository () {
         }
     }
 
+
+
     suspend fun placeOrder(newOrder: User.OrderItem, userId: String) {
         // add order to customer and
         // specific items to their owners
@@ -305,8 +323,9 @@ class RemoteUserRepository () {
                     itemPrices,
                     newOrder.shippingCharges,
                     newOrder.paymentMethod,
+                    newOrder.address,
                     newOrder.orderDate,
-                    OrderStatus.CONFIRMED.name)
+                    newOrder.status)
 
                 val ownerRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, ownerId).get().await()
                 if (!ownerRef.isEmpty) {

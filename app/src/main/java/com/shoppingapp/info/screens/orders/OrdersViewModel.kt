@@ -10,9 +10,6 @@ import com.shoppingapp.info.utils.StoreDataStatus
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import com.shoppingapp.info.utils.Result
-import com.shoppingapp.info.utils.getRandomString
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.util.*
 
 class OrdersViewModel(
@@ -205,7 +202,7 @@ class OrdersViewModel(
                 val itemPos = items.indexOfFirst { it.itemId == itemId }
                 cartList = items.toMutableList()
                 val deferredRes = async {
-                    userRepository.deleteCartItemByUserId(itemId)
+                    userRepository.deleteCartItem(itemId)
                 }
                 val res = deferredRes.await()
                 if (res is Result.Success) {
@@ -230,32 +227,32 @@ class OrdersViewModel(
         _selectedPaymentMethod.value = method
     }
 
-    fun finalizeOrder(userId: String) {
-        _orderStatus.value = StoreDataStatus.LOADING
-//        val deliveryAddress = _userAddresses.value?.find { it.addressId == _selectedAddress.value }
-        val paymentMethod = _selectedPaymentMethod.value
-        val currDate = Date()
-        val orderId = getRandomString(6, currDate.time.toString(), 1)
-        val items = _cartItems.value
-        val itemPrices = _priceList.value
-        val shippingCharges = 0.0
-        if (paymentMethod != null && !items.isNullOrEmpty() && !itemPrices.isNullOrEmpty()) {
-            val newOrder = User.OrderItem(
-                orderId,
-                userId,
-                items,
-                itemPrices,
-                shippingCharges,
-                paymentMethod,
-                currDate,
-            )
-//            newOrderData.value = newOrder
-            insertOrder(newOrder)
-        } else {
-            Log.d(TAG, "orFinalizeOrder: Error, data null or empty")
-            _orderStatus.value = StoreDataStatus.ERROR
-        }
-    }
+//    fun finalizeOrder(userId: String) {
+//        _orderStatus.value = StoreDataStatus.LOADING
+////        val deliveryAddress = _userAddresses.value?.find { it.addressId == _selectedAddress.value }
+//        val paymentMethod = _selectedPaymentMethod.value
+//        val currDate = Date()
+//        val orderId = getRandomString(6, currDate.time.toString(), 1)
+//        val items = _cartItems.value
+//        val itemPrices = _priceList.value
+//        val shippingCharges = 0.0
+//        if (paymentMethod != null && !items.isNullOrEmpty() && !itemPrices.isNullOrEmpty()) {
+//            val newOrder = User.OrderItem(
+//                orderId,
+//                userId,
+//                items,
+//                itemPrices,
+//                shippingCharges,
+//                paymentMethod,
+//                currDate,
+//            )
+////            newOrderData.value = newOrder
+//            insertOrder(newOrder)
+//        } else {
+//            Log.d(TAG, "orFinalizeOrder: Error, data null or empty")
+//            _orderStatus.value = StoreDataStatus.ERROR
+//        }
+//    }
 
     private fun insertOrder(newOrder: User.OrderItem) {
         viewModelScope.launch {

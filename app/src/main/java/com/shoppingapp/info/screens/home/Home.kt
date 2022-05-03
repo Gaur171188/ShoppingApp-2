@@ -44,7 +44,7 @@ class Home : Fragment() {
     private val productController by lazy { ProductController() }
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(layoutInflater,R.layout.home,container,false)
 
 
@@ -59,9 +59,9 @@ class Home : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        if (viewModel.isUserSeller()){
-            refreshData()
-        }
+//        if (viewModel.isUserSeller()) {
+//            viewModel.refreshProducts()
+//        }
 
     }
 
@@ -72,23 +72,13 @@ class Home : Fragment() {
     }
 
 
-    private fun refreshData() {
-        if (viewModel.isUserSeller()){
-            viewModel.getProductByOwner()
-        }else{
-            viewModel.refreshProducts()
-        }
-    }
 
-
-    // TODO: 4/22/2022 update the local data base before app is open ..
-    // TODO: 4/22/2022 you can update the database in backend using work manager
 
     private fun setViews() {
 
         /** swipe to refresh **/
         binding.swipeRefreshLayout.setOnRefreshListener {
-            refreshData()
+            viewModel.refreshProducts()
         }
 
 

@@ -91,8 +91,28 @@ fun setOrderDate(tv: TextView, date: Date){
 }
 
 
+//@BindingAdapter(value = ["date","status"], requireAll = true)
+//fun setOrderStatus(tv: TextView, date: Date){
+//    tv.text = "Ordered on: " + SimpleDateFormat("dd/MM/yyyy").format(date)
+//}
+
+@BindingAdapter("setOrderStatus")
+fun setOrderStatus(tv: TextView, value: String){
+    tv.text = value
+}
+
+
+@BindingAdapter("setUserState")
+fun setUserState(image: ImageView,b: Boolean){
+    if (b){ // seller
+        image.visibility = View.GONE
+    }else{ // customer
+        image.visibility = View.VISIBLE
+    }
+}
+
 @BindingAdapter("setOrderItemsCount")
-fun setOrderItemsCount(tv: TextView, v: Double){
+fun setOrderItemsCount(tv: TextView, v: Int){
     tv.text = "$v items purchased"
 }
 

@@ -19,6 +19,11 @@ class LocalUserRepository(private val userApi: UserApi) {
 
 	private val ioDispatcher = Dispatchers.IO
 
+
+	companion object{
+		const val TAG = "LocalUserRepository"
+	}
+
 	suspend fun addUser(user: User) {
 		withContext(ioDispatcher) {
 			userApi.insert(user)
@@ -48,6 +53,41 @@ class LocalUserRepository(private val userApi: UserApi) {
 			}
 		}
 	}
+
+	suspend fun insertOrder(order: User.OrderItem) = withContext(ioDispatcher){
+		try {
+			val user = userApi.getUserById(order.customerId)
+			if (user != null){
+				val orders = user.orders.toMutableSet()
+				orders.add(order)
+				user.orders = orders.toList()
+				userApi.updateUser(user)
+
+			}else{ }
+
+		}catch (ex: Exception){
+			Log.d(TAG,ex.message.toString())
+		}
+
+	}
+
+	suspend fun deleteOrder(order: User.OrderItem) = withContext(ioDispatcher){
+		try {
+			val user = userApi.getUserById(order.customerId)
+			if (user != null){
+				val orders = user.orders.toMutableSet()
+				orders.remove(order)
+				user.orders = orders.toList()
+				userApi.updateUser(user)
+
+			}else{ }
+
+		}catch (ex: Exception){
+			Log.d(TAG,ex.message.toString())
+		}
+
+	}
+
 
 
 	suspend fun getUserById(userId: String): User? = withContext(ioDispatcher) {
@@ -85,14 +125,14 @@ class LocalUserRepository(private val userApi: UserApi) {
 				val uData = userApi.getUserById(userId)
 				if (uData != null) {
 					val ordersList = uData.orders
-					return@withContext Result.Success(ordersList)
+					return@withContext Success(ordersList)
 				} else {
-					return@withContext Result.Error(Exception("User Not Found"))
+					return@withContext Error(Exception("User Not Found"))
 				}
 
 			} catch (e: Exception) {
 				Log.d("UserLocalSource", "onGetOrders: Error Occurred, ${e.message}")
-				return@withContext Result.Error(e)
+				return@withContext Error(e)
 			}
 		}
 

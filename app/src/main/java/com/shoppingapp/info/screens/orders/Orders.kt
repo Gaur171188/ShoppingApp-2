@@ -5,12 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.OrdersBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
+import org.koin.android.ext.android.bind
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
@@ -24,7 +27,7 @@ class Orders : Fragment() {
 
     private lateinit var binding: OrdersBinding
     private val orderController by lazy { OrderController() }
-//    private lateinit var ordersAdapter: OrdersAdapter
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.orders, container, false)
@@ -34,23 +37,28 @@ class Orders : Fragment() {
         setObservers()
 
         return binding.root
+
     }
 
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//        homeViewModel.getAllOrders()
-//    }
-
+    private fun navigateToOrderDetails(orderId: String) {
+        val data = bundleOf("orderId" to orderId)
+        findNavController().navigate(R.id.action_orders_to_orderDetailsFragment,data)
+    }
 
     private fun setAdapter(){
-//        val orders = homeViewModel.orders.value
-        orderController.setData(emptyList())
-
+        val orders = homeViewModel.orders.value ?: emptyList()
+        orderController.setData(orders)
 
         orderController.clickListener = object : OrderController.OnClickListener {
 
             override fun onItemClick(order: User.OrderItem) {
-                Toast.makeText(requireContext(),"click",Toast.LENGTH_SHORT).show()
+
+                if(homeViewModel.isUserSeller()){
+                    navigateToOrderDetails(order.orderId)
+                }else{
+                    Toast.makeText(requireContext(),"click",Toast.LENGTH_SHORT).show()
+                }
+
             }
 
         }
@@ -68,28 +76,15 @@ class Orders : Fragment() {
             ordersAppBar.topAppBar.title = "Orders"
 
 
+            swipeRefreshLayout.setOnRefreshListener {
+                homeViewModel.refreshOrders()
+            }
+
+
         }
 
 
-//        binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
-//        binding.ordersAppBar.topAppBar.title = getString(R.string.orders)
-//        binding.ordersAppBar.topAppBar.setNavigationOnClickListener {
-//            findNavController().navigateUp()
-//        }
-//        binding.ordersEmptyMessage.visibility = View.GONE
-//        if (context != null) {
-//            ordersAdapter = OrdersAdapter(emptyList(), requireContext())
-//            ordersAdapter.onClickListener = object : OrdersAdapter.OnClickListener {
-//                override fun onCardClick(orderId: String) {
-//                    Log.d(TAG, "onOrderSummaryClick: Getting order details")
-//                    findNavController().navigate(
-//                        R.id.action_orders_to_orderDetailsFragment,
-//                        bundleOf("orderId" to orderId)
-//                    )
-//                }
-//            }
-//            binding.orderAllOrdersRecyclerView.adapter = ordersAdapter
-//        }
+
 
     }
 
@@ -98,40 +93,14 @@ class Orders : Fragment() {
 
 
         /** orders live data **/
-        homeViewModel.orders.observe(viewLifecycleOwner){orders->
+        homeViewModel.orders.observe(viewLifecycleOwner){ orders->
             if (orders != null){
                 orderController.setData(orders)
+                binding.swipeRefreshLayout.isRefreshing = false
             }
         }
 
 
-//        homeViewModel.storeDataStatus.observe(viewLifecycleOwner) { status ->
-//            when (status) {
-//                StoreDataStatus.LOADING -> {
-//                    binding.orderAllOrdersRecyclerView.visibility = View.GONE
-//                    binding.ordersEmptyMessage.visibility = View.GONE
-//                    binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
-//                    binding.loaderLayout.circularLoader.showAnimationBehavior
-//                }
-//                else -> {
-//                    binding.loaderLayout.circularLoader.hideAnimationBehavior
-//                    binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
-//                }
-//            }
-//
-//            if (status != null && status != StoreDataStatus.LOADING) {
-//                homeViewModel.userOrders.observe(viewLifecycleOwner) { orders ->
-//                    if (orders.isNotEmpty()) {
-//                        ordersAdapter.data = orders.sortedByDescending { it.orderDate }
-//                        binding.orderAllOrdersRecyclerView.adapter?.notifyDataSetChanged()
-//                        binding.orderAllOrdersRecyclerView.visibility = View.VISIBLE
-//                    } else if (orders.isEmpty()) {
-//                        binding.loaderLayout.circularLoader.hideAnimationBehavior
-//                        binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
-//                        binding.ordersEmptyMessage.visibility = View.VISIBLE
-//                    }
-//                }
-//            }
-//        }
+
     }
 }

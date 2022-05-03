@@ -8,7 +8,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.shoppingapp.info.R
 import com.shoppingapp.info.ShoppingApplication
+import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.repository.user.RemoteUserRepository
+import com.shoppingapp.info.repository.user.UserRepository
 
 import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.StoreDataStatus
@@ -17,7 +19,8 @@ import kotlinx.coroutines.*
 
 class LoginViewModel(
     private val remoteUserRepository: RemoteUserRepository,
-    private val sharePrefManager: SharePrefManager ): ViewModel() {
+    private val sharePrefManager: SharePrefManager,
+    private val productRepository: ProductRepository): ViewModel() {
 
 //    private val app = application
 ////    val userPref = SharePref(app.applicationContext, SharePref.FILE_USER)
@@ -80,7 +83,7 @@ class LoginViewModel(
 
 
     fun login(email: String, password: String, isRemOn: Boolean) {
-        scopeIO.launch {
+        viewModelScope.launch {
             withContext(Dispatchers.Main){
                 _inProgress.value = StoreDataStatus.LOADING
             }
@@ -92,6 +95,9 @@ class LoginViewModel(
                     } else {// user is exist
                         Log.i(TAG, "user is exist")
                         signWithEmailAndPassword(email, password,isRemOn)
+                        viewModelScope.launch {
+                            productRepository.refreshProducts()
+                        }
                     }
                 },
                 onError = { error -> // error network

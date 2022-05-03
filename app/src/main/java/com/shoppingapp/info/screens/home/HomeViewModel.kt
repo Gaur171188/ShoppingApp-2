@@ -7,8 +7,6 @@ import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.repository.user.UserRepository
 import com.shoppingapp.info.screens.orders.OrdersViewModel
-import com.shoppingapp.info.screens.product_details.ProductDetailsViewModel
-import com.shoppingapp.info.utils.AddObjectStatus
 import com.shoppingapp.info.utils.StoreDataStatus
 import java.time.Month
 import com.shoppingapp.info.utils.Result
@@ -99,23 +97,28 @@ class HomeViewModel(
 
         viewModelScope.launch {
             userRepository.hardRefreshUserData()
-            getUserLikes()
-            initUser()
+            refreshUser()
+            refreshOrders()
         }
 
-        if (isUserSeller()) {
-            Log.i(TAG,"Seller")
-         getProductByOwner()
 
-        }else{
+        _products = allProducts as MutableLiveData<List<Product>>
+        if (!isUserSeller()) {
             Log.i(TAG,"customer")
-            _products = allProducts as MutableLiveData<List<Product>>
-            refreshStuckData()
+            refreshStuckLikesAndCartItems()
             refreshCartData()
+            getUserLikes()
 
         }
 
     }
+
+
+    fun refreshOrders() {
+       refreshStuckOrders()
+    }
+
+
 
     fun set(productId: String) {
         viewModelScope.launch {
@@ -220,15 +223,6 @@ class HomeViewModel(
         }
     }
 
-    fun getProductByOwner(){
-        viewModelScope.launch {
-            val res = productRepository.getAllProductsByOwner()
-            if (res is Result.Success){
-                _products.value = res.data!!
-            }
-        }
-    }
-
 
     fun isUserSeller() = userRepository.isUserSeller()
 
@@ -241,19 +235,30 @@ class HomeViewModel(
     fun refreshProducts() {
         viewModelScope.launch {
             val res = productRepository.refreshProducts()
-            if (res is Result.Success){ // data is refreshed
+            if (res is Result.Success) { // data is refreshed
 
             }
             getUserLikes()
         }
     }
 
-    fun refreshStuckData(){
+    fun refreshStuckLikesAndCartItems(){
         viewModelScope.launch {
-            val res = productRepository.getProducts()
-            if (res is Result.Success){
-                userRepository.refreshProductLikes(res.data) // refresh likes
-                userRepository.refreshCartItems(res.data) // refresh cartItems
+            val productRes = productRepository.getProducts()
+            if (productRes is Result.Success){
+                userRepository.refreshProductLikes(productRes.data) // refresh likes
+                userRepository.refreshCartItems(productRes.data) // refresh cartItems
+            }
+        }
+    }
+
+    fun refreshStuckOrders(){
+        viewModelScope.launch {
+            val ordersRes = userRepository.getOrders()
+            if (ordersRes is Result.Success){
+                val orders = ordersRes.data
+                _orders.value = orders
+                orders?.let { userRepository.refreshOrderItems(it) }
             }
         }
     }
@@ -302,7 +307,7 @@ class HomeViewModel(
             _cartItems.value?.let { items ->
                 val itemPos = items.indexOfFirst { it.itemId == itemId }
                 cartList = items.toMutableList()
-                val deferredRes = async { userRepository.deleteCartItemByUserId(itemId) }
+                val deferredRes = async { userRepository.deleteCartItem(itemId) }
                 val res = deferredRes.await()
                 if (res is Result.Success) {
                     cartList.removeAt(itemPos)
@@ -439,7 +444,7 @@ fun toggleProductInCart(product: Product,onComplete: (Result<Boolean>) -> Unit) 
                     val carts = userRepository.getUser()?.cart
                     val cart = carts?.find { product.productId == it.productId }
                     if (cart != null){
-                        onComplete(userRepository.deleteCartItemByUserId(cart.itemId))
+                        onComplete(userRepository.deleteCartItem(cart.itemId))
 
                     }
                 }
@@ -620,7 +625,7 @@ fun toggleProductInCart(product: Product,onComplete: (Result<Boolean>) -> Unit) 
     fun getAllOrders() {
         viewModelScope.launch {
             _storeDataStatus.value = StoreDataStatus.LOADING
-            val deferredRes = async { userRepository.getOrdersByUserId(userId!!) }
+            val deferredRes = async { userRepository.getOrders() }
             val res = deferredRes.await()
             if (res is Result.Success) {
                 _userOrders.value = res.data ?: emptyList()
@@ -726,15 +731,17 @@ fun toggleProductInCart(product: Product,onComplete: (Result<Boolean>) -> Unit) 
 //        }
 //    }
 
-    private fun initUser() {
+    private fun refreshUser() {
         viewModelScope.launch {
             val user = userRepository.getUser()
             if (user != null){
                 _user.value = user
-                _orders.value = user.orders
+                _cartItems.value = user.cart
             }else{
                 _user.value = null
             }
         }
     }
+
+
 }

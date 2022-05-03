@@ -46,7 +46,7 @@
                     android:layout_height="wrap_content"
                     app:constraint_referenced_ids="order_details_payment_label_tv,
                 order_details_pro_label_tv,order_details_ship_label_tv,
-                order_details_payment_layout,order_details_shipping_add_layout,
+                paymentDetails,orderDetails,
                 products_RecyclerView,btn_order_change_status" />
 
                 <TextView
@@ -114,7 +114,7 @@
                     app:tint="@color/white" />
 
                 <include
-                    android:id="@+id/order_details_shipping_add_layout"
+                    android:id="@+id/orderDetails"
                     layout="@layout/shipping_card_layout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -139,10 +139,10 @@
                     android:textStyle="bold"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/order_details_shipping_add_layout" />
+                    app:layout_constraintTop_toBottomOf="@id/orderDetails" />
 
                 <include
-                    android:id="@+id/order_details_payment_layout"
+                    android:id="@+id/paymentDetails"
                     layout="@layout/item_price_card_layout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

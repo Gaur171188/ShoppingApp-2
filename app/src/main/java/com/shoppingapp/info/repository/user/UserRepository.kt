@@ -29,6 +29,23 @@ class UserRepository(
 
 	}
 
+	suspend fun refreshOrders(): Result<Boolean> {
+		return supervisorScope {
+			val task = async {
+				val updateOrders = remoteUserRepository.getOrdersFromRemote(userId)
+				val user = localUserRepository.getUser(userId)
+				user?.orders = updateOrders!!
+				localUserRepository.addUser(user!!)
+			}
+			try {
+				task.await()
+			    Result.Success(true)
+			}catch (ex: Exception){
+				Result.Error(ex)
+			}
+		}
+	}
+
 
 	suspend fun refreshProductLikes(products: List<Product>){
 		val oldLikes = remoteUserRepository.getStuckLikes(userId,products)
@@ -40,6 +57,12 @@ class UserRepository(
 		val oldCartItems = remoteUserRepository.getStuckCartItems(userId,products)
 		Log.d(TAG,"diff cart items = ${oldCartItems.size}")
 		deleteAllCartItems(oldCartItems)
+	}
+
+	suspend fun refreshOrderItems(orders: List<User.OrderItem>){
+		val oldOrders = remoteUserRepository.getStuckOrdersIds(userId,orders)
+		Log.d(TAG,"diff cart items = ${oldOrders.size}")
+		deleteAllOrders(orders)
 	}
 
 	fun getUserId() = sharePrefManager.getUserIdFromSession()
@@ -85,8 +108,14 @@ class UserRepository(
 	}
 
 	suspend fun deleteAllCartItems(cartItems: List<String>) {
-		cartItems.forEach { itemId -> deleteCartItemByUserId(itemId) }
+		cartItems.forEach { itemId -> deleteCartItem(itemId) }
 	}
+
+	suspend fun deleteAllOrders(orders: List<User.OrderItem>) {
+		orders.forEach { order ->  deleteOrder(order) }
+	}
+
+
 
 	suspend fun checkLogin(mobile: String, password: String): User? {
 		Log.d(TAG, "on Login: checking mobile and password")
@@ -250,7 +279,60 @@ class UserRepository(
 		}
 	}
 
-	suspend fun deleteCartItemByUserId(itemId: String): Result<Boolean> {
+
+	suspend fun insertOrder(order: User.OrderItem): Result<Boolean> {
+
+		return supervisorScope {
+			val remoteRes = async {
+				Log.d(TAG, "onInsert: inserting order item from remote source")
+				remoteUserRepository.insertOrder(order)
+			}
+
+			val localRes = async {
+				Log.d(TAG, "onInsert: inserting order item from local source")
+				localUserRepository.insertOrder(order)
+			}
+
+			try {
+				remoteRes.await()
+				localRes.await()
+				Result.Success(true)
+			}catch (ex: Exception){
+				Result.Error(ex)
+			}
+		}
+
+
+	}
+
+
+
+	suspend fun deleteOrder(order: User.OrderItem): Result<Boolean> {
+
+		return supervisorScope {
+			val remoteRes = async {
+				Log.d(TAG, "onDelete: deleting order item from remote source")
+				remoteUserRepository.deleteOrder(order)
+			}
+
+			val localRes = async {
+				Log.d(TAG, "onDelete: deleting order item from remote source")
+				localUserRepository.deleteOrder(order)
+			}
+
+			try {
+			    remoteRes.await()
+				localRes.await()
+				Result.Success(true)
+			}catch (ex: Exception){
+				Result.Error(ex)
+			}
+		}
+
+
+	}
+
+	suspend fun deleteCartItem(itemId: String): Result<Boolean> {
 		return supervisorScope {
 			val remoteRes = async {
 				Log.d(TAG, "onDelete: deleting cart item from remote source")
@@ -319,7 +401,7 @@ class UserRepository(
 		}
 	}
 
-	suspend fun getOrdersByUserId(userId: String) = localUserRepository.getOrdersByUserId(userId)
+	suspend fun getOrders() = localUserRepository.getOrdersByUserId(userId)
 
 	suspend fun getLikesByUserId() = localUserRepository.getLikesByUserId(userId)
 

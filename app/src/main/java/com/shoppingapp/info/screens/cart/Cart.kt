@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -82,7 +81,7 @@ class Cart : Fragment() {
         /** swipe refresh cart items **/
         binding.swipeRefreshCartItems.setOnRefreshListener {
             homeViewModel.refreshCartData()
-            homeViewModel.refreshStuckData()
+            homeViewModel.refreshStuckLikesAndCartItems()
         }
 
 

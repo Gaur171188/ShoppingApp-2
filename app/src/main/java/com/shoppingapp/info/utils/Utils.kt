@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.room.TypeConverter
+import com.shoppingapp.info.data.User
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
@@ -14,12 +15,21 @@ const val ERR_UPLOAD = "UploadErrorException"
 
 enum class StoreDataStatus { LOADING, ERROR, DONE }
 enum class UserType { CUSTOMER, SELLER }
-enum class OrderStatus { CONFIRMED, PACKAGING, PACKED, SHIPPING, SHIPPED, ARRIVING, DELIVERED }
+enum class OrderStatus { CONFIRMED, SPOON, ARRIVING, DELIVERED }
 enum class AddProductViewErrors { NONE, EMPTY, ERR_PRICE_0 }
 enum class AddProductErrors { NONE, ERR_ADD, ERR_ADD_IMG, ADDING }
 enum class AddItemErrors { ERROR_SIZE, ERROR_COLOR }
 enum class AddObjectStatus { DONE, ERR_ADD, ADDING }
 
+
+
+fun getItemsPriceTotal(price: Map<String, Double>,items: List<User.CartItem>): Double {
+    var totalPrice = 0.0
+    price.forEach { (itemId, price) ->
+        totalPrice += price * (items.find { it.itemId == itemId }?.quantity ?: 1)
+    }
+    return totalPrice
+}
 
 
 class MyOnFocusChangeListener : View.OnFocusChangeListener {
