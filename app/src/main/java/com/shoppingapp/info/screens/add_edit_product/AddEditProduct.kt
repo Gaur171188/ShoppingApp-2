@@ -76,6 +76,8 @@ class AddEditProduct : Fragment() {
         userId = sharePrefManager.getUserIdFromSession()!!
 
 
+        showMessage(requireContext(),"colors: ${product.availableColors.size} ,sizes: ${product.availableSizes.size} ")
+
 
 //        productId = arguments?.getString("productId").toString()
 
@@ -160,26 +162,23 @@ class AddEditProduct : Fragment() {
     // todo put this in data binding
     private fun fillDataInAllViews() {
         binding.apply {
-            if(isEdit){
-                product.let { product ->
-                    Log.d(TAG, "fill data in views")
-                    addProAppBar.topAppBar.title = "Edit Product - ${product.name}"
-                    productName.setText(product.name)
-                    proPriceEditText.setText(product.price.toString())
-                    proMrpEditText.setText(product.mrp.toString())
-                    productDes.setText(product.description)
+            addProAppBar.topAppBar.title = "Edit Product - ${product.name}"
+            productName.setText(product.name)
+            proPriceEditText.setText(product.price.toString())
+            proMrpEditText.setText(product.mrp.toString())
+            productDes.setText(product.description)
 
-                    imgList = product.images.map { it.toUri() } as MutableList<Uri>
-                    val adapter = AddProductImagesAdapter(requireContext(), imgList)
-                    addProImagesRv.adapter = adapter
 
-                    btnAddProduct.text = "Update"
-                    btnDeleteProduct.show()
+            imgList = product.images.map { it.toUri() } as MutableList<Uri>
+            val adapter = AddProductImagesAdapter(requireContext(), imgList)
+            addProImagesRv.adapter = adapter
 
-                    setShoeSizesChips(product.availableSizes)
-                    setShoeColorsChips(product.availableColors)
-                }
-            }
+            btnAddProduct.text = "Update"
+            btnDeleteProduct.show()
+
+            setShoeColorsChips(product.availableColors)
+            setShoeSizesChips(product.availableSizes)
+
         }
     }
 
@@ -206,8 +205,9 @@ class AddEditProduct : Fragment() {
 
             loaderLayout.loaderFrameLayout.visibility = View.GONE
 
-            setShoeSizesChips()
-            setShoeColorsChips()
+//            setShoeSizesChips()
+//            setShoeColorsChips()
+
             addProductErrorMessage.visibility = View.GONE
             productName.onFocusChangeListener = focusChangeListener
             proPriceEditText.onFocusChangeListener = focusChangeListener
@@ -261,11 +261,11 @@ class AddEditProduct : Fragment() {
             if (imgList.isEmpty() || imgList.size <= 0) {
                 showMessage(requireContext(), "one image at least required!")
             }
-            else{
+            else {
                 val newProduct = Product(getProductId(userId),name,userId,desc,catName, price ?: 0.0,mrp ?: 0.0,sizeList.toList(),colorsList.toList())
-                if (!isEdit){
+                if (!isEdit){ // insert new product
                     viewModel.submitProduct(newProduct,imgList)
-                }else{
+                }else{ // update product
                     product.name = name
                     product.mrp = mrp!!
                     product.description = desc
@@ -281,7 +281,7 @@ class AddEditProduct : Fragment() {
 
     }
 
-    private fun setShoeSizesChips(shoeList: List<Int>? = emptyList()) {
+    private fun setShoeSizesChips(shoeList: List<Int>) {
         binding.addProductSizeChipGroup.apply {
             removeAllViews()
             for ((_, v) in ShoeSizes) {
@@ -292,11 +292,12 @@ class AddEditProduct : Fragment() {
                 chip.text = "$v"
                 chip.isCheckable = true
 
-                if (shoeList?.contains(v) == true) {
+                if (shoeList.contains(v) == true) {
                     chip.isChecked = true
                     sizeList.add(chip.tag.toString().toInt())
                 }
 
+                /** select size button **/
                 chip.setOnCheckedChangeListener { buttonView, isChecked ->
                     val tag = buttonView.tag.toString().toInt()
                     if (!isChecked) {
@@ -334,6 +335,7 @@ class AddEditProduct : Fragment() {
                     colorsList.add(chip.tag.toString())
                 }
 
+                /** select color button **/
                 chip.setOnCheckedChangeListener { buttonView, isChecked ->
                     val tag = buttonView.tag.toString()
                     if (!isChecked) {

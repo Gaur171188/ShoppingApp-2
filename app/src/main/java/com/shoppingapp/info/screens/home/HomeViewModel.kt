@@ -45,14 +45,15 @@ class HomeViewModel(): ViewModel() {
     val removeLikeStatus: LiveData<DataStatus?> = _removeLikeStatus
 
 
+    private val _cartItems= MutableLiveData<List<User.CartItem>?>()
+    val cartItems: LiveData<List<User.CartItem>?> = _cartItems
 
 
 
 
-
-
-    private val _isItemInCart = MutableLiveData<Boolean>()
-    val isItemInCart: LiveData<Boolean> get() = _isItemInCart
+//
+//    private val _isItemInCart = MutableLiveData<Boolean>()
+//    val isItemInCart: LiveData<Boolean> get() = _isItemInCart
 
     private var _userOrders = MutableLiveData<List<User.OrderItem>>()
     val userOrders: LiveData<List<User.OrderItem>> get() = _userOrders
@@ -93,16 +94,13 @@ class HomeViewModel(): ViewModel() {
     private val _cartProducts = MutableLiveData<List<Product>>()
     val cartProducts: LiveData<List<Product>> = _cartProducts
 
-    private val _cartItems= MutableLiveData<List<User.CartItem>?>()
-    val cartItems: LiveData<List<User.CartItem>?> = _cartItems
+
 
     private val _itemsPrice = MutableLiveData<Map<String, Double>>()
     val itemsPrice: LiveData<Map<String, Double>> = _itemsPrice
 
     private val _orders= MutableLiveData<List<User.OrderItem>?>()
     val orders: LiveData<List<User.OrderItem>?> = _orders
-
-
 
 
 
@@ -123,7 +121,9 @@ class HomeViewModel(): ViewModel() {
             val user = userRepository.getUserById(userId)
             _userData.value = user
             val likes = user?.likes
+            val cart = user?.cart
             _userLikes.value = likes
+            _cartItems.value = cart
             productRepository.getProducts()
                 .addOnSuccessListener {
                     _productsStatus.value = DataStatus.SUCCESS

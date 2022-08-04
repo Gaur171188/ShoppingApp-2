@@ -67,14 +67,20 @@ class Home : Fragment() {
     }
 
 
-    override fun onStart() {
-        super.onStart()
+//    override fun onStart() {
+//        super.onStart()
+//
+//
+////      refresh the data
+//        viewModel.loadData(userId)
+//
+//
+//    }
 
+    override fun onResume() {
+        super.onResume()
 
-//      refresh the data
         viewModel.loadData(userId)
-
-
     }
 
 
@@ -253,12 +259,13 @@ class Home : Fragment() {
 
             override fun onProductClick(product: Product) {
 
-                if (isUserSeller == true) {
+                if (isUserSeller == true) { // go to add edit product
                     val data = bundleOf(Constants.KEY_IS_EDIT to true , Constants.KEY_PRODUCT to product )
                     findNavController().navigate(R.id.action_goto_addProduct, data)
-                }else {
+                }else { // go to product details
 
-                    val data =  bundleOf(Constants.KEY_PRODUCT to product)
+                    val isProductInCart = viewModel.cartItems.value?.map{ it.productId }?.contains(product.productId)
+                    val data =  bundleOf(Constants.KEY_PRODUCT to product, Constants.KEY_CHECK_IN_CART to isProductInCart)
                     findNavController().navigate(R.id.action_home_to_productDetails,data)
                 }
 

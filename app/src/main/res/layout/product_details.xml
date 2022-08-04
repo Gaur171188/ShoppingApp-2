@@ -138,6 +138,7 @@
                         android:orientation="horizontal">
 
                     </RadioGroup>
+
                 </HorizontalScrollView>
 
                 <TextView
@@ -177,7 +178,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:text="@string/specification"
+                    android:text="@string/description"
                     android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
                     android:textSize="16sp"
                     android:textStyle="bold"
@@ -236,7 +237,7 @@
 
 
             <ImageButton
-                android:id="@+id/btn_RemoveCartItem"
+                android:id="@+id/btn_remove_quantity"
                 android:layout_width="33dp"
                 android:layout_height="28dp"
                 android:background="@null"
@@ -256,7 +257,7 @@
                 tools:text="123" />
 
             <ImageButton
-                android:id="@+id/btn_addCartItem"
+                android:id="@+id/btn_insert_quantity"
                 android:layout_width="33dp"
                 android:layout_height="28dp"
                 android:background="@null"

@@ -48,29 +48,38 @@ class ProductDetailsViewModel(): ViewModel() {
 
 
 
-
-
-
-    fun setQuantityOfItem (productId: String,userId: String, value: Int) {
+    fun setQuantityOfItem (value: Int) {
         viewModelScope.launch {
-
             val newQuantity = value + _quantity.value!!
             _quantity.value = newQuantity
-
-            val user = userRepository.getUserById(userId)
-            if (user != null) {
-                val item = user.cart.find { it.productId == productId }
-                if (item != null) {
-                    item.quantity = newQuantity
-                }
-            }
-
         }
     }
 
 
+
+//    fun setQuantityOfItem (productId: String,userId: String, value: Int) {
+//        viewModelScope.launch {
+//
+//            val newQuantity = value + _quantity.value!!
+//            _quantity.value = newQuantity
+//
+//            val user = userRepository.getUserById(userId)
+//
+//
+//            if (user != null) {
+//                val item = user.cart.find { it.productId == productId }
+//                if (item != null) {
+//                    item.quantity = newQuantity
+//                }
+//            }
+//
+//        }
+//    }
+
+
     // check if item in cart.
     // load cart data.
+    // load quantity.
 
     fun loadData(user: User,product: Product) {
         val cart = user.cart
@@ -82,8 +91,6 @@ class ProductDetailsViewModel(): ViewModel() {
         loadCartItems(cart)
         loadQuantity(productId,cart)
         isItemInCart(itemInCart)
-//        isProductLiked(isLiked)
-
     }
 
 
@@ -105,47 +112,23 @@ class ProductDetailsViewModel(): ViewModel() {
     }
 
 
-    fun isProductLiked(isLiked: Boolean) {
-//        val isProductLiked = likes.contains(productId)
-        _isProductLiked.value = isLiked
-    }
 
 
-
-
-
-
-
-//    fun checkIfInCart(productId: String,userId: String) {
-//        viewModelScope.launch {
-//            val user = userRepository.getUserById(userId)
-//            Log.d(TAG,"product id: $productId")
-//            Log.d(TAG, "products: ${allProducts.value!!.size}")
-//            if (user != null) {
-//                val cartList = user.cart
-//                val idx = cartList.indexOfFirst { it.productId == productId }
-//                _isItemInCart.value = idx >= 0
-//                Log.d(TAG, "Checking in Cart: Success, value = ${_isItemInCart.value}, ${cartList.size}")
-//            } else {
-//                _isItemInCart.value = false
-//            }
-//        }
-//    }
 
 
 
     fun addToCart(product: Product,size: Int?, color: String?,userId: String) {
-        Log.d(TAG, "onAddingToCart: Loading..")
+        Log.d(TAG, "onAddingCartItem: Loading..")
         viewModelScope.launch {
             val itemId = UUID.randomUUID().toString()
             val newItem = User.CartItem(itemId, product.productId, product.owner, _quantity.value!!, color, size)
             userRepository.insertCartItem(newItem,userId)
                 .addOnSuccessListener {
-                    Log.d(TAG, "onAddingToCart: Item has been added success")
+                    Log.d(TAG, "onAddingCartItem: Item has been added success")
                     _isItemInCart.value = true
                 }
                 .addOnFailureListener { e ->
-                    Log.d(TAG, "onAddingToCart: failed to add due to ${e.message}")
+                    Log.d(TAG, "onAddingCartItem: failed to add due to ${e.message}")
                 }
         }
     }
@@ -167,19 +150,10 @@ class ProductDetailsViewModel(): ViewModel() {
 
 
 
-    private fun insertCartItem(item: User.CartItem) {
-//        viewModelScope.launch {
-//            val deferredRes = async { userRepository.insertCartItemByUserId(item) }
-//            val res = deferredRes.await()
-//            if (res is Result.Success) {
-//                _isItemInCart.value = true
-//                Log.d(TAG, "onAddItem: Success")
-//            } else {
-//                if (res is Error) {
-//                    Log.d(TAG, "onAddItem: Error, ${res}")
-//                }
-//            }
-//        }
+    fun updateCartItem(product: Product,size: Int?, color: String?,userId: String){
+        viewModelScope.launch {
+
+        }
     }
 
 
