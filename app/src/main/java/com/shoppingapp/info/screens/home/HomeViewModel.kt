@@ -8,6 +8,7 @@ import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.product.RemoteProductRepository
 import com.shoppingapp.info.repository.user.RemoteUserRepository
+import com.shoppingapp.info.screens.favorites.FavoritesViewModel
 import com.shoppingapp.info.utils.DataStatus
 import kotlinx.coroutines.*
 
@@ -34,6 +35,20 @@ class HomeViewModel(): ViewModel() {
     /** progress **/
     private val _productsStatus = MutableLiveData<DataStatus>()
     val productsStatus: LiveData<DataStatus> = _productsStatus
+
+    /** progress **/
+    private val _addLikeStatus = MutableLiveData<DataStatus?>()
+    val addLikeStatus: LiveData<DataStatus?> = _addLikeStatus
+
+    /** progress **/
+    private val _removeLikeStatus = MutableLiveData<DataStatus?>()
+    val removeLikeStatus: LiveData<DataStatus?> = _removeLikeStatus
+
+
+
+
+
+
 
 
     private val _isItemInCart = MutableLiveData<Boolean>()
@@ -128,6 +143,55 @@ class HomeViewModel(): ViewModel() {
     }
 
 
+    fun insertLikeByProductId (product: Product, userId: String) {
+        Log.d(TAG,"OnLikeProduct: Loading..")
+        resetData()
+        _addLikeStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            userRepository.likeProduct(product.productId,userId)
+                .addOnSuccessListener {
+                    Log.d(TAG,"OnLikeProduct: like has been added success")
+                    _addLikeStatus.value = DataStatus.SUCCESS
+                    val likedProducts = _likedProducts.value?.toMutableList()
+                    likedProducts?.add(product)
+                    _likedProducts.value = likedProducts
+                }
+                .addOnFailureListener { e ->
+                    Log.d(TAG,"OnLikeProduct: error happen during adding due to ${e.message}")
+                    _addLikeStatus.value = DataStatus.ERROR
+                    _errorMessage.value = e.message
+                }
+        }
+    }
+
+    fun removeLikeByProductId (product: Product, userId: String) {
+        Log.d(TAG,"OnLikeProduct: Loading..")
+        resetData()
+        _removeLikeStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            userRepository.dislikeProduct(product.productId,userId)
+                .addOnSuccessListener {
+                    Log.d(TAG,"OnLikeProduct: like has been removed success")
+                    _removeLikeStatus.value = DataStatus.SUCCESS
+                    val likedProducts = _likedProducts.value?.toMutableList()
+                    likedProducts?.remove(product)
+                    _likedProducts.value = likedProducts
+                }
+                .addOnFailureListener { e ->
+                    Log.d(TAG,"OnLikeProduct: error happen during removing due to ${e.message}")
+                    _removeLikeStatus.value = DataStatus.ERROR
+                    _errorMessage.value = e.message
+                }
+        }
+    }
+
+
+
+    fun resetData() {
+        _addLikeStatus.value = null
+        _removeLikeStatus.value = null
+        _errorMessage.value = null
+    }
 
 
 //

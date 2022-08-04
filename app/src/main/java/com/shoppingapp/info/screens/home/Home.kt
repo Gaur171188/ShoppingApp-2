@@ -5,18 +5,17 @@ package com.shoppingapp.info.screens.home
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -24,6 +23,7 @@ import com.shoppingapp.info.ProductCategories
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.HomeBinding
+import com.shoppingapp.info.screens.favorites.FavoritesViewModel
 import com.shoppingapp.info.utils.*
 import kotlinx.coroutines.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
@@ -37,6 +37,8 @@ class Home : Fragment() {
 
     private lateinit var binding: HomeBinding
     private val viewModel by sharedViewModel<HomeViewModel>()
+//    private val favoritesViewModel by sharedViewModel<FavoritesViewModel>()
+    private lateinit var favoritesViewModel: FavoritesViewModel
 
     private val focusChangeListener = MyOnFocusChangeListener()
 
@@ -49,6 +51,8 @@ class Home : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(layoutInflater,R.layout.home,container,false)
+        favoritesViewModel = ViewModelProvider(this)[FavoritesViewModel::class.java]
+
 
         val sharePrefManager = SharePrefManager(requireContext())
         userId = sharePrefManager.getUserIdFromSession()!!
@@ -67,17 +71,10 @@ class Home : Fragment() {
         super.onStart()
 
 
-
-
 //      refresh the data
         viewModel.loadData(userId)
 
 
-        if (isUserSeller == true) {
-            showMessage(requireContext(),"Seller")
-        }else{
-            showMessage(requireContext(),"Customer")
-        }
     }
 
 
@@ -134,6 +131,31 @@ class Home : Fragment() {
             }
 
 
+//            /** add like status **/
+//            favoritesViewModel.addLikeStatus.observe(viewLifecycleOwner) { status ->
+//                if (status != null){
+//                    when(status){
+//                        DataStatus.SUCCESS -> { showMessage(requireContext(),"liked") }
+//                        DataStatus.LOADING -> {}
+//                        DataStatus.ERROR -> {}
+//                        else -> {}
+//                    }
+//                }
+//
+//            }
+
+
+            /** favorites error message **/
+            favoritesViewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+               if (message != null){
+                   showMessage(requireContext(),message)
+                   favoritesViewModel.resetData()
+               }
+            }
+
+
+
+
         }
 
 
@@ -156,9 +178,9 @@ class Home : Fragment() {
             }
             R.id.item_favorites -> {
                 // show favorite products list
-                val likedProducts = viewModel.likedProducts.value
-                val userLikes = bundleOf("userLikes" to likedProducts)
-                findNavController().navigate(R.id.action_homeFragment_to_favoritesFragment,userLikes)
+//                val likedProducts = viewModel.likedProducts.value
+//                val userLikes = bundleOf("userLikes" to likedProducts)
+                findNavController().navigate(R.id.action_homeFragment_to_favoritesFragment)
 
                 true
             }
@@ -208,9 +230,12 @@ class Home : Fragment() {
                 inputManager.hideSoftInputFromWindow(it.windowToken, 0)
 //			viewModel.filterProducts("All")
             }
+
+            /** app bar menu item **/
             homeTopAppBar.topAppBar.setOnMenuItemClickListener { menuItem ->
                 setAppBarItemClicks(menuItem)
             }
+
         }
     }
 
@@ -240,9 +265,18 @@ class Home : Fragment() {
             }
 
             override fun onLikeClick(product: Product) {
-//                viewModel.toggleLikeByProductId(product.productId)
-                Toast.makeText(requireContext(),"liked",Toast.LENGTH_SHORT).show()
+                val isProductLiked = viewModel.likedProducts.value?.contains(product)!!
+                if (!isProductLiked){ // insert like
+                    viewModel.insertLikeByProductId(product,userId)
+                }else{ // remove like
+                    viewModel.removeLikeByProductId(product, userId)
+                }
+
             }
+
+
+
+
 
 
         }

@@ -99,12 +99,10 @@ class AddEditProduct : Fragment() {
                 when (status) {
                     DataStatus.LOADING -> {
                         binding.loaderLayout.loaderFrameLayout.show()
-//                    binding.loaderLayout.circularLoader.showAnimationBehavior
                     }
                     DataStatus.SUCCESS -> {
                         binding.loaderLayout.loaderFrameLayout.hide()
                         findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
-//                    binding.loaderLayout.circularLoader.hideAnimationBehavior
 
                     }
                     DataStatus.ERROR ->{
@@ -119,12 +117,10 @@ class AddEditProduct : Fragment() {
                 when (status) {
                     DataStatus.LOADING -> {
                         binding.loaderLayout.loaderFrameLayout.show()
-//                    binding.loaderLayout.circularLoader.showAnimationBehavior
                     }
                     DataStatus.SUCCESS -> {
                         binding.loaderLayout.loaderFrameLayout.hide()
                         findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
-//                    binding.loaderLayout.circularLoader.hideAnimationBehavior
 
                     }
                     DataStatus.ERROR ->{
@@ -140,12 +136,10 @@ class AddEditProduct : Fragment() {
                 when (status) {
                     DataStatus.LOADING -> {
                         binding.loaderLayout.loaderFrameLayout.show()
-//                    binding.loaderLayout.circularLoader.showAnimationBehavior
                     }
                     DataStatus.SUCCESS -> {
                         binding.loaderLayout.loaderFrameLayout.hide()
                         findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
-//                    binding.loaderLayout.circularLoader.hideAnimationBehavior
 
                     }
                     DataStatus.ERROR -> {
