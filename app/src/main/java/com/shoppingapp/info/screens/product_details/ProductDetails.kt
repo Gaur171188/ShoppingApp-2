@@ -5,21 +5,17 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.os.Bundle
-import android.util.TypedValue
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RadioButton
 import androidx.core.content.ContextCompat
-import androidx.core.view.setMargins
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.shoppingapp.info.R
-import com.shoppingapp.info.ShoeColors
-import com.shoppingapp.info.ShoeSizes
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.ProductDetailsBinding
@@ -41,8 +37,8 @@ class ProductDetails: Fragment() {
 
 
 
-    private var selectedSize: Int? = null
-    private var selectedColor: String? = null
+//    private var selectedSize: Int? = null
+//    private var selectedColor: String? = null
 
 
     private lateinit var product: Product
@@ -60,6 +56,7 @@ class ProductDetails: Fragment() {
         setViews()
         setObservers()
 
+        Log.d(TAG,product.toString())
 
         return binding.root
     }
@@ -72,8 +69,8 @@ class ProductDetails: Fragment() {
 
         viewModel.loadData(user,product)
 
-        selectedSize = null
-        selectedColor = null
+//        selectedSize = null
+//        selectedColor = null
 
     }
 
@@ -117,16 +114,31 @@ class ProductDetails: Fragment() {
         }
 
 
-        /** live data item in cart **/
-        viewModel.isItemInCart.observe(viewLifecycleOwner) {
-            if (it != null){
-                if (it == true) {
-                    binding.btnAddToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
-                } else {
-                    binding.btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
+        /** live data data status **/
+        viewModel.updateCartStatus.observe(viewLifecycleOwner) { status ->
+            when (status) {
+                DataStatus.LOADING -> {}
+                DataStatus.SUCCESS -> {
+//                    findNavController().navigate(R.id.action_productDetails_to_cart)
+                    showMessage(requireContext(),"cart updated")
                 }
+                DataStatus.ERROR ->{}
+
             }
         }
+
+
+
+//        /** live data item in cart **/
+//        viewModel.isItemInCart.observe(viewLifecycleOwner) {
+//            if (it != null){
+//                if (it == true) {
+//                    binding.btnAddToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
+//                } else {
+//                    binding.btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
+//                }
+//            }
+//        }
 
 
 
@@ -136,6 +148,7 @@ class ProductDetails: Fragment() {
 
 
 
+    // todo: add data binding data to layout
 
     private fun setViews() {
         binding.apply {
@@ -184,6 +197,14 @@ class ProductDetails: Fragment() {
             binding.btnLikeProduct.isChecked = isLiked
 
 
+            // set button text
+            if (isItemInCart) {
+                    btnAddToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
+                } else {
+                    btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
+                }
+
+
             // set images and dots
             setImagesView()
 
@@ -192,8 +213,12 @@ class ProductDetails: Fragment() {
             productDescription.text = product.description
             productPrice.text = resources.getString(R.string.pro_details_price_value, product.price.toString())
 
-            setShoeSizeButtons()
-            setShoeColorsButtons()
+
+            // todo: fix the issue of set the sizes and colors
+
+//            setShoeSizeButtons()
+//            setShoeColorsChips(product.availableColors)
+//            setShoeColorsButtons()
 
 
         }
@@ -206,21 +231,11 @@ class ProductDetails: Fragment() {
     private fun addToCart() {
 
         if (isItemInCart) {  // update cart item then go to cart
-            viewModel
-            findNavController().navigate(R.id.action_productDetails_to_cart)
-
+            viewModel.updateCartItem(product.productId,userId)
         } else {
-            if (selectedSize == null) {
-                showMessage(requireContext(),"Size required")
-            }
-            if (selectedColor == null){
-                showMessage(requireContext(), "Color required")
-            }else {
-                viewModel.addToCart(product,selectedSize, selectedColor,userId)
-            }
+            viewModel.addToCart(product,userId)
         }
 
-//        binding.btnAddToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
 
 
     }
@@ -243,100 +258,159 @@ class ProductDetails: Fragment() {
 
 
 
-    private fun setShoeSizeButtons() {
-        binding.proDetailsSizesRadioGroup.apply {
-            for ( (_, v) in ShoeSizes ) {
+//    private fun setShoeSizeButtons() {
+//        binding.proDetailsSizesRadioGroup.apply {
+//            for ( (_, v) in ShoeSizes ) {
+//
+//                if (product.availableSizes.contains(v)) {
+//
+//                    val param = layoutParams as ViewGroup.MarginLayoutParams
+//                    param.setMargins(resources.getDimensionPixelSize(R.dimen.radio_margin_size))
+//                    param.width = ViewGroup.LayoutParams.WRAP_CONTENT
+//                    param.height = ViewGroup.LayoutParams.WRAP_CONTENT
+//
+//                    val radioButton = RadioButton(context)
+//                    radioButton.id = v
+//                    radioButton.tag = v
+//                    radioButton.layoutParams = param
+//                    radioButton.background = ContextCompat.getDrawable(context, R.drawable.radio_selector)
+//                    radioButton.setButtonDrawable(R.color.transparent)
+//                    radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
+//                    radioButton.setTextColor(Color.BLACK)
+//                    radioButton.setTypeface(null, Typeface.BOLD)
+//                    radioButton.textAlignment = View.TEXT_ALIGNMENT_CENTER
+//                    radioButton.text = "$v"
+//
+//
+//
+//                    // set the product size
+//                    if (product.availableSizes.contains(v)) {
+//                        radioButton.isChecked = true
+//                        val tag = radioButton.tag.toString().toInt()
+//                        selectedSize = v
+//                    }
+//
+//                    /** button select size **/
+//                    radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
+//                        val tag = buttonView.tag.toString().toInt()
+//                        if (isChecked) {
+//                            selectedSize = tag
+//                        }
+//                    }
+//
+//                    addView(radioButton)
+//                }
+//            }
+//            invalidate()
+//        }
+//    }
 
-                if (product.availableSizes.contains(v)) {
-
-                    val param = layoutParams as ViewGroup.MarginLayoutParams
-                    param.setMargins(resources.getDimensionPixelSize(R.dimen.radio_margin_size))
-                    param.width = ViewGroup.LayoutParams.WRAP_CONTENT
-                    param.height = ViewGroup.LayoutParams.WRAP_CONTENT
-
-                    val radioButton = RadioButton(context)
-                    radioButton.id = v
-                    radioButton.tag = v
-                    radioButton.layoutParams = param
-                    radioButton.background = ContextCompat.getDrawable(context, R.drawable.radio_selector)
-                    radioButton.setButtonDrawable(R.color.transparent)
-                    radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14F)
-                    radioButton.setTextColor(Color.BLACK)
-                    radioButton.setTypeface(null, Typeface.BOLD)
-                    radioButton.textAlignment = View.TEXT_ALIGNMENT_CENTER
-                    radioButton.text = "$v"
-
-
-                    // set the product size
-                    if (product.availableSizes.contains(v)) {
-                        radioButton.isChecked = true
-                        val tag = radioButton.tag.toString().toInt()
-                        selectedSize = tag
-                    }
-
-                    /** button select size **/
-                    radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
-                        val tag = buttonView.tag.toString().toInt()
-                        if (isChecked) {
-                            selectedSize = tag
-                        }
-                    }
-
-                    addView(radioButton)
-                }
-            }
-            invalidate()
-        }
-    }
 
 
 
+//    private fun setShoeColorsButtons() {
+//        binding.proDetailsColorsRadioGroup.apply {
+//            var ind = 1
+//            for ( (k, v ) in ShoeColors) {
+//                if (product.availableColors.contains(k)) {
+//
+//                    val param = layoutParams as ViewGroup.MarginLayoutParams
+//                    param.setMargins(resources.getDimensionPixelSize(R.dimen.radio_margin_size))
+//                    param.width = ViewGroup.LayoutParams.WRAP_CONTENT
+//                    param.height = ViewGroup.LayoutParams.WRAP_CONTENT
+//
+//                    val radioButton = RadioButton(context)
+//                    radioButton.id = ind
+//                    radioButton.tag = k
+//                    radioButton.layoutParams = param
+//                    radioButton.background = ContextCompat.getDrawable(context, R.drawable.color_radio_selector)
+//                    radioButton.setButtonDrawable(R.color.transparent)
+//                    radioButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(v))
+//
+//                    if (k == "white") {
+//                        radioButton.backgroundTintMode = PorterDuff.Mode.MULTIPLY
+//                    } else {
+//                        radioButton.backgroundTintMode = PorterDuff.Mode.ADD
+//                    }
+//
+//
+//                    if (product.availableColors?.contains(k) == true) {
+//                        radioButton.isChecked = true
+//                        selectedColor = k
+////                        colorsList.add(chip.tag.toString())
+//                    }
+//
+////                    // set the product color
+////                    if (product.availableColors.contains(k)) {
+////                        radioButton.isChecked = true
+////                        val tag = radioButton.tag.toString()
+////                         selectedColor = k
+////                    }
+//
+//                    /** button select color **/
+//                    radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
+//                        val tag = buttonView.tag.toString()
+//                        if (isChecked) {
+//                            selectedColor = tag
+//                        }
+//                    }
+//
+//                    addView(radioButton)
+//                    ind++
+//                }
+//            }
+//            invalidate()
+//        }
+//    }
 
-    private fun setShoeColorsButtons() {
-        binding.proDetailsColorsRadioGroup.apply {
-            var ind = 1
-            for ( (k, v ) in ShoeColors) {
-                if (product.availableColors.contains(k)) {
 
-                    val param = layoutParams as ViewGroup.MarginLayoutParams
-                    param.setMargins(resources.getDimensionPixelSize(R.dimen.radio_margin_size))
-                    param.width = ViewGroup.LayoutParams.WRAP_CONTENT
-                    param.height = ViewGroup.LayoutParams.WRAP_CONTENT
+//    private fun setShoeColorsChips(colorList: List<String>? = emptyList()) {
+//        binding.addProductColorChipGroup.apply {
+//            removeAllViews()
+//            var ind = 1
+//
+//            for ((k, v) in ShoeColors) {
+//                val chip = Chip(context)
+//                chip.id = ind
+//                chip.tag = k
+//
+//                chip.chipStrokeColor = ColorStateList.valueOf(Color.BLACK)
+//                chip.chipStrokeWidth = TypedValue.applyDimension(
+//                    TypedValue.COMPLEX_UNIT_DIP,
+//                    1F,
+//                    context.resources.displayMetrics
+//                )
+//                chip.chipBackgroundColor = ColorStateList.valueOf(Color.parseColor(v))
+//                chip.isCheckable = true
+//
+//
+//
+//                if (colorList?.contains(k) == true) {
+//                    chip.isChecked = true
+////                    colorsList.add(chip.tag.toString())
+//                }
+//
+//                /** select color button **/
+//                chip.setOnCheckedChangeListener { buttonView, isChecked ->
+//                    val tag = buttonView.tag.toString()
+//                    if (isChecked) {
+//                        selectedColor = tag
+////                        colorsList.remove(tag)
+//                    }
+//                }
+//                val tag = chip.tag.toString()
+//                val isColorExist = ShoeColors.contains(tag)
+//                if (isColorExist){
+//                    addView(chip)
+//                }else{
+//                    removeView(chip)
+//                }
+//
+//                ind++
+//            }
+//            invalidate()
+//        }
+//    }
 
-                    val radioButton = RadioButton(context)
-                    radioButton.id = ind
-                    radioButton.tag = k
-                    radioButton.layoutParams = param
-                    radioButton.background = ContextCompat.getDrawable(context, R.drawable.color_radio_selector)
-                    radioButton.setButtonDrawable(R.color.transparent)
-                    radioButton.backgroundTintList = ColorStateList.valueOf(Color.parseColor(v))
 
-                    if (k == "white") {
-                        radioButton.backgroundTintMode = PorterDuff.Mode.MULTIPLY
-                    } else {
-                        radioButton.backgroundTintMode = PorterDuff.Mode.ADD
-                    }
-
-                    // set the product color
-                    if (product.availableColors.contains(v)) {
-                        radioButton.isChecked = true
-                        val tag = radioButton.tag.toString()
-                         selectedColor = tag
-                    }
-
-                    /** button select color **/
-                    radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
-                        val tag = buttonView.tag.toString()
-                        if (isChecked) {
-                            selectedColor = tag
-                        }
-                    }
-
-                    addView(radioButton)
-                    ind++
-                }
-            }
-            invalidate()
-        }
-    }
 }

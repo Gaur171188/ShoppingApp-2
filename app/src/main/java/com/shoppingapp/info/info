@@ -1,0 +1,11 @@
+
+#some information for this app:
+
+
+there is a 3 type of users in this project (normal user , seller , admin)
+
+the admin can:
+
+1- add the category and subcategory.
+2- enable the color, sizes or other things in this category.
+3- show the statistics for the all data.

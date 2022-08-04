@@ -75,8 +75,8 @@ data class User(
         var productId: String = "",
         var ownerId: String = "",
         var quantity: Int = 0,
-        var color: String?,
-        var size: Int?
+        var color: String? = null,
+        var size: Int? = null
     ) : Parcelable {
         constructor() : this("", "", "", 0, "NA", -1)
 
