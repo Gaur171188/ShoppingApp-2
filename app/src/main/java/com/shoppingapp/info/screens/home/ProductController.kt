@@ -14,7 +14,8 @@ class ProductController(): TypedEpoxyController<List<Any>>() {
     lateinit var clickListener: OnClickListener
     lateinit var likes: List<String>
 
-    var isSeller by Delegates.notNull<Boolean>()
+//    var isSeller by Delegates.notNull<Boolean>()
+var isSeller = false
 
 
     override fun buildModels(list: List<Any>?) {
@@ -26,7 +27,6 @@ class ProductController(): TypedEpoxyController<List<Any>>() {
 
                 is Product -> {
                     val isLiked = likes.contains(data.productId)
-
 
                     productHome {
                         id(data.productId)
@@ -41,7 +41,6 @@ class ProductController(): TypedEpoxyController<List<Any>>() {
                         }
                     }
 
-
                 }
 
                 is Ad -> {
@@ -54,6 +53,7 @@ class ProductController(): TypedEpoxyController<List<Any>>() {
                         }
                     }
                 }
+
 
             }
 

@@ -13,7 +13,7 @@ import kotlin.math.roundToInt
 
 const val ERR_UPLOAD = "UploadErrorException"
 
-enum class StoreDataStatus { LOADING, ERROR, DONE }
+enum class DataStatus { LOADING, ERROR, SUCCESS }
 enum class UserType { CUSTOMER, SELLER }
 enum class OrderStatus { CONFIRMED, SPOON, ARRIVING, DELIVERED }
 enum class AddProductViewErrors { NONE, EMPTY, ERR_PRICE_0 }
@@ -66,9 +66,10 @@ internal fun isEmailValid(email: String): Boolean {
     }
 }
 
-internal fun getProductId(ownerId: String, proCategory: String): String {
+internal fun getProductId(ownerId: String): String {
     val uniqueId = UUID.randomUUID().toString()
-    return "pro-$proCategory-$ownerId-$uniqueId"
+    return "$uniqueId-$ownerId"
+//    return "pro-$proCategory-$ownerId-$uniqueId"
 }
 
 

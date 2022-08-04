@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/registration_nav_graph"
-    app:startDestination="@id/login">
+    app:startDestination="@id/lunch">
 
     <fragment
         android:id="@+id/login"
-        android:name="com.shoppingapp.info.screens.login.Login"
+        android:name="com.shoppingapp.info.screens.auth.Login"
         android:label="Login"
         tools:layout="@layout/login">
         <action
@@ -16,13 +16,24 @@
     </fragment>
     <fragment
         android:id="@+id/registration"
-        android:name="com.shoppingapp.info.screens.registration.Registration"
+        android:name="com.shoppingapp.info.screens.auth.Registration"
         android:label="Registration"
         tools:layout="@layout/registration">
         <action
             android:id="@+id/action_registration_to_login"
             app:destination="@id/login"
             app:popUpTo="@id/login"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/lunch"
+        android:name="com.shoppingapp.info.screens.auth.Lunch"
+        android:label="Lunch"
+        tools:layout="@layout/lunch">
+        <action
+            android:id="@+id/action_lunch_to_login"
+            app:destination="@id/login"
+            app:popUpTo="@id/lunch"
             app:popUpToInclusive="true" />
     </fragment>
 </navigation>

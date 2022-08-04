@@ -31,8 +31,6 @@ class SelectPayment: Fragment() {
 
 
 
-
-
         return binding.root
 
     }

@@ -1,14 +1,21 @@
 package com.shoppingapp.info.screens.account
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.shoppingapp.info.repository.user.UserRepository
+import android.app.Application
+import android.content.Context
+import android.util.Log
+import androidx.lifecycle.*
+import com.shoppingapp.info.repository.user.RemoteUserRepository
 import com.shoppingapp.info.utils.Result
+import com.shoppingapp.info.utils.SharePrefManager
 import kotlinx.coroutines.launch
 
-class AccountViewModel(private val userRepository: UserRepository): ViewModel() {
+class AccountViewModel(): ViewModel() {
+
+    companion object{
+        private const val TAG = "AccountViewModel"
+    }
+
+    private val repository = RemoteUserRepository()
 
     private var _isSignOut = MutableLiveData<Boolean?>()
     val isSignOut: LiveData<Boolean?> get() = _isSignOut
@@ -18,19 +25,15 @@ class AccountViewModel(private val userRepository: UserRepository): ViewModel() 
 
 
 
-
-    fun signOut() {
+    fun signOut(context: Context) {
         viewModelScope.launch {
-            val res = userRepository.signOut()
-            if (res is Result.Success) {
-                _isSignOut.value = true
-            }else{
-                _error.value = "error happening!"
-                _isSignOut.value = null
-            }
+            repository.signOut()
+            SharePrefManager(context).signOut()
+            _isSignOut.value = true
+            Log.d(TAG,"signOut Success")
         }
     }
 
-    fun isUserIsSeller() = userRepository.isUserSeller()
+
 
 }

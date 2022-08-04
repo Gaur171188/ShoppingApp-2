@@ -14,17 +14,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import com.shoppingapp.info.R
 import com.shoppingapp.info.ShoeColors
 import com.shoppingapp.info.ShoeSizes
+import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.AddEditProductBinding
-import com.shoppingapp.info.utils.AddProductErrors
-import com.shoppingapp.info.utils.AddProductViewErrors
-import com.shoppingapp.info.utils.MyOnFocusChangeListener
-import com.shoppingapp.info.utils.StoreDataStatus
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import com.shoppingapp.info.utils.*
 import kotlin.properties.Delegates
 
 
@@ -36,20 +34,22 @@ class AddEditProduct : Fragment() {
     }
 
     private lateinit var binding: AddEditProductBinding
-    private val viewModel by sharedViewModel<AddEditProductViewModel>()
+    private lateinit var viewModel: AddEditProductViewModel
     private val focusChangeListener = MyOnFocusChangeListener()
 
     // arguments
     private var isEdit by Delegates.notNull<Boolean>()
     private lateinit var catName: String
-    private lateinit var productId: String
+    private lateinit var product: Product
+
+    var userId = ""
+
 
     private var sizeList = mutableSetOf<Int>()
     private var colorsList = mutableSetOf<String>()
     private var imgList = mutableListOf<Uri>()
 
-    private val getImages =
-        registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { result ->
+    private val getImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { result ->
             imgList.addAll(result)
             if (imgList.size > 3) {
                 imgList = imgList.subList(0, 3)
@@ -62,14 +62,24 @@ class AddEditProduct : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.add_edit_product,container,false)
-//        viewModel = ViewModelProvider(this)[AddEditProductViewModel::class.java]
+        viewModel = ViewModelProvider(this)[AddEditProductViewModel::class.java]
 
 
-        isEdit = arguments?.getBoolean("isEdit") == true
-        catName = arguments?.getString("categoryName").toString()
-        productId = arguments?.getString("productId").toString()
+        isEdit = arguments?.getBoolean(Constants.KEY_IS_EDIT) == true
+        catName = arguments?.getString(Constants.KEY_CATEGORY).toString()
 
-        initViewModel()
+        product = try { arguments?.getParcelable<Product>(Constants.KEY_PRODUCT)!! }
+        catch (ex: Exception){ Product() }
+
+
+        val sharePrefManager = SharePrefManager(requireContext())
+        userId = sharePrefManager.getUserIdFromSession()!!
+
+
+
+//        productId = arguments?.getString("productId").toString()
+
+
         setViews()
         setObservers()
 
@@ -78,163 +88,203 @@ class AddEditProduct : Fragment() {
         return binding.root
     }
 
-    private fun initViewModel() {
-        Log.d(TAG, "init view model, isedit = $isEdit")
-
-        viewModel.setEditState(isEdit)
-        if (isEdit) {
-            Log.d(TAG, "init view model, isedit = true, $productId")
-            viewModel.setProductData(productId)
-
-            binding.btnAddProduct.text = "Update"
-            binding.btnDeleteProduct.visibility = View.VISIBLE
-        } else {
-            Log.d(TAG, "init view model, isedit = false, $catName")
-            viewModel.setCategory(catName)
-            binding.btnAddProduct.text = "Add Product"
-        }
-    }
 
     private fun setObservers() {
 
-        viewModel.errorStatus.observe(viewLifecycleOwner) { err ->
-            modifyErrors(err)
-        }
-        viewModel.dataStatus.observe(viewLifecycleOwner) { status ->
-            when (status) {
-                StoreDataStatus.LOADING -> {
-                    binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
-                    binding.loaderLayout.circularLoader.showAnimationBehavior
-                }
-                StoreDataStatus.DONE -> {
-                    binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
-                    binding.loaderLayout.circularLoader.hideAnimationBehavior
-                    fillDataInAllViews()
-                }
-                else -> {
-                    binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
-                    binding.loaderLayout.circularLoader.hideAnimationBehavior
-                    makeToast("Error getting Data, Try Again!")
-                }
-            }
-        }
-        viewModel.addProductErrors.observe(viewLifecycleOwner) { status ->
-            when (status) {
-                AddProductErrors.ADDING -> {
-                    binding.loaderLayout.loaderFrameLayout.visibility = View.VISIBLE
-                    binding.loaderLayout.circularLoader.showAnimationBehavior
-                }
-                AddProductErrors.ERR_ADD_IMG -> {
-                    setAddProductErrors(getString(R.string.add_product_error_img_upload))
-                }
-                AddProductErrors.ERR_ADD -> {
-                    setAddProductErrors(getString(R.string.add_product_insert_error))
-                }
-                AddProductErrors.NONE -> {
-                    binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
-                    binding.loaderLayout.circularLoader.hideAnimationBehavior
-                }
-            }
-        }
-    }
-
-    private fun setAddProductErrors(errText: String) {
-        binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
-        binding.loaderLayout.circularLoader.hideAnimationBehavior
-        binding.addProductErrorMessage.visibility = View.VISIBLE
-        binding.addProductErrorMessage.text = errText
-
-    }
-
-    private fun fillDataInAllViews() {
-        if(isEdit){
-            viewModel.productData.value?.let { product ->
-                Log.d(TAG, "fill data in views")
-                binding.addProAppBar.topAppBar.title = "Edit Product - ${product.name}"
-                binding.productName.setText(product.name)
-                binding.proPriceEditText.setText(product.price.toString())
-                binding.proMrpEditText.setText(product.mrp.toString())
-                binding.productDes.setText(product.description)
-
-                imgList = product.images.map { it.toUri() } as MutableList<Uri>
-                val adapter = AddProductImagesAdapter(requireContext(), imgList)
-                binding.addProImagesRv.adapter = adapter
-
-                setShoeSizesChips(product.availableSizes)
-                setShoeColorsChips(product.availableColors)
-
-                binding.btnAddProduct.setText(R.string.edit_product_btn_text)
-            }
-        }
+        binding.apply {
 
 
-    }
-
-    private fun setViews() {
-        Log.d(TAG, "set views")
-
-        if (!isEdit) { // add new product
-            binding.addProAppBar.topAppBar.title = "Add Product - ${viewModel.selectedCategory.value}"
-
-            val adapter = AddProductImagesAdapter(requireContext(), imgList)
-            binding.addProImagesRv.adapter = adapter
-        }
-        binding.btnAddImagesToProduct.setOnClickListener {
-            getImages.launch("image/*")
-        }
-
-        binding.addProAppBar.topAppBar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
-
-        binding.loaderLayout.loaderFrameLayout.visibility = View.GONE
-
-        setShoeSizesChips()
-        setShoeColorsChips()
-
-        binding.addProductErrorMessage.visibility = View.GONE
-        binding.productName.onFocusChangeListener = focusChangeListener
-        binding.proPriceEditText.onFocusChangeListener = focusChangeListener
-        binding.proMrpEditText.onFocusChangeListener = focusChangeListener
-        binding.productDes.onFocusChangeListener = focusChangeListener
-
-        binding.btnAddProduct.setOnClickListener {
-            onAddProduct()
-            if (viewModel.errorStatus.value == AddProductViewErrors.NONE) {
-                viewModel.addProductErrors.observe(viewLifecycleOwner) { err ->
-                    if (err == AddProductErrors.NONE) {
+            /** product update status **/
+            viewModel.productUpdateStatus.observe(viewLifecycleOwner) { status ->
+                when (status) {
+                    DataStatus.LOADING -> {
+                        binding.loaderLayout.loaderFrameLayout.show()
+//                    binding.loaderLayout.circularLoader.showAnimationBehavior
+                    }
+                    DataStatus.SUCCESS -> {
+                        binding.loaderLayout.loaderFrameLayout.hide()
                         findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
+//                    binding.loaderLayout.circularLoader.hideAnimationBehavior
+
+                    }
+                    DataStatus.ERROR ->{
+                        loaderLayout.loaderFrameLayout.hide()
                     }
                 }
             }
+
+
+            /** product update status **/
+            viewModel.productDeleteStatus.observe(viewLifecycleOwner) { status ->
+                when (status) {
+                    DataStatus.LOADING -> {
+                        binding.loaderLayout.loaderFrameLayout.show()
+//                    binding.loaderLayout.circularLoader.showAnimationBehavior
+                    }
+                    DataStatus.SUCCESS -> {
+                        binding.loaderLayout.loaderFrameLayout.hide()
+                        findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
+//                    binding.loaderLayout.circularLoader.hideAnimationBehavior
+
+                    }
+                    DataStatus.ERROR ->{
+                        loaderLayout.loaderFrameLayout.hide()
+                    }
+                }
+            }
+
+
+
+            /** product submit status **/
+            viewModel.productSubmitStatus.observe(viewLifecycleOwner) { status ->
+                when (status) {
+                    DataStatus.LOADING -> {
+                        binding.loaderLayout.loaderFrameLayout.show()
+//                    binding.loaderLayout.circularLoader.showAnimationBehavior
+                    }
+                    DataStatus.SUCCESS -> {
+                        binding.loaderLayout.loaderFrameLayout.hide()
+                        findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
+//                    binding.loaderLayout.circularLoader.hideAnimationBehavior
+
+                    }
+                    DataStatus.ERROR -> {
+                        loaderLayout.loaderFrameLayout.hide()
+                    }
+                }
+            }
+
+
         }
 
 
-        // TODO: 4/22/2022 add progress during deleting the product
 
-        /** button delete product **/
-        binding.btnDeleteProduct.setOnClickListener {
-            viewModel.deleteProduct(productId, onSuccess = { isDeleted ->
-                if (isDeleted){
-                    findNavController().navigateUp()
-                    Toast.makeText(requireContext(),"removed",Toast.LENGTH_SHORT).show()
+    }
+
+
+
+    // todo put this in data binding
+    private fun fillDataInAllViews() {
+        binding.apply {
+            if(isEdit){
+                product.let { product ->
+                    Log.d(TAG, "fill data in views")
+                    addProAppBar.topAppBar.title = "Edit Product - ${product.name}"
+                    productName.setText(product.name)
+                    proPriceEditText.setText(product.price.toString())
+                    proMrpEditText.setText(product.mrp.toString())
+                    productDes.setText(product.description)
+
+                    imgList = product.images.map { it.toUri() } as MutableList<Uri>
+                    val adapter = AddProductImagesAdapter(requireContext(), imgList)
+                    addProImagesRv.adapter = adapter
+
+                    btnAddProduct.text = "Update"
+                    btnDeleteProduct.show()
+
+                    setShoeSizesChips(product.availableSizes)
+                    setShoeColorsChips(product.availableColors)
                 }
-            })
+            }
         }
     }
 
+    private fun setViews() {
+        binding.apply {
+            if (!isEdit) { // add new product
+                addProAppBar.topAppBar.title = "Add Product - ${product.category}"
+
+                val adapter = AddProductImagesAdapter(requireContext(), imgList)
+                addProImagesRv.adapter = adapter
+                btnAddProduct.text = "Add Product"
+            }else{
+                fillDataInAllViews()
+            }
+            btnAddImagesToProduct.setOnClickListener {
+                getImages.launch("image/*")
+            }
+
+
+            /** button back **/
+            addProAppBar.topAppBar.setNavigationOnClickListener {
+                findNavController().navigateUp()
+            }
+
+            loaderLayout.loaderFrameLayout.visibility = View.GONE
+
+            setShoeSizesChips()
+            setShoeColorsChips()
+            addProductErrorMessage.visibility = View.GONE
+            productName.onFocusChangeListener = focusChangeListener
+            proPriceEditText.onFocusChangeListener = focusChangeListener
+            proMrpEditText.onFocusChangeListener = focusChangeListener
+            productDes.onFocusChangeListener = focusChangeListener
+
+            btnAddProduct.setOnClickListener {
+                onAddProduct()
+            }
+
+            /** button delete product **/
+            btnDeleteProduct.setOnClickListener {
+                viewModel.deleteProduct(product.productId)
+            }
+
+
+        }
+
+
+    }
+
     private fun onAddProduct() {
-        val name = binding.productName.text.toString()
-        val price = binding.proPriceEditText.text.toString().toDoubleOrNull()
-        val mrp = binding.proMrpEditText.text.toString().toDoubleOrNull()
-        val desc = binding.productDes.text.toString()
-        Log.d(
-            TAG,
-            "onAddProduct: Add product initiated, $name, $price, $mrp, $desc, $sizeList, $colorsList, $imgList"
-        )
-        viewModel.submitProduct(
-            name, price, mrp, desc, sizeList.toList(), colorsList.toList(), imgList
-        )
+        binding.apply {
+            val name = productName.text.toString()
+            val price = proPriceEditText.text.toString().toDoubleOrNull()
+            val mrp = proMrpEditText.text.toString().toDoubleOrNull()
+            val desc = productDes.text.toString()
+
+            if (name.isEmpty()){
+                productName.error = "Product Name required!"
+                productName.requestFocus()
+            }
+            if (price.toString().isEmpty()){
+                proPriceEditText.error = "Price required!"
+                proPriceEditText.requestFocus()
+            }
+            if (mrp.toString().isEmpty()){
+                proMrpEditText.error = "Mrc required!"
+                proMrpEditText.requestFocus()
+            }
+            if (desc.isEmpty()){
+                productDes.error = "Description required!"
+                productDes.requestFocus()
+            }
+            if (colorsList.isEmpty()){
+                showMessage(requireContext(),"colors required!")
+            }
+            if (sizeList.isEmpty()){
+                showMessage(requireContext(), "sizes required!")
+            }
+            if (imgList.isEmpty() || imgList.size <= 0) {
+                showMessage(requireContext(), "one image at least required!")
+            }
+            else{
+                val newProduct = Product(getProductId(userId),name,userId,desc,catName, price ?: 0.0,mrp ?: 0.0,sizeList.toList(),colorsList.toList())
+                if (!isEdit){
+                    viewModel.submitProduct(newProduct,imgList)
+                }else{
+                    product.name = name
+                    product.mrp = mrp!!
+                    product.description = desc
+                    product.availableColors = colorsList.toList()
+                    product.availableSizes = sizeList.toList()
+                    product.price = price!!.toDouble()
+                    viewModel.updateProduct(product,imgList,product.images)
+                }
+
+            }
+
+        }
+
     }
 
     private fun setShoeSizesChips(shoeList: List<Int>? = emptyList()) {
@@ -305,19 +355,7 @@ class AddEditProduct : Fragment() {
         }
     }
 
-    private fun modifyErrors(err: AddProductViewErrors) {
-        when (err) {
-            AddProductViewErrors.NONE -> binding.addProductErrorMessage.visibility = View.GONE
-            AddProductViewErrors.EMPTY -> {
-                binding.addProductErrorMessage.visibility = View.VISIBLE
-                binding.addProductErrorMessage.text = getString(R.string.add_product_error_string)
-            }
-            AddProductViewErrors.ERR_PRICE_0 -> {
-                binding.addProductErrorMessage.visibility = View.VISIBLE
-                binding.addProductErrorMessage.text = getString(R.string.add_pro_error_price_string)
-            }
-        }
-    }
+
 
     private fun makeToast(text: String) {
         Toast.makeText(context, text, Toast.LENGTH_LONG).show()

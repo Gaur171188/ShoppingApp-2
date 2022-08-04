@@ -5,11 +5,11 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
-import com.shoppingapp.info.repository.product.ProductRepository
-import com.shoppingapp.info.repository.user.UserRepository
-import com.shoppingapp.info.screens.orders.OrdersViewModel
+import com.shoppingapp.info.repository.product.RemoteProductRepository
+import com.shoppingapp.info.repository.user.RemoteUserRepository
+
 import com.shoppingapp.info.utils.AddObjectStatus
-import com.shoppingapp.info.utils.StoreDataStatus
+import com.shoppingapp.info.utils.DataStatus
 import kotlinx.coroutines.async
 import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.utils.Result.Error
@@ -17,188 +17,169 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 
-class ProductDetailsViewModel(
-    private val userRepository: UserRepository,
-    private val productRepository: ProductRepository,
-    private val allProducts: LiveData<List<Product>>): ViewModel() {
+class ProductDetailsViewModel(): ViewModel() {
 
     companion object{
         private const val TAG = "ProductDetailsViewModel"
     }
+    private val userRepository = RemoteUserRepository()
+    private val productRepository = RemoteProductRepository()
 
     private val _productId = MutableLiveData<String>()
 
     private val _cartItems = MutableLiveData<List<User.CartItem>>()
     val cartItems: LiveData<List<User.CartItem>> = _cartItems
 
-
     private val _quantity = MutableLiveData<Int?>()
     val quantity: LiveData<Int?> = _quantity
 
-    private val _productData = MutableLiveData<Product?>()
-    val productData: LiveData<Product?> get() = _productData
+    private val _loadStatus = MutableLiveData<DataStatus>()
+    val loadStatus: LiveData<DataStatus> = _loadStatus
 
-    private val _dataStatus = MutableLiveData<StoreDataStatus>()
-    val dataStatus: LiveData<StoreDataStatus> get() = _dataStatus
-
-    private val _errorStatus = MutableLiveData<String?>()
-    val errorStatus: LiveData<String?> get() = _errorStatus
-
-//    private val _errorStatus = MutableLiveData<List<AddItemErrors>>()
-//    val errorStatus: LiveData<List<AddItemErrors>> get() = _errorStatus
-
-    private val _addItemStatus = MutableLiveData<AddObjectStatus?>()
-    val addItemStatus: LiveData<AddObjectStatus?> get() = _addItemStatus
+    private val _errorMessage = MutableLiveData<String>()
+    val errorMessage: LiveData<String> = _errorMessage
 
     private val _isProductLiked = MutableLiveData<Boolean>()
-    val isProductLiked: LiveData<Boolean> get() = _isProductLiked
+    val isProductLiked: LiveData<Boolean> = _isProductLiked
 
     private val _isItemInCart = MutableLiveData<Boolean>()
-    val isItemInCart: LiveData<Boolean> get() = _isItemInCart
-
-
-    init {
-        _errorStatus.value = null
-    }
-
-
-
-    fun getProductDetails(productId: String) {
-        viewModelScope.launch {
-            _dataStatus.value = StoreDataStatus.LOADING
-            try {
-                val res = productRepository.getProductById(productId,false)
-                if (res is Result.Success) {
-                    _productData.value = res.data
-                    _dataStatus.value = StoreDataStatus.DONE
-                } else if (res is Error) {
-                    throw Exception("Error getting product")
-                }
-            } catch (e: Exception) {
-                _productData.value = Product()
-                _dataStatus.value = StoreDataStatus.ERROR
-                _errorStatus.value = "Error happening!"
-            }
-        }
-    }
+    val isItemInCart: LiveData<Boolean> = _isItemInCart
 
 
 
 
 
-    fun setQuantityOfItem(productId: String, value: Int) {
+
+
+    fun setQuantityOfItem (productId: String,userId: String, value: Int) {
         viewModelScope.launch {
 
             val newQuantity = value + _quantity.value!!
             _quantity.value = newQuantity
 
-
-            val user = userRepository.getUser()
+            val user = userRepository.getUserById(userId)
             if (user != null) {
                 val item = user.cart.find { it.productId == productId }
-                if (item != null){
+                if (item != null) {
                     item.quantity = newQuantity
-
-                    // if the item exist in cart it will be updated and save the cart value.
-                    val deferredRes = async { userRepository.updateCartItemByUserId(item) }
-                    deferredRes.await()
                 }
             }
 
-
         }
+    }
+
+
+    // check if item in cart.
+    // load cart data.
+
+    fun loadData(user: User,product: Product) {
+        val cart = user.cart
+        val likes = user.likes
+        val productId = product.productId
+        val productIds = cart.map { it.productId }
+        val itemInCart = productIds.contains(productId)
+
+        loadCartItems(cart)
+        loadQuantity(productId,cart)
+        isItemInCart(itemInCart)
+        isProductLiked(likes,productId)
+
+    }
+
+
+    fun loadQuantity(productId: String, cartItem: List<User.CartItem>) {
+        val quantity = cartItem.find { it.productId == productId }?.quantity
+        if (quantity != null) {
+            _quantity.value = quantity
+        }else{
+            _quantity.value = 1
+        }
+    }
+
+    fun loadCartItems(cartItem: List<User.CartItem>){
+        _cartItems.value = cartItem
+    }
+
+    fun isItemInCart(b: Boolean){
+        _isItemInCart.value = b
+    }
+
+
+    fun isProductLiked(likes: List<String>,productId: String) {
+        val isProductLiked = likes.contains(productId)
+        _isProductLiked.value = isProductLiked
     }
 
 
 
 
-    fun getCartItems(productId: String) {
-        viewModelScope.launch {
-            val user = userRepository.getUser()
-            if(user != null){
-                viewModelScope.launch {
-                    _cartItems.value = user.cart
-                    val quantity = user.cart.find { it.productId == productId }?.quantity
-                    if (quantity != null){
-                        _quantity.value = quantity!!
-                    }else{
-                        _quantity.value = 1
-                    }
 
+
+
+//    fun checkIfInCart(productId: String,userId: String) {
+//        viewModelScope.launch {
+//            val user = userRepository.getUserById(userId)
+//            Log.d(TAG,"product id: $productId")
+//            Log.d(TAG, "products: ${allProducts.value!!.size}")
+//            if (user != null) {
+//                val cartList = user.cart
+//                val idx = cartList.indexOfFirst { it.productId == productId }
+//                _isItemInCart.value = idx >= 0
+//                Log.d(TAG, "Checking in Cart: Success, value = ${_isItemInCart.value}, ${cartList.size}")
+//            } else {
+//                _isItemInCart.value = false
+//            }
+//        }
+//    }
+
+
+
+    fun addToCart(product: Product,size: Int?, color: String?,userId: String) {
+        Log.d(TAG, "onAddingToCart: Loading..")
+        viewModelScope.launch {
+            val itemId = UUID.randomUUID().toString()
+            val newItem = User.CartItem(itemId, product.productId, product.owner, _quantity.value!!, color, size)
+            userRepository.insertCartItem(newItem,userId)
+                .addOnSuccessListener {
+                    Log.d(TAG, "onAddingToCart: Item has been added success")
+                    _isItemInCart.value = true
                 }
-            } else {
-                _cartItems.value = emptyList()
-                Log.d(OrdersViewModel.TAG, "Getting Cart Items: User Not Found")
-            }
-        }
-    }
-
-
-    fun setLike(productId: String) {
-        viewModelScope.launch {
-
-            val res = userRepository.getLikesByUserId()
-            if (res is Result.Success) {
-                val userLikes = res.data ?: emptyList()
-                _isProductLiked.value = userLikes.contains(productId)
-            } else {
-                if (res is Error){
-                    Log.d(TAG, "Getting Likes: Error Occurred, ${res}")
+                .addOnFailureListener { e ->
+                    Log.d(TAG, "onAddingToCart: failed to add due to ${e.message}")
                 }
-
-            }
         }
     }
 
 
-    fun isUserSeller() = userRepository.isUserSeller()
-
-
-    fun checkIfInCart(productId: String) {
+    fun removeCartItem(itemId: String, userId: String) {
+        Log.d(TAG, "onRemovingCartItem: Loading..")
         viewModelScope.launch {
-            val user = userRepository.getUser()
-            Log.d(TAG,"product id: $productId")
-            Log.d(TAG, "products: ${allProducts.value!!.size}")
-            if (user != null) {
-                val cartList = user.cart
-                val idx = cartList.indexOfFirst { it.productId == productId }
-                _isItemInCart.value = idx >= 0
-                Log.d(TAG, "Checking in Cart: Success, value = ${_isItemInCart.value}, ${cartList.size}")
-            } else {
-                _isItemInCart.value = false
-            }
+            userRepository.removeCartItem(itemId,userId)
+                .addOnSuccessListener {
+                    Log.d(TAG, "onRemovingCartItem: Item has been removed success")
+                    _isItemInCart.value = false
+                }
+                .addOnFailureListener { e ->
+                    Log.d(TAG, "onRemovingCartItem: failed to remove due to ${e.message}")
+                }
         }
     }
-
-
-
-    fun addToCart(size: Int?, color: String?,productId: String) {
-
-        Log.d(TAG, "item is adding to cart ..")
-        val itemId = UUID.randomUUID().toString()
-        val newItem = User.CartItem(itemId, productId, productData.value!!.owner, _quantity.value!!, color, size)
-        insertCartItem(newItem)
-
-    }
-
 
 
 
     private fun insertCartItem(item: User.CartItem) {
-        viewModelScope.launch {
-            val deferredRes = async {
-                userRepository.insertCartItemByUserId(item)
-            }
-            val res = deferredRes.await()
-            if (res is Result.Success) {
-                _isItemInCart.value = true
-                Log.d(TAG, "onAddItem: Success")
-            } else {
-                if (res is Error) {
-                    Log.d(TAG, "onAddItem: Error, ${res}")
-                }
-            }
-        }
+//        viewModelScope.launch {
+//            val deferredRes = async { userRepository.insertCartItemByUserId(item) }
+//            val res = deferredRes.await()
+//            if (res is Result.Success) {
+//                _isItemInCart.value = true
+//                Log.d(TAG, "onAddItem: Success")
+//            } else {
+//                if (res is Error) {
+//                    Log.d(TAG, "onAddItem: Error, ${res}")
+//                }
+//            }
+//        }
     }
 
 

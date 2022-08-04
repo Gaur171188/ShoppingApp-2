@@ -7,15 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import com.shoppingapp.info.R
-import com.shoppingapp.info.RegistrationActivity
+import com.shoppingapp.info.activities.RegistrationActivity
 import com.shoppingapp.info.databinding.AccountBinding
-
 import android.content.Intent
-
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+
 
 
 class Account : Fragment() {
@@ -24,16 +23,14 @@ class Account : Fragment() {
         private const val TAG = "Account"
     }
 
-//
-//    private val homeViewModel by activityViewModels<HomeViewModel>()
-    private val viewModel by sharedViewModel<AccountViewModel>()
+
+    private lateinit var viewModel: AccountViewModel
     private lateinit var binding: AccountBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = DataBindingUtil.inflate(inflater,R.layout.account, container, false)
-
-
+        viewModel = ViewModelProvider(this)[AccountViewModel::class.java]
 
         setViews()
         setObserves()
@@ -44,35 +41,37 @@ class Account : Fragment() {
     private fun setObserves() {
 
         /** isSignOut live data **/
-        viewModel.isSignOut.observe(viewLifecycleOwner){
+        viewModel.isSignOut.observe(viewLifecycleOwner) {
             if (it != null){
-                navigateToSignUpActivity()
+                navigateToRegistrationActivity()
             }
         }
+
     }
 
     private fun setViews() {
-        binding.accountTopAppBar.topAppBar.title = getString(R.string.account)
+        binding.apply {
 
-        // TODO: 4/19/2022   user this after dependency injection
-        if (!viewModel.isUserIsSeller()){
-            binding.btnOrders.visibility = View.GONE
-        }
+            // set Title
+            accountTopAppBar.topAppBar.title = getString(R.string.account)
 
 
-        binding.btnProfile.setOnClickListener {
-            Log.d(TAG, "Profile Selected")
-            findNavController().navigate(R.id.action_accountFragment_to_profileFragment)
-        }
-        binding.btnOrders.setOnClickListener {
-            Log.d(TAG, "Orders Selected")
-            findNavController().navigate(R.id.action_accountFragment_to_ordersFragment)
+
+            /** button profile **/
+            btnProfile.setOnClickListener {
+                Log.d(TAG, "Profile Selected")
+                findNavController().navigate(R.id.action_accountFragment_to_profileFragment)
+            }
+
+
+            /** button sign out **/
+            btnSignout.setOnClickListener {
+                Log.d(TAG, "Sign Out Selected")
+                showSignOutDialog()
+            }
+
         }
 
-        binding.btnSignout.setOnClickListener {
-            Log.d(TAG, "Sign Out Selected")
-            showSignOutDialog()
-        }
 
 
 
@@ -89,18 +88,20 @@ class Account : Fragment() {
                     dialog.cancel()
                 }
                 .setPositiveButton(getString(R.string.dialog_sign_out_btn_text)) { _, _ ->
-                   viewModel.signOut()
+                   viewModel.signOut(requireContext())
                 }
                 .show()
         }
     }
 
 
-    private fun navigateToSignUpActivity() {
+    private fun navigateToRegistrationActivity() {
         val homeIntent = Intent(context, RegistrationActivity::class.java)
-        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        homeIntent.apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
         context?.startActivity(homeIntent)
         requireActivity().finish()
     }

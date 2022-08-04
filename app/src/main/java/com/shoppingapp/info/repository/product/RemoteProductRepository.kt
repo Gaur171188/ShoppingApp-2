@@ -2,102 +2,69 @@ package com.shoppingapp.info.repository.product
 
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.data.User
-import com.shoppingapp.info.utils.Result
+import com.shoppingapp.info.utils.ERR_UPLOAD
 import kotlinx.coroutines.tasks.await
+import java.util.*
 
 class RemoteProductRepository() {
 
+	private val fireStore = FirebaseFirestore.getInstance()
+	private val storage = FirebaseStorage.getInstance()
+	private val storageRef = storage.reference
 
-	private val rootStore = Firebase.firestore
-	private val rootStorage = Firebase.storage
+	private fun productsPath() = fireStore.collection(PRODUCT_COLLECTION)
 
-	private val observableProducts = MutableLiveData<Result<List<Product>>?>()
-
-	private val storageRef = rootStorage.reference
-
-	private fun productsCollectionRef() = rootStore.collection(PRODUCT_COLLECTION)
-
-	suspend fun refreshProducts() {
-		observableProducts.value = getAllProducts()
-	}
-
-	fun observeProducts() = observableProducts
+	private val _products = MutableLiveData<List<Product>?>()
+	val products: LiveData<List<Product>?> = _products
 
 
-	// here you must update all the user data check if the product is still in remote database then update the user cart.
-	suspend fun hardRefreshData(){
+	init {
+	    observeProducts()
 	}
 
 
-
-
-
-	suspend fun getAllProducts(): Result<List<Product>> {
-		val resRef = productsCollectionRef().get().await()
-		return if (!resRef.isEmpty) {
-			Result.Success(resRef.toObjects(Product::class.java))
-		} else {
-			Result.Error(Exception("Error getting Products!"))
+	private fun observeProducts() {
+		productsPath().addSnapshotListener { value, error ->
+			if (error == null){
+				if (value != null){
+					val products = value.toObjects(Product::class.java)
+					_products.value = products
+				}else{
+					_products.value = emptyList()
+				}
+			}
 		}
 	}
 
-	suspend fun insertProduct(newProduct: Product) {
-		productsCollectionRef().add(newProduct.toHashMap()).await()
-	}
+	suspend fun getProducts() = productsPath().get()
 
-	suspend fun updateProduct(proData: Product) {
-		val resRef =
-			productsCollectionRef().whereEqualTo(PRODUCT_ID_FIELD, proData.productId).get().await()
-		if (!resRef.isEmpty) {
-			val docId = resRef.documents[0].id
-			productsCollectionRef().document(docId).set(proData.toHashMap()).await()
-		} else {
-			Log.d(TAG, "onUpdateProduct: product with id: $proData.productId not found!")
-		}
-	}
+	suspend fun insertProduct(product: Product) = productsPath().document(product.productId).set(product.toHashMap())
 
-	suspend fun getProductById(productId: String): Result<Product> {
-		val resRef = productsCollectionRef().whereEqualTo(PRODUCT_ID_FIELD, productId).get().await()
-		return if (!resRef.isEmpty) {
-			Result.Success(resRef.toObjects(Product::class.java)[0])
-		} else {
-			Result.Error(Exception("Product with id: $productId Not Found!"))
-		}
-	}
+	suspend fun updateProduct(proData: Product) = productsPath().document(proData.productId).update(proData.toHashMap())
 
-	suspend fun deleteProduct(productId: String) {
-		Log.d(TAG, "onDeleteProduct: delete product with Id: $productId initiated")
-		val resRef = productsCollectionRef().whereEqualTo(PRODUCT_ID_FIELD, productId).get().await()
-		if (!resRef.isEmpty) {
-			val product = resRef.documents[0].toObject(Product::class.java)
-			val imgUrls = product?.images
+	suspend fun getProductById(productId: String) = productsPath().document(productId).get().await().toObject(Product::class.java)
 
+	suspend fun deleteProduct(productId: String): Task<Void> {
+		val product = getProductById(productId)
+		product?.images?.forEach { imageUri->
 			//deleting images first
-			imgUrls?.forEach { imgUrl ->
-				deleteImage(imgUrl)
-			}
-
-			//deleting doc containing product
-			val docId = resRef.documents[0].id
-			productsCollectionRef().document(docId).delete().addOnSuccessListener {
-				Log.d(TAG, "onDelete: DocumentSnapshot successfully deleted!")
-			}.addOnFailureListener { e ->
-				Log.w(TAG, "onDelete: Error deleting document", e)
-			}
-		} else {
-			Log.d(TAG, "onDeleteProduct: product with id: $productId not found!")
+			deleteFile(imageUri)
 		}
+
+		// delete product data
+		return productsPath().document(productId).delete()
 	}
 
-	suspend fun uploadImage(uri: Uri, fileName: String): Uri? {
-		val imgRef = storageRef.child("$SHOES_STORAGE_PATH/$fileName")
+
+	suspend fun uploadFile(uri: Uri, fileName: String): Uri? {
+		val imgRef = storageRef.child("$PRODUCTS_IMAGES/$fileName")
 		val uploadTask = imgRef.putFile(uri)
 		val uriRef = uploadTask.continueWithTask { task ->
 			if (!task.isSuccessful) {
@@ -109,29 +76,63 @@ class RemoteProductRepository() {
 	}
 
 
-
-	fun deleteImage(imgUrl: String) {
-		val ref = rootStorage.getReferenceFromUrl(imgUrl)
-		ref.delete().addOnSuccessListener {
-			Log.d(TAG, "onDelete: image deleted successfully!")
-		}.addOnFailureListener { e ->
-			Log.d(TAG, "onDelete: Error deleting image, error: $e")
+	suspend fun insertFiles(filesUri: List<Uri>): List<String> {
+		var urlList = mutableListOf<String>()
+		filesUri.forEach label@{ uri ->
+			val uniId = UUID.randomUUID().toString()
+			val fileName = uniId + uri.lastPathSegment?.split("/")?.last()
+			try {
+				val downloadUrl = uploadFile(uri, fileName)
+				urlList.add(downloadUrl.toString())
+			} catch (e: Exception) {
+				Log.d(TAG, "exception: message = $e")
+				revertUpload(fileName)
+				urlList = mutableListOf()
+				urlList.add(ERR_UPLOAD)
+				return@label
+			}
 		}
+		return urlList
 	}
 
-	fun revertUpload(fileName: String) {
-		val imgRef = storageRef.child("$SHOES_STORAGE_PATH/$fileName")
-		imgRef.delete().addOnSuccessListener {
-			Log.d(TAG, "onRevert: File with name: $fileName deleted successfully!")
-		}.addOnFailureListener { e ->
-			Log.d(TAG, "onRevert: Error deleting file with name = $fileName, error: $e")
+
+	suspend fun updateFiles(newList: List<Uri>, oldList: List<String>): List<String> {
+		var urlList = mutableListOf<String>()
+		newList.forEach label@{ uri ->
+			if (!oldList.contains(uri.toString())) {
+				val uniId = UUID.randomUUID().toString()
+				val fileName = uniId + uri.lastPathSegment?.split("/")?.last()
+				try {
+					val downloadUrl = uploadFile(uri, fileName)
+					urlList.add(downloadUrl.toString())
+				} catch (e: Exception) {
+					Log.d(TAG, "exception: message = $e")
+					revertUpload(fileName)
+					urlList = mutableListOf()
+					urlList.add(ERR_UPLOAD)
+					return@label
+				}
+			} else {
+				urlList.add(uri.toString())
+			}
 		}
+		oldList.forEach { imgUrl ->
+			if (!newList.contains(imgUrl.toUri())) {
+				deleteFile(imgUrl)
+			}
+		}
+		return urlList
 	}
+
+	private fun deleteFile(fileUri: String) = storage.getReferenceFromUrl(fileUri).delete()
+
+	private fun revertUpload(fileName: String) = storageRef.child("$PRODUCTS_IMAGES/$fileName")
+
 
 	companion object {
+		private const val PRODUCTS_IMAGES = "products_Images"
 		private const val PRODUCT_COLLECTION = "products"
 		private const val PRODUCT_ID_FIELD = "productId"
-		private const val SHOES_STORAGE_PATH = "Shoes"
 		private const val TAG = "ProductsRemoteSource"
 	}
 

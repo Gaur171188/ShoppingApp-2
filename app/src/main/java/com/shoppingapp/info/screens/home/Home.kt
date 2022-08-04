@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.CheckBox
 import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
@@ -25,8 +24,7 @@ import com.shoppingapp.info.ProductCategories
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.HomeBinding
-import com.shoppingapp.info.utils.MyOnFocusChangeListener
-import com.shoppingapp.info.utils.StoreDataStatus
+import com.shoppingapp.info.utils.*
 import kotlinx.coroutines.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -39,38 +37,48 @@ class Home : Fragment() {
 
     private lateinit var binding: HomeBinding
     private val viewModel by sharedViewModel<HomeViewModel>()
+
     private val focusChangeListener = MyOnFocusChangeListener()
 
     private val productController by lazy { ProductController() }
 
 
+    private var userId = ""
+    private var isUserSeller: Boolean? = null
+
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(layoutInflater,R.layout.home,container,false)
+
+        val sharePrefManager = SharePrefManager(requireContext())
+        userId = sharePrefManager.getUserIdFromSession()!!
+        isUserSeller = sharePrefManager.isUserSeller()
+
 
 
         setViews()
         setObservers()
 
-
         return binding.root
     }
 
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
 
-//        if (viewModel.isUserSeller()) {
-//            viewModel.refreshProducts()
-//        }
 
+
+
+//      refresh the data
+        viewModel.loadData(userId)
+
+
+        if (isUserSeller == true) {
+            showMessage(requireContext(),"Seller")
+        }else{
+            showMessage(requireContext(),"Customer")
+        }
     }
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.getUserLikes()
-    }
-
 
 
 
@@ -78,42 +86,14 @@ class Home : Fragment() {
 
         /** swipe to refresh **/
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refreshProducts()
+            viewModel.loadData(userId)
         }
 
-
-        setProductsAdapter()
+        setUserViews()
         setHomeTopAppBar()
-
-            binding.productsRecyclerView.apply {
-                val gridLayoutManager = GridLayoutManager(context, 2)
-                gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int {
-
-                        return when (productController.currentData?.get(position)) {
-                            2 -> 2 //ad
-                            else -> {
-                                val proCount = productController.currentData?.count { it is Product }// number of products
-                                val adCount = productController.currentData?.size?.minus(proCount!!) // number of ads
-                                val totalCount = proCount?.plus((adCount?.times(2)!!))
-                                // product, full for last item
-                                if (position + 1 == productController.currentData?.size && totalCount!! % 2 == 1) 2 else 1
-                            }
-                        }
-                    }
-                }
-                layoutManager = gridLayoutManager
-                adapter = productController.adapter
-                val itemDecoration = RecyclerViewPaddingItemDecoration(requireContext())
-                if (itemDecorationCount == 0) {
-                    addItemDecoration(itemDecoration)
-                }
-            }
+        setProductsAdapter()
 
 
-        if (!viewModel.isUserSeller()) {
-            binding.btnAddProduct.visibility = View.GONE
-        }
 
         binding.btnAddProduct.setOnClickListener {
             showDialogWithItems(ProductCategories, 0, false)
@@ -121,36 +101,47 @@ class Home : Fragment() {
 
     }
 
+    private fun setUserViews(){
+        binding.apply {
+            if (isUserSeller == true) {
+                btnAddProduct.show()
+            }
+        }
+    }
+
+
     @SuppressLint("NotifyDataSetChanged")
     private fun setObservers() {
 
+        binding.apply {
 
-        /** products live data **/
-        viewModel.products.observe(viewLifecycleOwner) {
-            val mix = getMixedDataList(it, getAdsList())
-            val likes = viewModel.userLikes.value ?: emptyList()
-            productController.likes = likes
-            productController.setData(mix)
-            binding.swipeRefreshLayout.isRefreshing = false
+            /** products live data **/
+            viewModel.products.observe(viewLifecycleOwner) {
+                val mix = getMixedDataList(it, getAdsList())
+                val likes = viewModel.userLikes.value ?: emptyList()
+                productController.likes = likes
+                productController.setData(mix)
+                swipeRefreshLayout.isRefreshing = false
+            }
+
+            /** products status **/
+            viewModel.productsStatus.observe(viewLifecycleOwner) { status ->
+                when (status){
+                    DataStatus.LOADING -> { loaderLayout.root.show() }
+                    DataStatus.SUCCESS -> {loaderLayout.root.hide()}
+                    DataStatus.ERROR -> {loaderLayout.root.hide()}
+                }
+            }
+
+
         }
-
-
-
-
-//        viewModel.userLikes.observe(viewLifecycleOwner) { likes ->
-//            if (likes != null) {
-//                productController.likes = likes
-//            }
-//            binding.swipeRefreshLayout.isRefreshing = false
-//        }
-
 
 
 
     }
 
     private fun performSearch(query: String) {
-        viewModel.filterBySearch(query)
+//        viewModel.filterBySearch(query)
     }
 
 
@@ -176,87 +167,110 @@ class Home : Fragment() {
     }
 
     private fun setHomeTopAppBar() {
-        var lastInput = ""
-        val debounceJob: Job? = null
-        val uiScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        binding.homeTopAppBar.topAppBar.inflateMenu(R.menu.home_app_bar_menu)
-        if (viewModel.isUserSeller()) {
-            binding.homeTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites)
-        }
-        binding.homeTopAppBar.homeSearchEditText.onFocusChangeListener = focusChangeListener
-        binding.homeTopAppBar.homeSearchEditText.doAfterTextChanged { editable ->
-            if (editable != null) {
-                val newtInput = editable.toString()
-                debounceJob?.cancel()
-                if (lastInput != newtInput) {
-                    lastInput = newtInput
-                    uiScope.launch {
-                        delay(500)
-                        if (lastInput == newtInput) {
-                            performSearch(newtInput)
+        binding.apply {
+            var lastInput = ""
+            val debounceJob: Job? = null
+            val uiScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+            homeTopAppBar.topAppBar.inflateMenu(R.menu.home_app_bar_menu)
+            if (isUserSeller == true) { homeTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites) }
+            homeTopAppBar.homeSearchEditText.onFocusChangeListener = focusChangeListener
+            homeTopAppBar.homeSearchEditText.doAfterTextChanged { editable ->
+                if (editable != null) {
+                    val newtInput = editable.toString()
+                    debounceJob?.cancel()
+                    if (lastInput != newtInput) {
+                        lastInput = newtInput
+                        uiScope.launch {
+                            delay(500)
+                            if (lastInput == newtInput) {
+                                performSearch(newtInput)
+                            }
                         }
                     }
                 }
             }
-        }
-        binding.homeTopAppBar.homeSearchEditText.setOnEditorActionListener { textView, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                textView.clearFocus()
-                val inputManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputManager.hideSoftInputFromWindow(textView.windowToken, 0)
-                performSearch(textView.text.toString())
-                true
-            } else {
-                false
+            homeTopAppBar.homeSearchEditText.setOnEditorActionListener { textView, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    textView.clearFocus()
+                    val inputManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    inputManager.hideSoftInputFromWindow(textView.windowToken, 0)
+                    performSearch(textView.text.toString())
+                    true
+                } else {
+                    false
+                }
             }
-        }
-        binding.homeTopAppBar.searchOutlinedTextLayout.setEndIconOnClickListener {
-            it.clearFocus()
-            binding.homeTopAppBar.homeSearchEditText.setText("")
-            val inputManager =
-                requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            inputManager.hideSoftInputFromWindow(it.windowToken, 0)
+            homeTopAppBar.searchOutlinedTextLayout.setEndIconOnClickListener {
+                it.clearFocus()
+                homeTopAppBar.homeSearchEditText.setText("")
+                val inputManager =
+                    requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputManager.hideSoftInputFromWindow(it.windowToken, 0)
 //			viewModel.filterProducts("All")
-        }
-        binding.homeTopAppBar.topAppBar.setOnMenuItemClickListener { menuItem ->
-            setAppBarItemClicks(menuItem)
+            }
+            homeTopAppBar.topAppBar.setOnMenuItemClickListener { menuItem ->
+                setAppBarItemClicks(menuItem)
+            }
         }
     }
 
     private fun setProductsAdapter() {
         val likesList = viewModel.userLikes.value ?: emptyList()
-        productController.isSeller = viewModel.isUserSeller()
+        productController.isSeller = isUserSeller == true
         productController.likes = likesList
         productController.setData(emptyList())
 
 
         /** click listener **/
-        productController.clickListener = object: ProductController.OnClickListener{
+        productController.clickListener = object: ProductController.OnClickListener {
 
             override fun onAdClicked() {}
 
             override fun onProductClick(product: Product) {
 
-                if (viewModel.isUserSeller()){
-                    navigateToAddEditProductScreen(isEdit = true, productId = product.productId)
+                if (isUserSeller == true) {
+                    val data = bundleOf(Constants.KEY_IS_EDIT to true , Constants.KEY_PRODUCT to product )
+                    findNavController().navigate(R.id.action_goto_addProduct, data)
                 }else {
-                    findNavController().navigate(
-                        R.id.action_home_to_productDetails,
-                        bundleOf("productId" to product.productId)
-                    )
+
+                    val data =  bundleOf(Constants.KEY_PRODUCT to product)
+                    findNavController().navigate(R.id.action_home_to_productDetails,data)
                 }
+
             }
 
-
             override fun onLikeClick(product: Product) {
-                viewModel.toggleLikeByProductId(product.productId)
+//                viewModel.toggleLikeByProductId(product.productId)
                 Toast.makeText(requireContext(),"liked",Toast.LENGTH_SHORT).show()
             }
 
 
         }
 
+        binding.productsRecyclerView.apply {
+            val gridLayoutManager = GridLayoutManager(context, 2)
+            gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                override fun getSpanSize(position: Int): Int {
 
+                    return when (productController.currentData?.get(position)) {
+                        2 -> 2 //ad
+                        else -> {
+                            val proCount = productController.currentData?.count { it is Product }// number of products
+                            val adCount = productController.currentData?.size?.minus(proCount!!) // number of ads
+                            val totalCount = proCount?.plus((adCount?.times(2)!!))
+                            // product, full for last item
+                            if (position + 1 == productController.currentData?.size && totalCount!! % 2 == 1) 2 else 1
+                        }
+                    }
+                }
+            }
+            layoutManager = gridLayoutManager
+            adapter = productController.adapter
+            val itemDecoration = RecyclerViewPaddingItemDecoration(requireContext())
+            if (itemDecorationCount == 0) {
+                addItemDecoration(itemDecoration)
+            }
+        }
 
     }
 
@@ -282,12 +296,11 @@ class Home : Fragment() {
                         dialog.cancel()
                     } else {
                         if (isFilter) {
-                            viewModel.filterProducts(categoryItems[checkedItem])
+//                            viewModel.filterProducts(categoryItems[checkedItem])
                         } else {
-                            navigateToAddEditProductScreen(
-                                isEdit = false,
-                                catName = categoryItems[checkedItem]
-                            )
+                            val data = bundleOf(Constants.KEY_IS_EDIT to false , Constants.KEY_CATEGORY to categoryItems[checkedItem] )
+                            findNavController().navigate(R.id.action_goto_addProduct,data)
+
                         }
                     }
                     dialog.cancel()
@@ -296,12 +309,12 @@ class Home : Fragment() {
         }
     }
 
-    private fun navigateToAddEditProductScreen(isEdit: Boolean, catName: String? = null, productId: String? = null) {
-        findNavController().navigate(
-            R.id.action_goto_addProduct,
-            bundleOf("isEdit" to isEdit, "categoryName" to catName, "productId" to productId)
-        )
-    }
+//    private fun navigateToAddEditProductScreen(isEdit: Boolean, catName: String? = null) {
+//        findNavController().navigate(
+//            R.id.action_goto_addProduct,
+//            bundleOf("isEdit" to isEdit, Constants.KEY_CATEGORY to catName)
+//        )
+//    }
 
     private fun getMixedDataList(data: List<Product>, adsList: List<Int>): List<Any> {
         val itemsList = mutableListOf<Any>()

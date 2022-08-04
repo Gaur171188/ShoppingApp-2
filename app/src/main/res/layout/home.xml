@@ -19,6 +19,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:layout_gravity="bottom|end"
+            android:visibility="gone"
+            tools:visibility="visible"
             android:contentDescription="@string/add_product"
             app:srcCompat="@drawable/ic_add_48" />
 
@@ -51,19 +53,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/products_recycler_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:clipToPadding="false"
-                        android:padding="6dp"
-                        app:flow_horizontalAlign="center"
-                        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:spanCount="2"
-                        tools:itemCount="10"
-                        tools:listitem="@layout/item_product_home" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/products_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:padding="6dp"
+                    app:flow_horizontalAlign="center"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:spanCount="2"
+                    tools:itemCount="10"
+                    tools:listitem="@layout/item_product_home" />
 
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

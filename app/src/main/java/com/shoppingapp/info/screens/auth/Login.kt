@@ -1,9 +1,7 @@
-package com.shoppingapp.info.screens.login
-
+package com.shoppingapp.info.screens.auth
 
 
 import android.content.Intent
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.util.Patterns
 import androidx.fragment.app.Fragment
@@ -11,13 +9,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.shoppingapp.info.MainActivity
+import com.shoppingapp.info.activities.MainActivity
 import com.shoppingapp.info.R
 import com.shoppingapp.info.databinding.LoginBinding
-import com.shoppingapp.info.utils.StoreDataStatus
-import org.koin.android.viewmodel.ext.android.sharedViewModel
+import com.shoppingapp.info.utils.DataStatus
+import com.shoppingapp.info.utils.hide
+import com.shoppingapp.info.utils.show
 
 
 class Login : Fragment() {
@@ -26,7 +25,7 @@ class Login : Fragment() {
         const val TAG = "Login"
     }
 
-    private val viewModel by sharedViewModel<LoginViewModel>()
+    private lateinit var viewModel: AuthViewModel
     private lateinit var binding: LoginBinding
 
     private var email: String = ""
@@ -36,11 +35,21 @@ class Login : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.login, container, false)
-//        viewModel = ViewModelProvider(this)[LoginViewModel::class.java]
+        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
 
 
 
+        setViews()
 
+        setObservers()
+
+        return binding.root
+
+    }
+
+
+
+    private fun setViews() {
         binding.apply {
 
             /** signup button **/
@@ -51,13 +60,14 @@ class Login : Fragment() {
 
             /** login button **/
             btnLogin.setOnClickListener {
-                viewModel.initLogin()
                 email = loginEmail.text!!.trim().toString()
                 password = loginPassword.text!!.trim().toString()
                 val isRemOn = binding.loginRememberSwitch.isChecked
 
                 if (email.isEmpty() && password.isEmpty()){
-                    viewModel.setLoginError("all fields is required!")
+                    viewModel.errorMessage.value = "all fields is required!"
+                    binding.loginEmail.requestFocus()
+                    binding.loginPassword.requestFocus()
 
                 }else{
                     if (email.isEmpty()){
@@ -81,67 +91,64 @@ class Login : Fragment() {
                         binding.loginPassword.error = "6 char required!"
                         binding.loginPassword.requestFocus()
                         return@setOnClickListener
+                    }else{
+                        viewModel.login(requireContext(),email, password,isRemOn)
                     }
 
-                    viewModel.login(email, password,isRemOn)
+
                 }
 
 
             }
 
+        }
+    }
+
+    private fun setObservers() {
 
 
 
+        /** live data error message **/
+        viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            if (error != null) {
+                binding.loginErrorMessage.text = error
+                binding.loginErrorMessage.show()
+            }else{
+                binding.loginErrorMessage.hide()
+            }
         }
 
 
-        observation()
-
-        return binding.root
-
-    }
-
-    private fun observation() {
-        /** live data error message **/
-        viewModel.errorMessage.observe(viewLifecycleOwner,{error ->
-            if (error != null ){
-                binding.loginErrorMessage.text = error
-            }
-        })
-
-
         /** live data progress **/
-        viewModel.inProgress.observe(viewLifecycleOwner, {
-            if (it != null){
-                when(it){
-                    StoreDataStatus.LOADING->{
-                        binding.loginErrorMessage.visibility = View.GONE
+        viewModel.inProgress.observe(viewLifecycleOwner) {
+            if (it != null) {
+                when (it) {
+                    DataStatus.LOADING -> {
                         binding.loader.visibility = View.VISIBLE
                     }
-                    StoreDataStatus.DONE -> {
-                        binding.loginErrorMessage.visibility = View.GONE
+                    DataStatus.SUCCESS -> {
                         binding.loader.visibility = View.GONE
                     }
-                    StoreDataStatus.ERROR ->{
-                        binding.loginErrorMessage.visibility = View.VISIBLE
+                    DataStatus.ERROR -> {
                         binding.loader.visibility = View.GONE
 
                     }
                 }
-            }else{
-                binding.loginErrorMessage.visibility = View.GONE
             }
-        })
+        }
 
 
         /** live data isLogin **/
-        viewModel.isLogged.observe(viewLifecycleOwner,{ isLogged->
-            if (isLogged != null){
+        viewModel.isLogged.observe(viewLifecycleOwner) { isLogged ->
+            if (isLogged) {
+
                 val intent = Intent(activity, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 startActivity(intent)
             }
-        })
+        }
+
+
 
     }
 

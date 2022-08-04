@@ -10,17 +10,14 @@ class SharePrefManager(context: Context) {
 	var editor: SharedPreferences.Editor = userSession.edit()
 
 
-	fun createLoginSession(
+	fun createLoginSession (
 		id: String,
-		name: String,
-		phone: String,
 		isRemOn: Boolean,
 		isSeller: Boolean
 	) {
+
 		editor.putBoolean(IS_LOGIN, true)
 		editor.putString(KEY_ID, id)
-		editor.putString(KEY_NAME, name)
-		editor.putString(KEY_PHONE, phone)
 		editor.putBoolean(KEY_REMEMBER_ME, isRemOn)
 		editor.putBoolean(KEY_IS_SELLER, isSeller)
 
@@ -34,7 +31,9 @@ class SharePrefManager(context: Context) {
 
 	fun isRememberMeOn(): Boolean = userSession.getBoolean(KEY_REMEMBER_ME, false)
 
-	fun getPhoneNumber(): String? = userSession.getString(KEY_PHONE, null)
+	fun getPhoneNumber(): String? = userSession.getString(KEY_PHONE, "")
+
+	fun getName(): String? = userSession.getString(KEY_NAME, "")
 
 	fun getUserDataFromSession(): HashMap<String, String?> {
 		return hashMapOf(

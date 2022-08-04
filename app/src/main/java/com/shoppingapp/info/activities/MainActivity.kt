@@ -1,18 +1,14 @@
-package com.shoppingapp.info
+package com.shoppingapp.info.activities
 
-import android.content.IntentFilter
-import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import com.shoppingapp.info.R
 import com.shoppingapp.info.databinding.ActivityMainBinding
 import com.shoppingapp.info.receiver.NetworkReceiver
-import com.shoppingapp.info.repository.product.RemoteProductRepository
-import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.SharePrefManager
 
 class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverListener {
@@ -24,7 +20,7 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this,R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
 
         // set up navigation bottom

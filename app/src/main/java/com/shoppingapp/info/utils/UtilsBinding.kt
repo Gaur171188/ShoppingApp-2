@@ -22,7 +22,7 @@ object x{
 
 
 @BindingAdapter("setImage")
-fun setImage(image: ImageView, images: List<String>?){
+fun setImage(image: ImageView, images: List<String>?) {
     try {
         val imgUrl = images?.get(0)?.toUri()?.buildUpon()?.scheme("https")?.build()
         Glide.with(context)

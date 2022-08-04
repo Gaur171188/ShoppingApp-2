@@ -1,6 +1,5 @@
 package com.shoppingapp.info.screens.product_details
 
-import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
@@ -13,96 +12,71 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.setMargins
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.shoppingapp.info.R
 import com.shoppingapp.info.ShoeColors
 import com.shoppingapp.info.ShoeSizes
+import com.shoppingapp.info.data.Product
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.ProductDetailsBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
-import com.shoppingapp.info.screens.orders.OrdersViewModel
-import com.shoppingapp.info.utils.AddItemErrors
-import com.shoppingapp.info.utils.AddObjectStatus
-import com.shoppingapp.info.utils.DotsIndicatorDecoration
-import com.shoppingapp.info.utils.StoreDataStatus
-import org.koin.android.ext.android.bind
+import com.shoppingapp.info.utils.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
-import org.koin.core.parameter.parametersOf
 
 
 class ProductDetails: Fragment() {
 
     companion object{
-        const val TAG = "Product Details"
+        const val TAG = "ProductDetails"
     }
 
 
     private val homeViewModel by sharedViewModel<HomeViewModel>()
-    private val viewModel by sharedViewModel<ProductDetailsViewModel> {
-        parametersOf(arguments?.getString("productId") as String) // the argument will be fixed in parameter of view model
-    }
+    private lateinit var viewModel: ProductDetailsViewModel
 
-    private val ordersViewModel by sharedViewModel<OrdersViewModel>()
+//    private val viewModel by sharedViewModel<ProductDetailsViewModel> {
+//        parametersOf(arguments?.getString("productId") as String) // the argument will be fixed in parameter of view model
+//    }
 
-    private lateinit var productId: String
+//    private val ordersViewModel by sharedViewModel<OrdersViewModel>()
+
+
+
+    private var productId: String = ""
 
     private lateinit var binding: ProductDetailsBinding
+
+    private lateinit var product: Product
     private var selectedSize: Int? = null
     private var selectedColor: String? = null
 
 
+    private var userId = ""
+    private var isUserSeller = false
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.product_details, container, false)
-        productId = arguments?.getString("productId") as String
+        viewModel = ViewModelProvider(this)[ProductDetailsViewModel::class.java]
+
+        val sharePrefManager = SharePrefManager(requireContext())
+        userId = sharePrefManager.getUserIdFromSession()!!
+        isUserSeller = sharePrefManager.isUserSeller()
+
+        product = try { arguments?.getParcelable<Product>(Constants.KEY_PRODUCT)!! }
+        catch (ex: Exception){ Product() }
 
 
-        if (viewModel.isUserSeller()) {
-            binding.btnAddProductToCart.visibility = View.GONE
-        } else {
-            binding.btnAddProductToCart.visibility = View.VISIBLE
 
-
-            /** button add in cart **/
-            binding.btnAddProductToCart.setOnClickListener {
-                if (viewModel.isItemInCart.value == true) {
-                    navigateToCartFragment()
-                } else {
-                    onAddToCart()
-
-                }
-            }
-        }
-
-        binding.btnBack.setOnClickListener {
-           findNavController().navigateUp()
-        }
-
-        /** button plus quantity **/
-        binding.btnCartProductPlus.setOnClickListener {
-
-            val quantity = viewModel.quantity.value!!
-            if (quantity >= 1){
-                viewModel.setQuantityOfItem(productId, +1)
-            }
-
-        }
-
-        /** button minus quantity **/
-        binding.btnCartProductMinus.setOnClickListener {
-            val quantity = viewModel.quantity.value!!
-            if (quantity >= 2){
-                viewModel.setQuantityOfItem(productId, -1)
-            }
-        }
+        setViews()
 
         setObservers()
-        viewModel.getProductDetails(productId)
+
 
         return binding.root
     }
@@ -110,9 +84,11 @@ class ProductDetails: Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.setLike(productId)
-        viewModel.checkIfInCart(productId)
-        viewModel.getCartItems(productId)
+
+        // refresh product data.
+        val user = homeViewModel.userData.value ?: User()
+        viewModel.loadData(user,product)
+
 
         selectedSize = null
         selectedColor = null
@@ -124,30 +100,24 @@ class ProductDetails: Fragment() {
     private fun setObservers() {
 
         /** live data data status **/
-        viewModel.dataStatus.observe(viewLifecycleOwner) {
-            when (it) {
-                StoreDataStatus.LOADING ->{}
-                StoreDataStatus.DONE -> {
-                    binding.proDetailsLayout.visibility = View.VISIBLE
-                    setViews()
+        viewModel.loadStatus.observe(viewLifecycleOwner) { dataStatus ->
+            when (dataStatus) {
+                DataStatus.LOADING -> {
+                    binding.proDetailsLayout.show()
                 }
-                StoreDataStatus.ERROR ->{}
-                else -> {
-                    binding.proDetailsLayout.visibility = View.GONE
+                DataStatus.SUCCESS -> {
+                    binding.proDetailsLayout.hide()
                 }
+                DataStatus.ERROR ->{
+                    binding.proDetailsLayout.hide()
+                }
+
             }
         }
 
 
-
-        /** live data is liked **/
-        viewModel.isProductLiked.observe(viewLifecycleOwner) {
-            binding.btnProductDetailsLike.isChecked = it
-        }
-
-
         /** quantity **/
-        viewModel.quantity.observe(viewLifecycleOwner){ quantity ->
+        viewModel.quantity.observe(viewLifecycleOwner) { quantity ->
             if (quantity != null){
                 binding.cartProductQuantity.text = quantity.toString()
             }
@@ -158,12 +128,10 @@ class ProductDetails: Fragment() {
         viewModel.isItemInCart.observe(viewLifecycleOwner) {
             if (it != null){
                 if (it == true) {
-                    binding.btnAddProductToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
+                    binding.btnAddToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
                 } else {
-                    binding.btnAddProductToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
+                    binding.btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
                 }
-            }else{
-                   binding.btnAddProductToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
             }
         }
 
@@ -173,73 +141,86 @@ class ProductDetails: Fragment() {
 
     }
 
-    @SuppressLint("ResourceAsColor")
-    private fun modifyErrors(errList: List<AddItemErrors>) {
-        makeToast("Please Select Size and Color.")
-        if (!errList.isNullOrEmpty()) {
-            errList.forEach { err ->
-                when (err) {
-                    AddItemErrors.ERROR_SIZE -> {
-                        binding.proDetailsSelectSizeLabel.setTextColor(R.color.red_600)
-                    }
-                    AddItemErrors.ERROR_COLOR -> {
-                        binding.proDetailsSelectColorLabel.setTextColor(R.color.red_600)
-                    }
-                }
-            }
-        }
-    }
+
+
 
     private fun setViews() {
+        binding.apply {
 
-        binding.btnAddProductToCart.visibility = View.VISIBLE
-
-        // set images and dots
-        setImagesView()
-
-        binding.productDetailsTitle.text = viewModel.productData.value?.name ?: ""
-        binding.btnProductDetailsLike.apply {
-            setOnClickListener {
-                homeViewModel.toggleLikeByProductId(productId)
+            /** button add in cart **/
+            btnAddToCart.setOnClickListener {
+                addToCart()
             }
+
+            /** button back **/
+            btnBack.setOnClickListener {
+                findNavController().navigateUp()
+            }
+
+            /** button plus quantity **/
+            btnAddCartItem.setOnClickListener {
+                val quantity = viewModel.quantity.value!!
+                if (quantity >= 1){
+                    viewModel.setQuantityOfItem(productId,userId, +1)
+                }
+            }
+
+            /** button minus quantity **/
+            btnRemoveCartItem.setOnClickListener {
+                val quantity = viewModel.quantity.value!!
+                if (quantity >= 2){
+                    viewModel.setQuantityOfItem(productId,userId,-1)
+                }
+            }
+
+            /** button like product **/
+            btnLikeProduct.setOnClickListener {
+                //  homeViewModel.toggleLikeByProductId(productId)
+            }
+
+            // todo: you must get the updated user likes from the server then update the view
+            btnLikeProduct.isChecked = viewModel.isProductLiked.value == true
+
+
+            // set images and dots
+            setImagesView()
+
+            /** title, description and price  **/
+            productTitle.text = product.name
+            productDescription.text = product.description
+            productPrice.text = resources.getString(R.string.pro_details_price_value, product.price.toString())
+
+            setShoeSizeButtons()
+            setShoeColorsButtons()
+
+
         }
 
 
-        /** set price data **/
-        binding.productPrice.text = resources.getString(
-            R.string.pro_details_price_value,
-            viewModel.productData.value?.price.toString()
-        )
-
-        setShoeSizeButtons()
-        setShoeColorsButtons()
-
-        /** set product description  **/
-        binding.productDescription.text = viewModel.productData.value?.description ?: ""
-
 
     }
 
-    private fun onAddToCart() {
-        viewModel.addToCart(selectedSize, selectedColor,productId)
+
+    private fun addToCart() {
+        if (viewModel.isItemInCart.value == true) {
+            findNavController().navigate(R.id.action_productDetails_to_cart)
+        } else {
+            if (selectedSize == null){
+                showMessage(requireContext(),"Size required")
+            }
+            if (selectedColor == null){
+                showMessage(requireContext(), "Color required")
+            }else{
+                viewModel.addToCart(product,selectedSize, selectedColor,userId)
+            }
+        }
     }
 
-
-    private fun navigateToCartFragment() {
-        findNavController().navigate(R.id.action_productDetails_to_cart)
-    }
-
-    private fun makeToast(text: String) {
-        Toast.makeText(context, text, Toast.LENGTH_LONG).show()
-    }
 
     private fun setImagesView() {
         if (context != null) {
             binding.proDetailsImagesRecyclerview.isNestedScrollingEnabled = false
-            val adapter = ProductImagesAdapter(
-                requireContext(),
-                viewModel.productData.value?.images ?: emptyList()
-            )
+            val adapter = ProductImagesAdapter(requireContext(), product.images ?: emptyList())
             binding.proDetailsImagesRecyclerview.adapter = adapter
             val rad = resources.getDimension(R.dimen.radius)
             val dotsHeight = resources.getDimensionPixelSize(R.dimen.dots_height)
@@ -254,7 +235,7 @@ class ProductDetails: Fragment() {
     private fun setShoeSizeButtons() {
         binding.proDetailsSizesRadioGroup.apply {
             for ((_, v) in ShoeSizes) {
-                if (viewModel.productData.value?.availableSizes?.contains(v) == true) {
+                if (product.availableSizes.contains(v)) {
                     val radioButton = RadioButton(context)
                     radioButton.id = v
                     radioButton.tag = v
@@ -287,7 +268,7 @@ class ProductDetails: Fragment() {
         binding.proDetailsColorsRadioGroup.apply {
             var ind = 1
             for ((k, v) in ShoeColors) {
-                if (viewModel.productData.value?.availableColors?.contains(k) == true) {
+                if (product.availableColors.contains(k) == true) {
                     val radioButton = RadioButton(context)
                     radioButton.id = ind
                     radioButton.tag = k

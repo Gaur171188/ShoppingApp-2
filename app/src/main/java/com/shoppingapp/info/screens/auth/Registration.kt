@@ -1,4 +1,4 @@
-package com.shoppingapp.info.screens.registration
+package com.shoppingapp.info.screens.auth
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -8,19 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.RegistrationBinding
 
-import com.shoppingapp.info.utils.StoreDataStatus
+import com.shoppingapp.info.utils.DataStatus
 import com.shoppingapp.info.utils.UserType
+import com.shoppingapp.info.utils.hide
+import com.shoppingapp.info.utils.show
 
 class Registration : Fragment() {
 
 
-    private val viewModel by activityViewModels<RegistrationViewModel>()
+//    private val viewModel by activityViewModels<RegistrationViewModel>()
+    private lateinit var viewModel: AuthViewModel
     private lateinit var binding : RegistrationBinding
 
     private var email = ""
@@ -32,7 +34,7 @@ class Registration : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
 
-//        viewModel = ViewModelProvider(this)[RegistrationViewModel::class.java]
+        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
 
         binding = DataBindingUtil.inflate(inflater, R.layout.registration,container,false)
 
@@ -44,7 +46,6 @@ class Registration : Fragment() {
             }
 
             btnSignup.setOnClickListener {
-                viewModel.initRegister()
 
                 name = signupName.text!!.trim().toString()
                 email = signupEmail.text!!.trim().toString()
@@ -55,7 +56,12 @@ class Registration : Fragment() {
 
 
                 if (name.isEmpty() && email.isEmpty() && email.isEmpty() && password.isEmpty()){
-                    viewModel.setRegistrationError("all fields is required!")
+                    viewModel.errorMessage.value = "please fill information"
+                    signupName.requestFocus()
+                    signupPhone.requestFocus()
+                    signupEmail.requestFocus()
+                    signupPassword.requestFocus()
+
                 }else{
 
                     if (name.isEmpty()){
@@ -92,7 +98,7 @@ class Registration : Fragment() {
                         return@setOnClickListener
                     }
 
-                    if (password.length < 6){
+                    if (password.length < 6) {
                         binding.signupPassword.error = "6 char required!"
                         binding.signupPassword.requestFocus()
                         return@setOnClickListener
@@ -100,9 +106,9 @@ class Registration : Fragment() {
 
                     if (signupPolicySwitch.isChecked){
                         val user = User("", name, phone, email, password, userType = usertype)
-                        viewModel.registration(user)
+                        viewModel.signUp(user)
                     }else{
-                        viewModel.setRegistrationError("You must confirm to the privacy policy!")
+                        viewModel.errorMessage.value = "You must confirm to the privacy policy!"
                     }
 
 
@@ -129,43 +135,48 @@ class Registration : Fragment() {
 
 
         /** live data error message **/
-        viewModel.errorMessage.observe(viewLifecycleOwner,{error ->
-            if (error != null ){
-                binding.signupErrorMessage.text = error
-            }
-        })
+        with(viewModel) {
 
-
-        /** live data progress **/
-        viewModel.inProgress.observe(viewLifecycleOwner, {
-            if (it != null){
-                when(it){
-                    StoreDataStatus.LOADING->{
-                        binding.signupErrorMessage.visibility = View.GONE
-                        binding.loader.visibility = View.VISIBLE
-                    }
-                    StoreDataStatus.DONE -> {
-                        binding.signupErrorMessage.visibility = View.GONE
-                        binding.loader.visibility = View.GONE
-                    }
-                    StoreDataStatus.ERROR ->{
-                        binding.signupErrorMessage.visibility = View.VISIBLE
-                        binding.loader.visibility = View.GONE
-                    }
+            /** live data error message **/
+            errorMessage.observe(viewLifecycleOwner) { error ->
+                if (error != null) {
+                    binding.signupErrorMessage.text = error
+                    binding.signupErrorMessage.show()
+                }else{
+                    binding.signupErrorMessage.hide()
                 }
-            }else{
-                binding.signupErrorMessage.visibility = View.GONE
             }
-        })
 
 
-        /** live data is registered **/
-        viewModel.isRegistered.observe(viewLifecycleOwner,{user ->
-            if (user != null){
-                findNavController().navigate(R.id.action_registration_to_login)
+            /** live data progress **/
+            inProgress.observe(viewLifecycleOwner) {
+                if (it != null) {
+                    when (it) {
+                        DataStatus.LOADING -> {
+                            binding.loader.visibility = View.VISIBLE
+                        }
+                        DataStatus.SUCCESS -> {
+                            binding.loader.visibility = View.GONE
+                        }
+                        DataStatus.ERROR -> {
+                            binding.loader.visibility = View.GONE
+                        }
+                    }
+                } else {
+                    binding.signupErrorMessage.visibility = View.GONE
+                }
             }
-        })
 
+
+            /** live data is registered **/
+            isRegister.observe(viewLifecycleOwner) { user ->
+                if (user != null) {
+                    findNavController().navigate(R.id.action_registration_to_login)
+                }
+            }
+
+
+        }
 
 
     }

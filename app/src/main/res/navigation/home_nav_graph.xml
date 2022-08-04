@@ -43,7 +43,9 @@
         tools:layout="@layout/select_payment">
         <action
             android:id="@+id/action_selectPaymentFragment_to_orderSuccessFragment2"
-            app:destination="@id/orderSuccess" />
+            app:destination="@id/orderSuccess"
+            app:popUpTo="@id/selectPayment"
+            app:popUpToInclusive="true" />
     </fragment>
     <action
         android:id="@+id/action_productDetailsFragment_to_homeFragment"

@@ -6,12 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
 import com.shoppingapp.info.databinding.ProfileBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
-import com.shoppingapp.info.utils.StoreDataStatus
+import com.shoppingapp.info.utils.DataStatus
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
@@ -62,7 +61,7 @@ class Profile: Fragment() {
     private fun setObserves() {
 
         /** live data user data **/
-        homeViewModel.user.observe(viewLifecycleOwner) {
+        homeViewModel.userData.observe(viewLifecycleOwner) {
             if (it != null) {
                 binding.userName.text = it.name
                 binding.email.text = it.email
@@ -74,15 +73,15 @@ class Profile: Fragment() {
         homeViewModel.dataStatus.observe(viewLifecycleOwner){
             if (it != null){
                 when(it){
-                    StoreDataStatus.LOADING ->{
+                    DataStatus.LOADING ->{
                         binding.loader.root.visibility = View.VISIBLE
                         binding.profileLayout.visibility = View.GONE
                     }
-                    StoreDataStatus.DONE ->{
+                    DataStatus.SUCCESS ->{
                         binding.loader.root.visibility = View.GONE
                         binding.profileLayout.visibility = View.VISIBLE
                     }
-                    StoreDataStatus.ERROR ->{
+                    DataStatus.ERROR ->{
 
                     }
                 }

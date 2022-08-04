@@ -1,33 +1,134 @@
 package com.shoppingapp.info.repository.user
 
+import android.content.Context
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.data.User
-import com.shoppingapp.info.utils.OrderStatus
+import com.shoppingapp.info.utils.SharePrefManager
+import com.shoppingapp.info.utils.UserType
+import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.tasks.await
 import java.lang.IndexOutOfBoundsException
 
-class RemoteUserRepository () {
+class RemoteUserRepository() {
 
-    private val _root by lazy { FirebaseFirestore.getInstance() }
-    private val mAuth by lazy { FirebaseAuth.getInstance() }
-
-    enum class SignStatus{ LOADING, ERROR, DONE}
-
-    private fun usersCollectionRef() = _root.collection(USERS_COLLECTION)
-
-    suspend fun signOut(){ mAuth.signOut() }
+    private val fireStore by lazy { FirebaseFirestore.getInstance() }
+    private val auth by lazy { FirebaseAuth.getInstance() }
+    private fun usersPath() = fireStore.collection(USERS_COLLECTION)
 
 
-    suspend fun getOrdersFromRemote(userId: String): List<User.OrderItem>? {
-            val ref = usersCollectionRef().document(userId).get().await()
+
+
+//    private suspend fun signInWithEmailAndPassword(
+//        email: String,
+//        password: String,
+//        onSuccess: (Boolean) -> Unit,
+//        onError: (String) -> Unit
+//    ) {
+//        return supervisorScope {
+//            val task = async {
+//                auth.signInWithEmailAndPassword(email, password)
+//                    .addOnCompleteListener {
+//                        if (it.isSuccessful){
+//                            if (it.result.user!!.isEmailVerified){
+//                                Log.d(TAG,"Login Success: ${it.result}")
+//                                onSuccess(true)
+//
+//                            }else{
+//                                val error = "email is not verified!"
+//                                Log.d(TAG,"Login Error: $error")
+//                                onError(error)
+//                            }
+//                        }
+//                    }
+//                    .addOnFailureListener {
+//                        Log.d(TAG,"Login Error: ${it.message}")
+//                        onError(it.message.toString())
+//                    }
+//            }
+//            try {
+//                task.await()
+//            }catch (ex: Exception){
+//                Log.d(TAG,"Login Error: ${ex.message}")
+//                onError(ex.message.toString())
+//            }
+//        }
+//    }
+//
+//
+//
+//    suspend fun signIn(email: String,
+//                       password: String,
+//                       onSuccess:(Boolean)-> Unit,
+//                       onError:(String)-> Unit) =
+//        signInWithEmailAndPassword(email,password,onSuccess, onError)
+
+
+   suspend fun signWithEmailAndPassword(context: Context,email: String, password: String,isRemOn:Boolean,onSuccess: (Boolean) -> Unit,onError: (String) -> Unit) {
+       auth.signInWithEmailAndPassword(email, password)
+           .addOnSuccessListener { authResult ->
+               if (authResult.user?.isEmailVerified!!){
+                   Log.d(TAG,"onSuccess: userId: ${authResult.user!!.uid}")
+                   usersPath().document(authResult.user!!.uid).get().addOnSuccessListener {
+
+                       val user = it.toObject(User::class.java)
+                       val isSeller = user?.userType == UserType.SELLER.name
+
+                       Log.d(TAG,"onSuccess: isSeller = $isSeller")
+                       val sharePrefManager = SharePrefManager(context)
+                       sharePrefManager.createLoginSession(
+                           id = user?.userId ?: "",
+                           isRemOn,
+                           isSeller)
+                       onSuccess(true)
+                   }
+               }else{
+                   Log.d(TAG,"onFailed: sign failed due to email is not verified")
+                   onError("email is not verified")
+               }
+           }
+           .addOnFailureListener { e ->
+               Log.d(TAG,"onFailed: sign failed due to ${e.message}")
+               onError(e.message!!)
+           }
+   }
+
+
+    suspend fun createUserAccount(user: User,onSuccess: (Boolean) -> Unit, onError: (String) -> Unit) {
+        auth.createUserWithEmailAndPassword(user.email, user.password)
+            .addOnSuccessListener {
+                val userId = it.user?.uid
+                if (userId != null) {
+                    user.userId = userId
+                    it.user?.sendEmailVerification()
+                        ?.addOnSuccessListener {
+                            Log.d(TAG,"Verification Success: email verification has been sent")
+
+                            addUser(user).addOnSuccessListener {
+                                Log.d(TAG,"Adding User Success: user has been added")
+                                onSuccess(true)
+                            }
+                        }
+                        ?.addOnFailureListener { e ->
+                            onError(e.message!!)
+                            Log.d(TAG,"Verification Failed: due to ${e.message}")
+                        }
+                }
+            }
+    }
+
+
+    suspend fun signOut() = auth.signOut()
+
+
+    suspend fun getOrders (userId: String): List<User.OrderItem>? {
+            val ref = usersPath().document(userId).get().await()
             val orders = if (ref != null) {
                 val user = ref.toObject(User::class.java)
                 return user?.orders
@@ -37,88 +138,48 @@ class RemoteUserRepository () {
 
 
 
-    suspend fun insertOrder(order: User.OrderItem){
+    suspend fun insertOrder(order: User.OrderItem) {
+
         // owner
         val ownerId = order.items[0].ownerId
-        val ownerRef = usersCollectionRef().document(ownerId).get().await()
+        val ownerRef = usersPath().document(ownerId).get().await()
         if (ownerRef != null){
-            usersCollectionRef().document(ownerId)
+            usersPath().document(ownerId)
                 .update(ORDERS_FIELD, FieldValue.arrayUnion(order))
         }
 
         // customer
-        val customer = usersCollectionRef().document(order.customerId).get().await()
+        val customer = usersPath().document(order.customerId).get().await()
         if (customer != null){
-            usersCollectionRef().document(ownerId)
+            usersPath().document(ownerId)
                 .update(ORDERS_FIELD, FieldValue.arrayUnion(order))
         }
 
     }
 
 
-    suspend fun deleteOrder(order: User.OrderItem){
+    suspend fun deleteOrder(order: User.OrderItem) {
+
         // owner
         val ownerId = order.items[0].ownerId
-        val ownerRef = usersCollectionRef().document(ownerId).get().await()
+        val ownerRef = usersPath().document(ownerId).get().await()
         if (ownerRef != null){
-            usersCollectionRef().document(ownerId)
+            usersPath().document(ownerId)
                 .update(ORDERS_FIELD, FieldValue.arrayRemove(order))
         }
 
         // customer
-        val customer = usersCollectionRef().document(order.customerId).get().await()
+        val customer = usersPath().document(order.customerId).get().await()
         if (customer != null){
-            usersCollectionRef().document(ownerId)
+            usersPath().document(ownerId)
                 .update(ORDERS_FIELD, FieldValue.arrayRemove(order))
         }
 
     }
 
-
-
-    fun signInWithPhoneAuthCredential(credential: PhoneAuthCredential, isUserLoggedIn: MutableLiveData<Boolean>) {
-        try {
-            mAuth.signInWithCredential(credential)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d(TAG, "signInWithCredential:success")
-                        val user = task.result?.user
-                        if (user != null) {
-                            isUserLoggedIn.postValue(true)
-                        }
-
-                    } else {
-                        Log.w(TAG, "signInWithCredential:failure", task.exception)
-                        if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                            Log.d(TAG, "createUserWithMobile:failure", task.exception)
-                            isUserLoggedIn.postValue(false)
-
-                        }
-                    }
-                }.addOnFailureListener {
-                    Log.d(TAG, "createUserWithMobile:failure", it)
-                    isUserLoggedIn.postValue(false)
-
-                }
-        } catch (e: Exception) {
-
-        }
-    }
-
-    suspend fun getUserById(userId: String, onComplete:(User?) -> Unit){
-        val resRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-        if (resRef != null){
-            val user = resRef.toObjects(User::class.java)[0]
-            onComplete(user)
-        }else{
-            onComplete(null)
-        }
-    }
-
-    suspend fun isEmailVerified() = mAuth.currentUser?.isEmailVerified
 
     suspend fun checkPassByUserId(userId: String ,password: String,onComplete: (Boolean) -> Unit) {
-        val ref = usersCollectionRef().whereEqualTo(USER_ID_FIELD,userId).get().await()
+        val ref = usersPath().whereEqualTo(USER_ID_FIELD,userId).get().await()
         if (ref != null){
             try {
                 val user = ref.toObjects(User::class.java)[0]
@@ -153,29 +214,15 @@ class RemoteUserRepository () {
 
 
 
-    suspend fun addUser(user: User) {
-        usersCollectionRef()
-            .document(user.userId)
-            .set(user)
-            .addOnSuccessListener {
-                Log.d(TAG, "Doc added")
-            }
-            .addOnFailureListener { e ->
-                Log.d(TAG, "firebase fire store error occurred: $e")
-            }
-    }
+    private fun addUser(user: User) = usersPath().document(user.userId).set(user)
 
-    suspend fun deleteUser(userId: String) { usersCollectionRef().document(userId).delete().await() }
+    suspend fun deleteUser(userId: String) { usersPath().document(userId).delete().await() }
 
-    suspend fun getUser(userId: String): User? {
-        return null
-    }
-
-    suspend fun getUserById(userId: String) = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-            .toObjects(User::class.java)[0]
+    suspend fun getUserById(userId: String) = usersPath().document(userId).get().await()
+            .toObject(User::class.java)
 
     suspend fun getOrdersByUserId(userId: String): Result<List<User.OrderItem>?> {
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
+        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
         return if (!userRef.isEmpty) {
             val userData = userRef.documents[0].toObject(User::class.java)
             Result.Success(userData!!.orders)
@@ -183,119 +230,105 @@ class RemoteUserRepository () {
             Result.Error(Exception("User Not Found!"))
         }
     }
+//
+//    // return list of product id
+//    suspend fun getStuckLikes(userId: String, products: List<Product>): List<String> {
+//        var diff: List<String> = emptyList()
+//            val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
+//             if (!userRef.isEmpty){
+//                val userData = userRef.documents[0].toObject(User::class.java)
+//                val likes = userData?.likes
+//                val productsId = products.map { it.productId }
+//                diff = likes?.minus(productsId.toSet())!!
+//
+//            }
+//        return diff
+//    }
 
-    // return list of product id
-    suspend fun getStuckLikes(userId: String, products: List<Product>): List<String> {
-        var diff: List<String> = emptyList()
-            val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-             if (!userRef.isEmpty){
-                val userData = userRef.documents[0].toObject(User::class.java)
-                val likes = userData?.likes
-                val productsId = products.map { it.productId }
-                diff = likes?.minus(productsId.toSet())!!
 
-            }
-        return diff
+//    // return list of product id
+//    suspend fun getStuckCartItems (userId: String,products: List<Product>): List<String> {
+//        var diff: List<String> = emptyList()
+//        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
+//        if (!userRef.isEmpty){
+//            val userData = userRef.documents[0].toObject(User::class.java)
+//            val cart = userData?.cart?.map { it.productId }
+//            val productsId = products.map { it.productId }
+//            diff = cart?.minus(productsId.toSet())!!
+//        }
+//        return diff
+//    }
+
+
+//    // return list of orders id
+//    suspend fun getStuckOrdersIds (userId: String,orders: List<User.OrderItem>): List<String> {
+//        var diff: List<String> = emptyList()
+//        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
+//        if (!userRef.isEmpty){
+//            val userData = userRef.documents[0].toObject(User::class.java)
+//            val order = userData?.orders?.map { it.orderId }
+//            val orderId = orders.map { it.orderId }
+//            diff = order?.minus(orderId.toSet())!!
+//        }
+//        return diff
+//    }
+
+
+
+    suspend fun likeProduct(productId: String, userId: String): Task<Void> {
+        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
+        val docId = userRef.documents[0].id
+        return usersPath().document(docId)
+            .update(LIKES_FIELD, FieldValue.arrayUnion(productId))
     }
 
 
-    // return list of product id
-    suspend fun getStuckCartItems(userId: String,products: List<Product>): List<String> {
-        var diff: List<String> = emptyList()
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-        if (!userRef.isEmpty){
-            val userData = userRef.documents[0].toObject(User::class.java)
-            val cart = userData?.cart?.map { it.productId }
-            val productsId = products.map { it.productId }
-            diff = cart?.minus(productsId.toSet())!!
+    suspend fun dislikeProduct(productId: String, userId: String): Task<Void> {
+        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
+        val docId = userRef.documents[0].id
+        return usersPath().document(docId)
+            .update(LIKES_FIELD, FieldValue.arrayRemove(productId))
+    }
+
+
+    suspend fun insertCartItem(newItem: User.CartItem, userId: String): Task<Void> {
+        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
+        val docId = userRef.documents[0].id
+        return usersPath().document(docId)
+            .update(CART_FIELD, FieldValue.arrayUnion(newItem.toHashMap()))
+    }
+
+
+    suspend fun removeCartItem(itemId: String, userId: String): Task<Void> {
+        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
+
+        val docId = userRef.documents[0].id
+        val oldCart =
+            userRef.documents[0].toObject(User::class.java)?.cart?.toMutableList()
+        val idx = oldCart?.indexOfFirst { it.itemId == itemId } ?: -1
+        if (idx != -1) {
+            oldCart?.removeAt(idx)
         }
-        return diff
+        return usersPath().document(docId)
+            .update(CART_FIELD, oldCart?.map { it.toHashMap() })
+
     }
 
-    // return list of orders id
-    suspend fun getStuckOrdersIds(userId: String,orders: List<User.OrderItem>): List<String> {
-        var diff: List<String> = emptyList()
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-        if (!userRef.isEmpty){
-            val userData = userRef.documents[0].toObject(User::class.java)
-            val order = userData?.orders?.map { it.orderId }
-            val orderId = orders.map { it.orderId }
-            diff = order?.minus(orderId.toSet())!!
-        }
-        return diff
-    }
+    suspend fun updateCartItem(item: User.CartItem, userId: String): Task<Void> {
+        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
 
-
-    suspend fun getLikesByUserId(userId: String): Result<List<String>?> {
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-        return if (!userRef.isEmpty) {
-            val userData = userRef.documents[0].toObject(User::class.java)
-            Result.Success(userData!!.likes)
-        } else {
-            Result.Error(Exception("User Not Found!"))
-        }
-    }
-
-    suspend fun getUserByMobileAndPassword(mobile: String, password: String): MutableList<User> = usersCollectionRef().whereEqualTo(
-        PHONE_FIELD, mobile)
-            .whereEqualTo(PASSWORD_FIELD, password).get().await().toObjects(User::class.java)
-
-    suspend fun likeProduct(productId: String, userId: String) {
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-        if (!userRef.isEmpty) {
             val docId = userRef.documents[0].id
-            usersCollectionRef().document(docId)
-                .update(LIKES_FIELD, FieldValue.arrayUnion(productId))
-        }
-    }
-
-    suspend fun dislikeProduct(productId: String, userId: String) {
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-        if (!userRef.isEmpty) {
-            val docId = userRef.documents[0].id
-            usersCollectionRef().document(docId)
-                .update(LIKES_FIELD, FieldValue.arrayRemove(productId))
-        }
-    }
-
-    suspend fun insertCartItem(newItem: User.CartItem, userId: String) {
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-        if (!userRef.isEmpty) {
-            val docId = userRef.documents[0].id
-            usersCollectionRef().document(docId)
-                .update(CART_FIELD, FieldValue.arrayUnion(newItem.toHashMap()))
-        }
-    }
-
-    suspend fun updateCartItem(item: User.CartItem, userId: String) {
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-        if (!userRef.isEmpty) {
-            val docId = userRef.documents[0].id
-            val oldCart =
-                userRef.documents[0].toObject(User::class.java)?.cart?.toMutableList()
+            val oldCart = userRef.documents[0].toObject(User::class.java)?.cart?.toMutableList()
             val idx = oldCart?.indexOfFirst { it.itemId == item.itemId } ?: -1
             if (idx != -1) {
                 oldCart?.set(idx, item)
             }
-            usersCollectionRef().document(docId)
+           return usersPath().document(docId)
                 .update(CART_FIELD, oldCart?.map { it.toHashMap() })
-        }
+
     }
 
-    suspend fun deleteCartItem(itemId: String, userId: String) {
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
-        if (!userRef.isEmpty) {
-            val docId = userRef.documents[0].id
-            val oldCart =
-                userRef.documents[0].toObject(User::class.java)?.cart?.toMutableList()
-            val idx = oldCart?.indexOfFirst { it.itemId == itemId } ?: -1
-            if (idx != -1) {
-                oldCart?.removeAt(idx)
-            }
-            usersCollectionRef().document(docId)
-                .update(CART_FIELD, oldCart?.map { it.toHashMap() })
-        }
-    }
+
 
 
 
@@ -327,28 +360,30 @@ class RemoteUserRepository () {
                     newOrder.orderDate,
                     newOrder.status)
 
-                val ownerRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, ownerId).get().await()
+                val ownerRef = usersPath().whereEqualTo(USER_ID_FIELD, ownerId).get().await()
                 if (!ownerRef.isEmpty) {
                     val docId = ownerRef.documents[0].id
-                    usersCollectionRef().document(docId)
+                    usersPath().document(docId)
                         .update(ORDERS_FIELD, FieldValue.arrayUnion(ownerOrder.toHashMap()))
                 }
             }
         }
 
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
+        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
         if (!userRef.isEmpty) {
             val docId = userRef.documents[0].id
-            usersCollectionRef().document(docId)
+            usersPath().document(docId)
                 .update(ORDERS_FIELD, FieldValue.arrayUnion(newOrder.toHashMap()))
-            usersCollectionRef().document(docId)
+            usersPath().document(docId)
                 .update(CART_FIELD, ArrayList<User.CartItem>())
         }
     }
 
+
+    // update the customer and owner status of order
     suspend fun setStatusOfOrderByUserId(orderId: String, userId: String, status: String) {
-        // update on customer and owner
-        val userRef = usersCollectionRef().whereEqualTo(USER_ID_FIELD, userId).get().await()
+
+        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
         if (!userRef.isEmpty) {
             val docId = userRef.documents[0].id
             val ordersList =
@@ -357,15 +392,15 @@ class RemoteUserRepository () {
             if (idx != -1) {
                 val orderData = ordersList?.get(idx)
                 if (orderData != null) {
-                    usersCollectionRef().document(docId)
+                    usersPath().document(docId)
                         .update(ORDERS_FIELD, FieldValue.arrayRemove(orderData.toHashMap()))
                     orderData.status = status
-                    usersCollectionRef().document(docId)
+                    usersPath().document(docId)
                         .update(ORDERS_FIELD, FieldValue.arrayUnion(orderData.toHashMap()))
 
                     // updating customer status
                     val custRef =
-                        usersCollectionRef().whereEqualTo(USER_ID_FIELD, orderData.customerId)
+                        usersPath().whereEqualTo(USER_ID_FIELD, orderData.customerId)
                             .get().await()
                     if (!custRef.isEmpty) {
                         val did = custRef.documents[0].id
@@ -375,12 +410,12 @@ class RemoteUserRepository () {
                         if (pos != -1) {
                             val order = orders?.get(pos)
                             if (order != null) {
-                                usersCollectionRef().document(did).update(
+                                usersPath().document(did).update(
                                     ORDERS_FIELD,
                                     FieldValue.arrayRemove(order.toHashMap())
                                 )
                                 order.status = status
-                                usersCollectionRef().document(did).update(
+                                usersPath().document(did).update(
                                     ORDERS_FIELD,
                                     FieldValue.arrayUnion(order.toHashMap())
                                 )
@@ -390,10 +425,6 @@ class RemoteUserRepository () {
                 }
             }
         }
-    }
-
-    suspend fun clearUser(userId: String) {
-        usersCollectionRef().document(userId).delete()
     }
 
 

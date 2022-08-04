@@ -54,8 +54,6 @@ data class User(
         var orderDate: Date = Date(),
         var status: String = OrderStatus.SPOON.name
     ) : Parcelable {
-//        constructor(): this("","",ArrayList(), mapOf(),0.0,"",Date())
-
         fun toHashMap(): HashMap<String, Any> {
             return hashMapOf(
                 "orderId" to orderId,
@@ -100,7 +98,7 @@ data class User(
 
 
     @Parcelize
-    data class Address(
+    data class Address (
         var addressId: String = "",
         var firstName: String = "",
         var lastName: String = "",
@@ -119,5 +117,6 @@ data class User(
             )
         }
     }
+
 
 }

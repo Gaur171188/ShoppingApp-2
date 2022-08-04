@@ -10,10 +10,11 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.shoppingapp.info.MainActivity
+import com.shoppingapp.info.activities.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -30,6 +31,13 @@ enum class AddAddressViewErrors { EMPTY, ERR_FNAME_EMPTY, ERR_LNAME_EMPTY, ERR_S
 
 
 
+fun showMessage(context: Context, text: String){
+    Toast.makeText(context,text,Toast.LENGTH_SHORT).show()
+}
+
+fun View.show() { visibility = View.VISIBLE }
+
+fun View.hide() { visibility = View.GONE }
 
 fun <T> throttleLatest(
     intervalMs: Long = 300L,
