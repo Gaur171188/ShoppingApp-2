@@ -27,6 +27,7 @@ import com.shoppingapp.info.databinding.ProductDetailsBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
+import kotlin.properties.Delegates
 
 
 class ProductDetails: Fragment() {
@@ -51,9 +52,11 @@ class ProductDetails: Fragment() {
 
     private lateinit var binding: ProductDetailsBinding
 
+
     private lateinit var product: Product
     private var selectedSize: Int? = null
     private var selectedColor: String? = null
+
 
 
     private var userId = ""
@@ -67,6 +70,8 @@ class ProductDetails: Fragment() {
         val sharePrefManager = SharePrefManager(requireContext())
         userId = sharePrefManager.getUserIdFromSession()!!
         isUserSeller = sharePrefManager.isUserSeller()
+
+
 
         product = try { arguments?.getParcelable<Product>(Constants.KEY_PRODUCT)!! }
         catch (ex: Exception){ Product() }
@@ -82,11 +87,15 @@ class ProductDetails: Fragment() {
     }
 
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
+
+
 
         // refresh product data.
         val user = homeViewModel.userData.value ?: User()
+
+
         viewModel.loadData(user,product)
 
 
@@ -147,6 +156,8 @@ class ProductDetails: Fragment() {
     private fun setViews() {
         binding.apply {
 
+            val isLiked = homeViewModel.likedProducts.value?.contains(product)!!
+
             /** button add in cart **/
             btnAddToCart.setOnClickListener {
                 addToCart()
@@ -175,11 +186,18 @@ class ProductDetails: Fragment() {
 
             /** button like product **/
             btnLikeProduct.setOnClickListener {
-                //  homeViewModel.toggleLikeByProductId(productId)
+                if (!isLiked){ // add like
+                    homeViewModel.insertLikeByProductId(product, userId)
+                }else{ // remove like
+                    homeViewModel.removeLikeByProductId(product, userId)
+                }
             }
 
-            // todo: you must get the updated user likes from the server then update the view
-            btnLikeProduct.isChecked = viewModel.isProductLiked.value == true
+
+            /*
+            there is a little delay until update liked data in home view model
+             */
+            binding.btnLikeProduct.isChecked = isLiked
 
 
             // set images and dots

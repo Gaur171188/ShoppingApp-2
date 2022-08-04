@@ -82,7 +82,7 @@ class ProductDetailsViewModel(): ViewModel() {
         loadCartItems(cart)
         loadQuantity(productId,cart)
         isItemInCart(itemInCart)
-        isProductLiked(likes,productId)
+//        isProductLiked(isLiked)
 
     }
 
@@ -105,9 +105,9 @@ class ProductDetailsViewModel(): ViewModel() {
     }
 
 
-    fun isProductLiked(likes: List<String>,productId: String) {
-        val isProductLiked = likes.contains(productId)
-        _isProductLiked.value = isProductLiked
+    fun isProductLiked(isLiked: Boolean) {
+//        val isProductLiked = likes.contains(productId)
+        _isProductLiked.value = isLiked
     }
 
 
