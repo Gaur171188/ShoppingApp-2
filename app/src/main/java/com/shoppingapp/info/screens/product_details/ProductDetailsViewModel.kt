@@ -30,23 +30,30 @@ class ProductDetailsViewModel(): ViewModel() {
 
 
     /** progress **/
-    private val _updateCartStatus = MutableLiveData<DataStatus>()
-    val updateCartStatus: LiveData<DataStatus> = _updateCartStatus
+    private val _updateCartStatus = MutableLiveData<DataStatus?>()
+    val updateCartStatus: LiveData<DataStatus?> = _updateCartStatus
 
     /** progress **/
-    private val _removeCartStatus = MutableLiveData<DataStatus>()
-    val removeCartStatus: LiveData<DataStatus> = _removeCartStatus
+    private val _removeCartStatus = MutableLiveData<DataStatus?>()
+    val removeCartStatus: LiveData<DataStatus?> = _removeCartStatus
 
     /** progress **/
-    private val _insertCartStatus = MutableLiveData<DataStatus>()
-    val insertCartStatus: LiveData<DataStatus> = _insertCartStatus
+    private val _insertCartStatus = MutableLiveData<DataStatus?>()
+    val insertCartStatus: LiveData<DataStatus?> = _insertCartStatus
 
 
-    private val _cartItems = MutableLiveData<List<User.CartItem>>()
-    val cartItems: LiveData<List<User.CartItem>> = _cartItems
+    private val _cartItems = MutableLiveData<List<User.CartItem>?>()
+    val cartItems: LiveData<List<User.CartItem>?> = _cartItems
 
     private val _quantity = MutableLiveData<Int?>()
     val quantity: LiveData<Int?> = _quantity
+
+    private val _cartProducts = MutableLiveData<List<Product>>()
+    val cartProducts: LiveData<List<Product>> = _cartProducts
+
+    private val _itemsPrice = MutableLiveData<Map<String, Double>>()
+    val itemsPrice: LiveData<Map<String, Double>> = _itemsPrice
+
 
 
     private val _errorMessage = MutableLiveData<String>()
@@ -60,6 +67,11 @@ class ProductDetailsViewModel(): ViewModel() {
 
 
 
+    fun resetProgress(){
+        _insertCartStatus.value = null
+        _removeCartStatus.value = null
+        _updateCartStatus.value = null
+    }
 
     fun setQuantityOfItem (value: Int) {
         viewModelScope.launch {
@@ -75,61 +87,103 @@ class ProductDetailsViewModel(): ViewModel() {
     // load cart data.
     // load quantity.
 
-    fun loadData(user: User,product: Product) {
-        val cart = user.cart
-        val likes = user.likes
-        val productId = product.productId
-        val productIds = cart.map { it.productId }
-        val itemInCart = productIds.contains(productId)
-
-        loadCartItems(cart)
-        loadQuantity(productId,cart)
-        isItemInCart(itemInCart)
-    }
-
-
-    fun loadQuantity(productId: String, cartItem: List<User.CartItem>) {
-        val quantity = cartItem.find { it.productId == productId }?.quantity
-        if (quantity != null) {
-            _quantity.value = quantity
-        }else{
-            _quantity.value = 1
-        }
-    }
-
-    fun loadCartItems(cartItem: List<User.CartItem>) {
-        _cartItems.value = cartItem
-    }
-
-    fun isItemInCart(b: Boolean){
-        _isItemInCart.value = b
-    }
-
-
-
-
-
-
-
-    fun addToCart(product: Product,userId: String) {
-        Log.d(TAG, "onAddingCartItem: Loading..")
-        _insertCartStatus.value = DataStatus.LOADING
-        viewModelScope.launch {
-            val itemId = UUID.randomUUID().toString()
-            val newItem = User.CartItem(itemId, product.productId, product.owner, _quantity.value!!)
-            userRepository.insertCartItem(newItem,userId)
-                .addOnSuccessListener {
-                    Log.d(TAG, "onAddingCartItem: Item has been added success")
-                    _isItemInCart.value = true
-                    _insertCartStatus.value = DataStatus.SUCCESS
-                }
-                .addOnFailureListener { e ->
-                    Log.d(TAG, "onAddingCartItem: failed to add due to ${e.message}")
-                    _insertCartStatus.value = DataStatus.ERROR
-                }
-        }
-    }
-
+//    fun loadData(user: User,product: Product) {
+//        val cart = user.cart
+//        val likes = user.likes
+//        val productId = product.productId
+//        val productIds = cart.map { it.productId }
+//        val itemInCart = productIds.contains(productId)
+//
+//        loadCartItems(cart)
+//        loadQuantity(productId,cart)
+//        isItemInCart(itemInCart)
+//    }
+//
+//
+//    fun loadQuantity(productId: String, cartItem: List<User.CartItem>) {
+//        val quantity = cartItem.find { it.productId == productId }?.quantity
+//        if (quantity != null) {
+//            _quantity.value = quantity
+//        }else{
+//            _quantity.value = 1
+//        }
+//    }
+//
+//    fun loadCartItems(cartItem: List<User.CartItem>) {
+//        _cartItems.value = cartItem
+//    }
+//
+//    fun isItemInCart(b: Boolean){
+//        _isItemInCart.value = b
+//    }
+//
+//
+//    // load cart products and prices
+//    fun loadCartProducts(products: List<Product>) {
+//        val cartProducts = ArrayList<Product>()
+//        val priceMap = mutableMapOf<String, Double>()
+//        val cartItems = _cartItems.value?.map { it.productId }
+//        products.forEach { product->
+//            val isProductInCart = cartItems?.contains(product.productId)
+//            if (isProductInCart == true){
+//                cartProducts.add(product)
+//            }
+//            _cartProducts.value = cartProducts
+//            _cartItems.value?.forEach { item ->
+//                val cartProduct = cartProducts.find { it.productId == item.productId }!!
+//                priceMap[item.itemId] = cartProduct.price
+//            }
+//            _itemsPrice.value = priceMap
+//
+//        }
+//    }
+//
+//
+//    fun getItemsPriceTotal(price: Map<String, Double>): Double {
+//        var totalPrice = 0.0
+//        price.forEach { (itemId, price) ->
+//            totalPrice += price * (_cartItems.value?.find { it.itemId == itemId }?.quantity ?: 1)
+//        }
+//        return totalPrice
+//    }
+//
+//
+//    fun getQuantityCount(): Int {
+//        var totalCount = 0
+//        _cartItems.value?.forEach {
+//            totalCount += it.quantity
+//        }
+//        return totalCount
+//    }
+//
+//
+//
+//
+//    fun addToCart(product: Product,userId: String) {
+//        Log.d(TAG, "onAddingCartItem: Loading..")
+//        _insertCartStatus.value = DataStatus.LOADING
+//        viewModelScope.launch {
+//            val itemId = UUID.randomUUID().toString()
+//            val newItem = User.CartItem(itemId, product.productId, product.owner, _quantity.value!!)
+//            userRepository.insertCartItem(newItem,userId)
+//                .addOnSuccessListener {
+//                    Log.d(TAG, "onAddingCartItem: Item has been added success")
+//                    _isItemInCart.value = true
+//                    _insertCartStatus.value = DataStatus.SUCCESS
+//
+//                    // update cart live data
+//                    val cart = _cartItems.value?.toMutableList()
+//                    cart?.add(newItem)
+//                    _cartItems.value = cart
+//
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.d(TAG, "onAddingCartItem: failed to add due to ${e.message}")
+//                    _insertCartStatus.value = DataStatus.ERROR
+//                }
+//        }
+//    }
+//
 
     fun removeCartItem(itemId: String, userId: String) {
         Log.d(TAG, "onRemovingCartItem: Loading..")
@@ -150,28 +204,28 @@ class ProductDetailsViewModel(): ViewModel() {
 
 
 
-    fun updateCartItem(productId: String,userId: String) {
-        Log.d(TAG, "onUpdatingCartItem: Loading..")
-        _updateCartStatus.value = DataStatus.LOADING
-        viewModelScope.launch {
-            val item = _cartItems.value?.find { it.productId == productId }
-            if (item != null){
-                // update the element that you want from here
-                item.quantity = _quantity.value!!
-                userRepository.updateCartItem(item,userId)
-                    .addOnSuccessListener {
-                        Log.d("ProductDetails",item.toString())
-                        Log.d(TAG, "onUpdatingCartItem: Item has been update success")
-                        _updateCartStatus.value = DataStatus.SUCCESS
-                    }
-                    .addOnFailureListener { e ->
-                        Log.d(TAG, "onUpdatingCartItem: failed to update due to ${e.message}")
-                        _updateCartStatus.value = DataStatus.ERROR
-                    }
-            }
-
-        }
-    }
+//    fun updateCartItem(productId: String,userId: String) {
+//        Log.d(TAG, "onUpdatingCartItem: Loading..")
+//        _updateCartStatus.value = DataStatus.LOADING
+//        viewModelScope.launch {
+//            val item = _cartItems.value?.find { it.productId == productId }
+//            if (item != null){
+//                // update the element that you want from here
+//                item.quantity = _quantity.value!!
+//                userRepository.updateCartItem(item,userId)
+//                    .addOnSuccessListener {
+//                        Log.d("ProductDetails",item.toString())
+//                        Log.d(TAG, "onUpdatingCartItem: Item has been update success")
+//                        _updateCartStatus.value = DataStatus.SUCCESS
+//                    }
+//                    .addOnFailureListener { e ->
+//                        Log.d(TAG, "onUpdatingCartItem: failed to update due to ${e.message}")
+//                        _updateCartStatus.value = DataStatus.ERROR
+//                    }
+//            }
+//
+//        }
+//    }
 
 
 

@@ -128,6 +128,12 @@ class Favorites : Fragment() {
         }
 
 
+        // back button
+        binding.favTopAppBar.topAppBar.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
+
 
     }
 

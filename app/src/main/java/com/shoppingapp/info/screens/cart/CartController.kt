@@ -19,7 +19,7 @@ class CartController(): TypedEpoxyController<List<CartItem>>() {
 
 
 
-    companion object{
+    companion object {
         private const val TAG = "CartControllerss"
     }
 
@@ -33,6 +33,7 @@ class CartController(): TypedEpoxyController<List<CartItem>>() {
 //            Log.d(TAG,"likes: ${likes.size}")
 //            Log.d(TAG,"products: ${products.size}")
 
+
             val product = products.find { it.productId == cart.productId } ?: Product()
 //            val isLiked = likes.contains(product.productId)
 
@@ -43,7 +44,7 @@ class CartController(): TypedEpoxyController<List<CartItem>>() {
                     isSeller(isSeller)
                     productData(product)
                     onDeleteClick { _ -> clickListener.onDeleteClick(cart,index) }
-                    onItemClick { _ -> clickListener.onItemClick(cart,index) }
+                    onItemClick { _ -> clickListener.onItemClick(product) }
                 }
 
 
@@ -54,7 +55,7 @@ class CartController(): TypedEpoxyController<List<CartItem>>() {
 
     interface OnClickListener {
         fun onDeleteClick(cartItem: CartItem, position: Int)
-        fun onItemClick(cartItem: CartItem, position: Int)
+        fun onItemClick(product: Product)
     }
 
 

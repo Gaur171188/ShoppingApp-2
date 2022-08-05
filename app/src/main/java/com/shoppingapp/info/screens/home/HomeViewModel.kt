@@ -8,11 +8,10 @@ import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.product.RemoteProductRepository
 import com.shoppingapp.info.repository.user.RemoteUserRepository
-import com.shoppingapp.info.screens.favorites.FavoritesViewModel
+import com.shoppingapp.info.screens.product_details.ProductDetailsViewModel
 import com.shoppingapp.info.utils.DataStatus
 import kotlinx.coroutines.*
-
-
+import java.util.*
 
 
 @Suppress("DeferredResultUnused")
@@ -44,16 +43,67 @@ class HomeViewModel(): ViewModel() {
     private val _removeLikeStatus = MutableLiveData<DataStatus?>()
     val removeLikeStatus: LiveData<DataStatus?> = _removeLikeStatus
 
-
     private val _cartItems= MutableLiveData<List<User.CartItem>?>()
     val cartItems: LiveData<List<User.CartItem>?> = _cartItems
 
+//    private val _cartProducts = MutableLiveData<List<Product>>()
+//    val cartProducts: LiveData<List<Product>> = _cartProducts
 
 
 
+
+//    private val _itemsPrice = MutableLiveData<Map<String, Double>>()
+//    val itemsPrice: LiveData<Map<String, Double>> = _itemsPrice
 //
-//    private val _isItemInCart = MutableLiveData<Boolean>()
-//    val isItemInCart: LiveData<Boolean> get() = _isItemInCart
+//
+
+    /** product details **/
+    /** progress **/
+    private val _updateCartStatus = MutableLiveData<DataStatus?>()
+    val updateCartStatus: LiveData<DataStatus?> = _updateCartStatus
+
+    /** progress **/
+    private val _removeCartStatus = MutableLiveData<DataStatus?>()
+    val removeCartStatus: LiveData<DataStatus?> = _removeCartStatus
+
+    /** progress **/
+    private val _insertCartStatus = MutableLiveData<DataStatus?>()
+    val insertCartStatus: LiveData<DataStatus?> = _insertCartStatus
+
+
+    private val _productQuantity = MutableLiveData<Int?>()
+    val productQuantity: LiveData<Int?> = _productQuantity
+
+    private val _cartProducts = MutableLiveData<List<Product>>()
+    val cartProducts: LiveData<List<Product>> = _cartProducts
+
+    private val _itemsPrice = MutableLiveData<Map<String, Double>>()
+    val itemsPrice: LiveData<Map<String, Double>> = _itemsPrice
+
+
+    private val _isProductLiked = MutableLiveData<Boolean>()
+    val isProductLiked: LiveData<Boolean> = _isProductLiked
+
+
+
+    private val _totalItemsPrice = MutableLiveData<Double>()
+    val totalItemsPrice: LiveData<Double> = _totalItemsPrice
+
+    private val _quantityCount = MutableLiveData<Int?>()
+    val quantityCount: LiveData<Int?> = _quantityCount
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private var _userOrders = MutableLiveData<List<User.OrderItem>>()
     val userOrders: LiveData<List<User.OrderItem>> get() = _userOrders
@@ -79,8 +129,6 @@ class HomeViewModel(): ViewModel() {
     private val _dataStatus = MutableLiveData<DataStatus>()
     val dataStatus: LiveData<DataStatus> get() = _dataStatus
 
-    private val _quantity = MutableLiveData<Int?>()
-    val quantity: LiveData<Int?> = _quantity
 
 //    private val _user = MutableLiveData<User?>()
 //    val user: LiveData<User?> get() = _user
@@ -91,13 +139,9 @@ class HomeViewModel(): ViewModel() {
     private val _isConnected = MutableLiveData<Boolean>()
     val isConnected: LiveData<Boolean> get() = _isConnected
 
-    private val _cartProducts = MutableLiveData<List<Product>>()
-    val cartProducts: LiveData<List<Product>> = _cartProducts
 
 
 
-    private val _itemsPrice = MutableLiveData<Map<String, Double>>()
-    val itemsPrice: LiveData<Map<String, Double>> = _itemsPrice
 
     private val _orders= MutableLiveData<List<User.OrderItem>?>()
     val orders: LiveData<List<User.OrderItem>?> = _orders
@@ -113,6 +157,7 @@ class HomeViewModel(): ViewModel() {
     // load liked products
     // load user likes
     // load user data
+    // load cart products
 
     fun loadData(userId: String) {
         Log.d(TAG,"OnGettingData: Loading..")
@@ -124,6 +169,7 @@ class HomeViewModel(): ViewModel() {
             val cart = user?.cart
             _userLikes.value = likes
             _cartItems.value = cart
+
             productRepository.getProducts()
                 .addOnSuccessListener {
                     _productsStatus.value = DataStatus.SUCCESS
@@ -131,6 +177,8 @@ class HomeViewModel(): ViewModel() {
                     _products.value = products
                     val likeProducts = likes?.map { proId -> products.find { it.productId == proId } ?: Product() }
                     _likedProducts.value = likeProducts
+
+
                     Log.d(TAG,"OnGettingData: Loading Success you have ${it.size()} product")
                     Log.d(TAG,"OnGettingData: Loading Success you have ${likeProducts?.size} product liked")
                 }
@@ -143,9 +191,257 @@ class HomeViewModel(): ViewModel() {
     }
 
 
+
+
+
+
+
+    fun loadProductDetails(product: Product) {
+        val cart = _userData.value?.cart!!
+        val likes = _userData.value?.likes
+        val productId = product.productId
+
+        loadCartItems(cart)
+        loadQuantity(productId,cart)
+
+    }
+
+    fun setQuantityOfItem (value: Int) {
+        viewModelScope.launch {
+            val newQuantity = value + _productQuantity.value!!
+            _productQuantity.value = newQuantity
+        }
+    }
+
+
+    fun loadQuantity(productId: String, cartItem: List<User.CartItem>) {
+        val quantity = cartItem.find { it.productId == productId }?.quantity
+        if (quantity != null) {
+            _productQuantity.value = quantity
+        }else{
+            _productQuantity.value = 1
+        }
+    }
+
+    fun loadCartItems(cartItem: List<User.CartItem>) {
+        _cartItems.value = cartItem
+    }
+
+
+    // load cart products and prices
+    fun loadCartDetails(products: List<Product>) {
+//        val cartProducts = ArrayList<Product>()
+
+//        val cartItems = _cartItems.value?.map { it.productId }
+//        products.forEach { product->
+//            val isProductInCart = cartItems?.contains(product.productId)
+//            if (isProductInCart == true){
+//                cartProducts.add(product)
+//            }
+//            _cartProducts.value = cartProducts
+//        }
+        loadCardProducts()
+        loadItemsPrice()
+        loadQuantityCount()
+    }
+
+
+    fun loadCardProducts(){
+        val cartProducts = ArrayList<Product>()
+        val cartItems = _cartItems.value?.map { it.productId }
+        _products.value?.forEach { product->
+            val isProductInCart = cartItems?.contains(product.productId)
+            if (isProductInCart == true){
+                cartProducts.add(product)
+            }
+            _cartProducts.value = cartProducts
+        }
+    }
+
+    // load items price
+    fun loadItemsPrice() {
+        val priceMap = mutableMapOf<String, Double>()
+        _cartItems.value?.forEach { item ->
+            val cartProduct = _products.value?.find { it.productId == item.productId }!!
+            priceMap[item.itemId] = cartProduct.price
+        }
+        _itemsPrice.value = priceMap
+        loadItemsPriceTotal(priceMap)
+    }
+
+
+    fun loadItemsPriceTotal(price: Map<String, Double>): Double {
+        var totalPrice = 0.0
+        price.forEach { (itemId, price) ->
+            totalPrice += price * (_cartItems.value?.find { it.itemId == itemId }?.quantity ?: 1)
+        }
+         _totalItemsPrice.value = totalPrice
+        return totalPrice
+    }
+
+
+    fun loadQuantityCount(): Int {
+        var totalCount = 0
+        _cartItems.value?.forEach {
+            totalCount += it.quantity
+        }
+        _quantityCount.value = totalCount
+        return totalCount
+    }
+
+
+
+    fun addToCart(product: Product,userId: String) {
+        Log.d(TAG, "onAddingCartItem: Loading..")
+        _insertCartStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            val itemId = UUID.randomUUID().toString()
+            val newItem = User.CartItem(itemId, product.productId, product.owner, _productQuantity.value!!)
+            userRepository.insertCartItem(newItem,userId)
+                .addOnSuccessListener {
+                    Log.d(TAG, "onAddingCartItem: Item has been added success")
+                    _insertCartStatus.value = DataStatus.SUCCESS
+
+//                    // update cart live data
+//                    val cart = _cartItems.value?.toMutableList()
+//                    cart?.add(newItem)
+//                    _cartItems.value = cart
+
+                    loadData(userId)
+
+                }
+                .addOnFailureListener { e ->
+                    Log.d(TAG, "onAddingCartItem: failed to add due to ${e.message}")
+                    _insertCartStatus.value = DataStatus.ERROR
+                }
+        }
+    }
+
+
+
+
+    fun removeCartItem(itemId: String, userId: String) {
+        Log.d(TAG, "onRemovingCartItem: Loading..")
+        _removeCartStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            userRepository.removeCartItem(itemId,userId)
+                .addOnSuccessListener {
+                    Log.d(TAG, "onRemovingCartItem: Item has been removed success")
+                    _removeCartStatus.value = DataStatus.SUCCESS
+
+                    loadData(userId)
+//                    val items = _cartItems.value?.toMutableList()
+//                    val removedItem = items?.find { it.itemId == itemId }
+//                    items?.remove(removedItem)
+//                    _cartItems.value = items
+
+//                    loadCartDetails(_products.value!!)
+                }
+                .addOnFailureListener { e ->
+                    Log.d(TAG, "onRemovingCartItem: failed to remove due to ${e.message}")
+                    _removeCartStatus.value = DataStatus.ERROR
+                }
+        }
+    }
+
+
+
+    fun updateCartItem(productId: String,userId: String) {
+        Log.d(TAG, "onUpdatingCartItem: Loading..")
+        _updateCartStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            val item = _cartItems.value?.find { it.productId == productId }
+            if (item != null){
+                // update the element that you want from here
+                item.quantity = _productQuantity.value!!
+                userRepository.updateCartItem(item,userId)
+                    .addOnSuccessListener {
+                        Log.d("ProductDetails",item.toString())
+                        Log.d(TAG, "onUpdatingCartItem: Item has been update success")
+                        _updateCartStatus.value = DataStatus.SUCCESS
+                    }
+                    .addOnFailureListener { e ->
+                        Log.d(TAG, "onUpdatingCartItem: failed to update due to ${e.message}")
+                        _updateCartStatus.value = DataStatus.ERROR
+                    }
+            }
+
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //    // load cart products and prices
+//    fun loadCartProduct() {
+//        val cartProducts = ArrayList<Product>()
+//        val priceMap = mutableMapOf<String, Double>()
+//        val cartItems = _cartItems.value?.map { it.productId }
+//        _products.value?.forEach { product->
+//            val isProductInCart = cartItems?.contains(product.productId)
+//            if (isProductInCart == true){
+//                cartProducts.add(product)
+//            }
+//            _cartProducts.value = cartProducts
+//            _cartItems.value?.forEach { item ->
+//                val cartProduct = cartProducts.find { it.productId == item.productId }!!
+//                priceMap[item.itemId] = cartProduct.price
+//            }
+//            _itemsPrice.value = priceMap
+//
+//        }
+//    }
+//
+
+
+
+//        private suspend fun getAllProductsInCart() {
+//        viewModelScope.launch {
+//            val priceMap = mutableMapOf<String, Double>()
+//            val proList = mutableListOf<Product>()
+//
+//            _cartItems.value?.let { itemList ->
+//                itemList.forEach label@ { item ->
+//                    val productDeferredRes = async {
+//                        productRepository.getProductById(item.productId, true)
+//                    }
+//                    val proRes = productDeferredRes.await()
+//                    if (proRes is Success) {
+//                        val proData = proRes.data
+//                        proList.add(proData)
+//                        priceMap[item.itemId] = proData.price
+//                    } else {
+//                        return@label
+//                    }
+//                }
+//            }
+//            _priceList.value = priceMap
+//            _cartProducts.value = proList
+//        }
+//    }
+
+
+
     fun insertLikeByProductId (product: Product, userId: String) {
         Log.d(TAG,"OnLikeProduct: Loading..")
-        resetData()
+        resetProgress()
         _addLikeStatus.value = DataStatus.LOADING
         viewModelScope.launch {
             userRepository.likeProduct(product.productId,userId)
@@ -166,7 +462,7 @@ class HomeViewModel(): ViewModel() {
 
     fun removeLikeByProductId (product: Product, userId: String) {
         Log.d(TAG,"OnLikeProduct: Loading..")
-        resetData()
+        resetProgress()
         _removeLikeStatus.value = DataStatus.LOADING
         viewModelScope.launch {
             userRepository.dislikeProduct(product.productId,userId)
@@ -187,11 +483,59 @@ class HomeViewModel(): ViewModel() {
 
 
 
-    fun resetData() {
+    fun resetProgress() {
         _addLikeStatus.value = null
         _removeLikeStatus.value = null
+        _updateCartStatus.value = null
         _errorMessage.value = null
     }
+
+
+//    fun getItemsPriceTotal(price: Map<String, Double>): Double {
+//        var totalPrice = 0.0
+//        price.forEach { (itemId, price) ->
+//            totalPrice += price * (_cartItems.value?.find { it.itemId == itemId }?.quantity ?: 1)
+//        }
+//        return totalPrice
+//    }
+//
+//
+//    fun getQuantityCount(): Int {
+//        var totalCount = 0
+//        _cartItems.value?.forEach {
+//            totalCount += it.quantity
+//        }
+//        return totalCount
+//    }
+
+
+//
+//        private suspend fun getAllProductsInCart() {
+//        viewModelScope.launch {
+//            val priceMap = mutableMapOf<String, Double>()
+//            val proList = mutableListOf<Product>()
+//
+//            _cartItems.value?.let { itemList ->
+//                itemList.forEach label@ { item ->
+//                    val productDeferredRes = async {
+//                        productRepository.getProductById(item.productId, true)
+//                    }
+//                    val proRes = productDeferredRes.await()
+//                    if (proRes is Success) {
+//                        val proData = proRes.data
+//                        proList.add(proData)
+//                        priceMap[item.itemId] = proData.price
+//                    } else {
+//                        return@label
+//                    }
+//                }
+//            }
+//            _priceList.value = priceMap
+//            _cartProducts.value = proList
+//        }
+//    }
+
+
 
 
 //

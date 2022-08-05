@@ -8,9 +8,8 @@
 //import com.shoppingapp.info.utils.Result
 //import com.shoppingapp.info.utils.Result.Success
 //
-//
-//class CartViewModel(val userRepository: UserRepository,
-//                    private val productRepository: ProductRepository): ViewModel() {
+////
+//class CartViewModel(): ViewModel() {
 //
 //    companion object{
 //        const val TAG = "CartViewModel"

@@ -14,6 +14,13 @@
         android:layout_height="match_parent">
 
 
+        <include
+            android:id="@+id/loader"
+            layout="@layout/circular_loader_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
 
 
         <androidx.core.widget.NestedScrollView
@@ -26,6 +33,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+
+
 
 
 

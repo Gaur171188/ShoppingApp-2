@@ -137,18 +137,20 @@ class Home : Fragment() {
             }
 
 
-//            /** add like status **/
-//            favoritesViewModel.addLikeStatus.observe(viewLifecycleOwner) { status ->
-//                if (status != null){
-//                    when(status){
-//                        DataStatus.SUCCESS -> { showMessage(requireContext(),"liked") }
-//                        DataStatus.LOADING -> {}
-//                        DataStatus.ERROR -> {}
-//                        else -> {}
-//                    }
-//                }
-//
-//            }
+            /** add like status **/
+                viewModel.addLikeStatus.observe(viewLifecycleOwner) { status ->
+                if (status != null){
+                    when(status){
+                        DataStatus.SUCCESS -> {
+                            showMessage(requireContext(),"liked")
+                            viewModel.resetProgress()
+                        }
+                        DataStatus.LOADING -> {}
+                        DataStatus.ERROR -> {}
+                        else -> {}
+                    }
+                }
+            }
 
 
             /** favorites error message **/
@@ -265,7 +267,12 @@ class Home : Fragment() {
                 }else { // go to product details
 
                     val isProductInCart = viewModel.cartItems.value?.map{ it.productId }?.contains(product.productId)
-                    val data =  bundleOf(Constants.KEY_PRODUCT to product, Constants.KEY_CHECK_IN_CART to isProductInCart)
+                    val isLiked = viewModel.likedProducts.value?.contains(product)!!
+                    val data =  bundleOf(
+                        Constants.KEY_PRODUCT to product,
+                        Constants.KEY_IS_EDIT to false,
+                        Constants.KEY_CHECK_IN_CART to isProductInCart,
+                        Constants.KEY_IS_LIKED to isLiked)
                     findNavController().navigate(R.id.action_home_to_productDetails,data)
                 }
 

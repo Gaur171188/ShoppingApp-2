@@ -136,7 +136,7 @@
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textColor="@color/blue_accent_300"
                 android:textStyle="bold"
-                setPrice="${totalPrice}"
+                setPrice="@{itemsPriceTotal}"
                 app:layout_constraintBottom_toBottomOf="@+id/price_total_label_tv"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/price_total_label_tv"
