@@ -47,6 +47,7 @@ class Cart : Fragment() {
 
         initData()
 
+        setViews()
 
 
 
@@ -61,7 +62,7 @@ class Cart : Fragment() {
 
         setObservers()
 
-        setViews()
+
     }
 
 
@@ -118,13 +119,12 @@ class Cart : Fragment() {
 
 //        initAdapter()
 
+
+
         /** swipe refresh cart items **/
         binding.swipeRefreshCartItems.setOnRefreshListener {
             loadData()
         }
-
-
-
 
 
 

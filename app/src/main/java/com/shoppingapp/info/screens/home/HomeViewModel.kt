@@ -329,7 +329,7 @@ class HomeViewModel(): ViewModel() {
                     Log.d(TAG, "onRemovingCartItem: Item has been removed success")
                     _removeCartStatus.value = DataStatus.SUCCESS
 
-                    loadData(userId)
+
 //                    val items = _cartItems.value?.toMutableList()
 //                    val removedItem = items?.find { it.itemId == itemId }
 //                    items?.remove(removedItem)

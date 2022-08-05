@@ -65,7 +65,6 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
         navFragment.navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.home -> setBottomNavVisibility(View.VISIBLE)
-                R.id.cart -> setBottomNavVisibility(View.VISIBLE)
                 R.id.account -> setBottomNavVisibility(View.VISIBLE)
                 R.id.orders -> setBottomNavVisibility(View.VISIBLE)
                 R.id.orderSuccess -> setBottomNavVisibility(View.VISIBLE)

@@ -158,5 +158,8 @@
         <action
             android:id="@+id/action_home_to_productDetails"
             app:destination="@id/productDetails" />
+        <action
+            android:id="@+id/action_home_to_cart"
+            app:destination="@id/cart" />
     </fragment>
 </navigation>

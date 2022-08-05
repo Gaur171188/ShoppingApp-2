@@ -6,9 +6,18 @@
         android:icon="@drawable/ic_favorite_outlined_24"
         android:title="@string/favorites"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/item_cart"
+        android:icon="@drawable/ic_outlined_shopping_cart_24"
+        android:title="@string/cart"
+        android:titleCondensed="@string/cart"
+        app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/item_filter"
         android:icon="@drawable/ic_filter_alt_24"
         android:title="@string/filter"
         app:showAsAction="ifRoom" />
+
 </menu>

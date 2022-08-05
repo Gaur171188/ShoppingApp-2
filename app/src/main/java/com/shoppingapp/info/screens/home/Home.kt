@@ -192,6 +192,10 @@ class Home : Fragment() {
 
                 true
             }
+            R.id.item_cart -> {
+                findNavController().navigate(R.id.action_home_to_cart)
+                true
+            }
             else -> false
         }
     }
@@ -202,7 +206,10 @@ class Home : Fragment() {
             val debounceJob: Job? = null
             val uiScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
             homeTopAppBar.topAppBar.inflateMenu(R.menu.home_app_bar_menu)
-            if (isUserSeller == true) { homeTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites) }
+            if (isUserSeller == true) {
+                homeTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites)
+                homeTopAppBar.topAppBar.menu.removeItem(R.id.item_cart)
+            }
             homeTopAppBar.homeSearchEditText.onFocusChangeListener = focusChangeListener
             homeTopAppBar.homeSearchEditText.doAfterTextChanged { editable ->
                 if (editable != null) {
