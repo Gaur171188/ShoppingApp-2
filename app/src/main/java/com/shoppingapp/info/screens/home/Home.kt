@@ -185,11 +185,7 @@ class Home : Fragment() {
                 true
             }
             R.id.item_favorites -> {
-                // show favorite products list
-//                val likedProducts = viewModel.likedProducts.value
-//                val userLikes = bundleOf("userLikes" to likedProducts)
                 findNavController().navigate(R.id.action_homeFragment_to_favoritesFragment)
-
                 true
             }
             R.id.item_cart -> {

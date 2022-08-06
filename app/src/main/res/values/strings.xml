@@ -108,6 +108,11 @@
     <string name="pro_details_go_to_cart_btn_text">Go To Cart</string>
     <string name="pro_details_add_to_cart_btn_text">Add To Cart</string>
     <string name="update_cart">Update Cart</string>
+    <string name="location">Location</string>
+    <string name="street">Street</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="city">City</string>
 
 
 </resources>

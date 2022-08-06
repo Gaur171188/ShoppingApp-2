@@ -118,4 +118,6 @@ dependencies {
     implementation "org.koin:koin-android-ext:$koin_version"
 
 
+//    // country picker
+    implementation 'com.hbb20:ccp:2.6.1'
 }

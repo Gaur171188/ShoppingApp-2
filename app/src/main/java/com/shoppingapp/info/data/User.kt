@@ -26,7 +26,8 @@ data class User(
     var cart: List<CartItem> = ArrayList(),
     @TypeConverters(ObjectListTypeConvertor::class)
     var orders: List<OrderItem> = ArrayList(),
-    var userType: String = UserType.CUSTOMER.name
+    var userType: String = UserType.CUSTOMER.name,
+    var country: String? = null
 ): Parcelable{
 
     fun toHashMap(): HashMap<String, Any> {

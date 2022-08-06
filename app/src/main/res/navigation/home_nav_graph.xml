@@ -8,7 +8,6 @@
 
     <fragment
         android:id="@+id/orders"
-        android:name="com.shoppingapp.info.screens.orders.Orders"
         android:label="fragment_orders"
         tools:layout="@layout/orders">
         <action
@@ -137,7 +136,6 @@
         app:destination="@id/addEditProduct" />
     <fragment
         android:id="@+id/orderDetails"
-        android:name="com.shoppingapp.info.screens.order_details.OrderDetails"
         android:label="fragment_order_details"
         tools:layout="@layout/order_details">
         <argument
@@ -162,4 +160,9 @@
             android:id="@+id/action_home_to_cart"
             app:destination="@id/cart" />
     </fragment>
+    <fragment
+        android:id="@+id/selectAddress"
+        android:name="com.shoppingapp.info.screens.select_address.SelectAddress"
+        android:label="SelectAddress"
+        tools:layout="@layout/select_address"/>
 </navigation>

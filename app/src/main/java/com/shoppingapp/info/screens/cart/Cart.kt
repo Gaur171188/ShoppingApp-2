@@ -117,22 +117,14 @@ class Cart : Fragment() {
 
         binding.cartAppBar.topAppBar.title = getString(R.string.cart_fragment_label)
 
-//        initAdapter()
-
-
-
         /** swipe refresh cart items **/
         binding.swipeRefreshCartItems.setOnRefreshListener {
             loadData()
         }
 
-
-
-        binding.cartCheckOutBtn.setOnClickListener {
+        binding.btnNext.setOnClickListener {
             navigateToSelectAddress()
         }
-
-
 
 
     }
@@ -238,7 +230,7 @@ class Cart : Fragment() {
 
 
     private fun navigateToSelectAddress() {
-//        findNavController().navigate(R.id.action_cartFragment_to_selectAddressFragment)
+//   navigateToSelectAddress  navigateToSelectAddress   findNavController().navigate(R.id.action_cart)
     }
 
 
