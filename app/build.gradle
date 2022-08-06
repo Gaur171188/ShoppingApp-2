@@ -102,7 +102,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt "androidx.room:room-compiler:$room_version"
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.4.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1'
 
     // RecyclerView - beta with ConcatAdapter (previously MergeAdapter)
     implementation "androidx.recyclerview:recyclerview:1.2.1"
@@ -118,6 +118,13 @@ dependencies {
     implementation "org.koin:koin-android-ext:$koin_version"
 
 
-//    // country picker
-    implementation 'com.hbb20:ccp:2.6.1'
+    // country picker
+    implementation "com.hbb20:ccp:2.6.1"
+
+
+    // location
+    implementation "com.github.BirjuVachhani:locus-android:4.1.0"
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
+
+
 }

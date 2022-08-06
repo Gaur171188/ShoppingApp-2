@@ -1,6 +1,7 @@
 import com.shoppingapp.info.screens.favorites.FavoritesViewModel
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.screens.product_details.ProductDetailsViewModel
+import com.shoppingapp.info.screens.select_address.SelectAddressViewModel
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -51,6 +52,7 @@ val viewModelModules = module {
     viewModel { HomeViewModel() }
     viewModel { FavoritesViewModel() }
     viewModel { ProductDetailsViewModel() }
+    viewModel { SelectAddressViewModel() }
 }
 
 

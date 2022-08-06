@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="cities">
+
+        <item>Tripoli</item>
+        <item>Bengazi</item>
+        <item>Misrata</item>
+        <item>Al Bayda</item>
+        <item>Misrata</item>
+        <item>Zawiya</item>
+        <item>Zliten</item>
+        <item>Ajdabiya</item>
+        <item>Tobruk</item>
+        <item>Ajdabiya</item>
+        <item>Derna</item>
+        <item>Sabha</item>
+        <item>Khoms</item>
+        <item>Zuwara</item>
+        <item>Khufra</item>
+        <item>Marj</item>
+        <item>Tajura</item>
+        <item>Tarhuna</item>
+        <item>Sirte</item>
+        <item>Gharyan</item>
+        <item>Msallata</item>
+        <item>Bani Walid</item>
+        <item>Sorman</item>
+        <item>Al-Uruba</item>
+        <item>Al Gseibat</item>
+        <item>Shahhat</item>
+        <item>Ubari</item>
+        <item>Jadid</item>
+        <item>El Agheila</item>
+        <item>Abyar</item>
+        <item>Nofaliya</item>
+        <item>Regdalin</item>
+        <item>Gasr Akhyar</item>
+        <item>All Qubah</item>
+        <item>Tawergha</item>
+        <item>Al Maya</item>
+        <item>Murzuk</item>
+        <item>Brega</item>
+        <item>Teghsat</item>
+        <item>Hun</item>
+        <item>Jalu</item>
+        <item>Sabratha</item>
+        <item>Al Ujeilat</item>
+        <item>Nalut</item>
+        <item>Suluq</item>
+        <item>Zaltan</item>
+        <item>Mizda</item>
+        <item>Waddan</item>
+<!--        <item>Ra's Lanuf</item>-->
+        <item>Al Urban</item>
+        <item>Yafran</item>
+        <item>Ar Rayaniya</item>
+        <item>Umm al Rizam</item>
+        <item>Taucheira</item>
+        <item>Brak</item>
+        <item>Abu Ghlasha</item>
+        <item>Ad Dawoon</item>
+        <item>Teji</item>
+        <item>Qaminis</item>
+        <item>Qatrun</item>
+        <item>Benina</item>
+        <item>Kikla</item>
+        <item>Al Rheibat</item>
+        <item>Sokna</item>
+        <item>Massa</item>
+        <item>Bin Jawad</item>
+        <item>Um al Aranib</item>
+        <item>Jadu</item>
+        <item>Ghadames</item>
+        <item>Ar Rabata</item>
+        <item>Sidi Khalifa</item>
+        <item>Ghat</item>
+        <item>Ar Rabta</item>
+        <item>Jadu</item>
+        <item>Al Abraq</item>
+        <item>Awjila</item>
+        <item>Ras al Hamam</item>
+        <item>Zella</item>
+        <item>Wadi Utba</item>
+        <item>Al Barkat</item>
+        <item>Martuba</item>
+        <item>Traghan</item>
+        <item>Al Hashan</item>
+        <item>Qayqab</item>
+        <item>El Bayyada</item>
+        <item>Qayqab</item>
+        <item>Mashashita</item>
+        <item>Bu-Fakhra</item>
+        <item>Musaid</item>
+        <item>Tacnis</item>
+        <item>Susa</item>
+        <item>Batta</item>
+        <item>Farzougha</item>
+<!--        <item>Qaryat 'Umar al Mukhtar</item>-->
+<!--        <item>Bi'r al Ashhab</item>-->
+
+    </string-array>
+
+</resources>

@@ -95,13 +95,13 @@
         android:label="fragment_cart"
         tools:layout="@layout/cart">
         <action
-            android:id="@+id/action_cart_to_selectPayment"
-            app:destination="@id/selectPayment" />
-        <action
             android:id="@+id/action_cart_to_product_details"
             app:destination="@id/productDetails"
             app:popUpTo="@id/productDetails"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_cart_to_selectAddress"
+            app:destination="@id/selectAddress" />
     </fragment>
     <fragment
         android:id="@+id/favorites"
@@ -141,6 +141,9 @@
         <argument
             android:name="orderId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_orderDetails_to_selectPayment"
+            app:destination="@id/selectPayment" />
     </fragment>
     <fragment
         android:id="@+id/home"
@@ -164,5 +167,9 @@
         android:id="@+id/selectAddress"
         android:name="com.shoppingapp.info.screens.select_address.SelectAddress"
         android:label="SelectAddress"
-        tools:layout="@layout/select_address"/>
+        tools:layout="@layout/select_address">
+        <action
+            android:id="@+id/action_selectAddress_to_orderDetails"
+            app:destination="@id/orderDetails" />
+    </fragment>
 </navigation>

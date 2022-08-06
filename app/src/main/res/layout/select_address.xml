@@ -14,14 +14,12 @@
         tools:context=".screens.select_address.SelectAddress">
 
 
-
         <include
             android:id="@+id/loader_layout"
             layout="@layout/circular_loader_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone" />
-
 
 
 
@@ -64,7 +62,7 @@
                     app:placeholderTextAppearance="@style/TextAppearance.MyTheme.Body2">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/signup_name"
+                        android:id="@+id/name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
@@ -91,13 +89,41 @@
                     app:placeholderTextAppearance="@style/TextAppearance.MyTheme.Body2">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/signup_phone"
+                        android:id="@+id/phone"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="phone"
                         android:paddingTop="12dp"
                         android:paddingBottom="12dp" />
                 </com.google.android.material.textfield.TextInputLayout>
+
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="24dp"
+                    android:hint="@string/street"
+                    app:expandedHintEnabled="false"
+                    app:hintTextAppearance="@style/TextAppearance.MyTheme.Subtitle2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/nameOutlinedTextField"
+                    app:placeholderText="Your Street"
+                    app:placeholderTextAppearance="@style/TextAppearance.MyTheme.Body2">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/street"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
+                        android:paddingTop="12dp"
+                        android:paddingBottom="12dp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
 
 
 
@@ -112,14 +138,14 @@
                     android:layout_marginStart="24dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginEnd="20dp"
-                    android:hint="Select Country"
+                    android:hint="Select City"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/emailOutlinedTextField"
                     app:boxStrokeColor="@color/blue_accent_300">
 
                     <AutoCompleteTextView
-                        android:id="@+id/city"
+                        android:id="@+id/selectCity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:dropDownHeight="240dp"
@@ -130,7 +156,6 @@
                         android:textStyle="bold" />
 
                 </com.google.android.material.textfield.TextInputLayout>
-
 
 
                 <TextView
@@ -297,7 +322,7 @@
 
 
         <Button
-            android:id="@+id/add_address_save_btn"
+            android:id="@+id/btn_Next"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

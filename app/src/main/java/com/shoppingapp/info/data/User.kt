@@ -44,7 +44,7 @@ data class User(
 
 
     @Parcelize
-    data class OrderItem(
+    data class OrderItem (
         var orderId: String = "",
         var customerId: String = "",
         var items: List<CartItem> = ArrayList(),
@@ -101,17 +101,16 @@ data class User(
     @Parcelize
     data class Address (
         var addressId: String = "",
-        var firstName: String = "",
-        var lastName: String = "",
+        var name: String = "",
         var streetAddress: String = "",
         var city: String = "",
+        var location: Location = Location(),
         var phoneNumber: String = ""
     ) : Parcelable {
         fun toHashMap(): HashMap<String, String> {
             return hashMapOf(
                 "addressId" to addressId,
-                "firstName" to firstName,
-                "lastName" to lastName,
+                "name" to name,
                 "streetAddress" to streetAddress,
                 "city" to city,
                 "phoneNumber" to phoneNumber

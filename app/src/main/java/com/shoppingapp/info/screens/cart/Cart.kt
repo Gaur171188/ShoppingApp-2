@@ -114,16 +114,19 @@ class Cart : Fragment() {
 
 
     private fun setViews() {
+        binding.apply {
 
-        binding.cartAppBar.topAppBar.title = getString(R.string.cart_fragment_label)
+            cartAppBar.topAppBar.title = getString(R.string.cart_fragment_label)
 
-        /** swipe refresh cart items **/
-        binding.swipeRefreshCartItems.setOnRefreshListener {
-            loadData()
-        }
+            /** swipe refresh cart items **/
+            swipeRefreshCartItems.setOnRefreshListener {
+                loadData()
+            }
 
-        binding.btnNext.setOnClickListener {
-            navigateToSelectAddress()
+            btnNext.setOnClickListener {
+                findNavController().navigate(R.id.action_cart_to_selectAddress)
+            }
+
         }
 
 
@@ -229,9 +232,6 @@ class Cart : Fragment() {
 
 
 
-    private fun navigateToSelectAddress() {
-//   navigateToSelectAddress  navigateToSelectAddress   findNavController().navigate(R.id.action_cart)
-    }
 
 
     private fun showDeleteDialog(itemId: String) {
