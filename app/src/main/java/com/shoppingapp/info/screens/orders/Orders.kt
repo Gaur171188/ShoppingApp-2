@@ -33,6 +33,11 @@
 //        binding = DataBindingUtil.inflate(inflater, R.layout.orders, container, false)
 //
 //
+
+
+
+// you mast pass the order data into order details
+
 //        setViews()
 //        setObservers()
 //

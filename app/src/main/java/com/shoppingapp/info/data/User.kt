@@ -27,6 +27,7 @@ data class User(
     @TypeConverters(ObjectListTypeConvertor::class)
     var orders: List<OrderItem> = ArrayList(),
     var userType: String = UserType.CUSTOMER.name,
+    var wallet: Wallet = Wallet(),
     var country: String? = null
 ): Parcelable{
 
@@ -41,6 +42,22 @@ data class User(
             "userType" to userType
         )
     }
+
+
+    @Parcelize
+    data class Wallet(
+        var balance: Int? = 0,
+        var promotional: Int? = 0,
+    ): Parcelable {
+        fun toHashMap(): HashMap<String, Any> {
+            return hashMapOf(
+              "balance" to balance!!,
+                "promotional" to promotional!!
+            )
+        }
+    }
+
+
 
 
     @Parcelize

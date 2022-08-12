@@ -3,6 +3,7 @@ package com.shoppingapp.info.utils
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.graphics.Color
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
@@ -81,8 +82,9 @@ fun setQuantity(tv: TextView, quantity: Int){
 }
 
 @BindingAdapter("setPrice")
-fun setPrice(tv: TextView, v: Double){
-    tv.text = "$ $v"
+fun setPrice(tv: TextView, v: Double) {
+    val price = v.toInt()
+    tv.text = "$price DLY"
 }
 
 @BindingAdapter("setOrderDate")

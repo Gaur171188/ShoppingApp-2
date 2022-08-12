@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:context=".screens.select_payment.Profile">
+        tools:context=".screens.payment.Profile">
 
         <include
             android:id="@+id/profile_top_app_bar"

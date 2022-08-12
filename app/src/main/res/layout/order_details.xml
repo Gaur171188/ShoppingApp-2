@@ -7,30 +7,28 @@
 
     </data>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         tools:context=".screens.order_details.OrderDetails">
 
         <include
             android:id="@+id/order_detail_app_bar"
             layout="@layout/layout_top_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
+            android:layout_height="wrap_content" />
 
         <include
             android:id="@+id/loader_layout"
             layout="@layout/circular_loader_layout"
             android:visibility="gone"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/order_detail_app_bar" />
+            android:layout_height="match_parent" />
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/order_detail_app_bar"
+            android:layout_marginTop="?actionBarSize"
             android:fillViewport="true"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -47,7 +45,7 @@
                     app:constraint_referenced_ids="order_details_payment_label_tv,
                 order_details_pro_label_tv,order_details_ship_label_tv,
                 paymentDetails,orderDetails,
-                products_RecyclerView,btn_order_change_status" />
+                products_RecyclerView" />
 
                 <TextView
                     android:id="@+id/order_details_pro_label_tv"
@@ -99,19 +97,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/products_RecyclerView" />
 
-                <ImageButton
-                    android:id="@+id/btn_order_change_status"
-                    android:layout_width="35dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="16dp"
-                    android:backgroundTint="@color/blue_accent_300"
-                    android:contentDescription="@string/change_order_status_button"
-                    android:scaleType="centerCrop"
-                    app:layout_constraintBottom_toBottomOf="@+id/order_details_ship_label_tv"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/order_details_ship_label_tv"
-                    app:srcCompat="@drawable/ic_edit_24"
-                    app:tint="@color/white" />
 
                 <include
                     android:id="@+id/orderDetails"
@@ -156,5 +141,23 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.core.widget.NestedScrollView>
-    </RelativeLayout>
+
+
+        <Button
+            android:id="@+id/btn_Next"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/blue_accent_300"
+            android:padding="16dp"
+            android:text="@string/next"
+            android:layout_gravity="bottom"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </FrameLayout>
 </layout>

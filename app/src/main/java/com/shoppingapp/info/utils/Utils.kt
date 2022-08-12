@@ -72,6 +72,17 @@ internal fun getProductId(ownerId: String): String {
 //    return "pro-$proCategory-$ownerId-$uniqueId"
 }
 
+internal fun getOrderId(): String {
+    val uniqueId = UUID.randomUUID().toString()
+    return "$uniqueId"
+}
+
+internal fun getAddressId(): String {
+    val uniqueId = UUID.randomUUID().toString()
+    return "$uniqueId"
+}
+
+
 
 
 

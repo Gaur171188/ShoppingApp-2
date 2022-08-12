@@ -31,6 +31,10 @@ class HomeViewModel(): ViewModel() {
     private val _userData = MutableLiveData<User?>()
     val userData: LiveData<User?> = _userData
 
+    private val _balance = MutableLiveData<Int?>()
+    val balance: LiveData<Int?> = _balance
+
+
     /** progress **/
     private val _productsStatus = MutableLiveData<DataStatus>()
     val productsStatus: LiveData<DataStatus> = _productsStatus
@@ -85,14 +89,11 @@ class HomeViewModel(): ViewModel() {
     val isProductLiked: LiveData<Boolean> = _isProductLiked
 
 
-
     private val _totalItemsPrice = MutableLiveData<Double>()
     val totalItemsPrice: LiveData<Double> = _totalItemsPrice
 
     private val _quantityCount = MutableLiveData<Int?>()
     val quantityCount: LiveData<Int?> = _quantityCount
-
-
 
 
 
@@ -142,10 +143,8 @@ class HomeViewModel(): ViewModel() {
 
 
 
-
     private val _orders= MutableLiveData<List<User.OrderItem>?>()
     val orders: LiveData<List<User.OrderItem>?> = _orders
-
 
 
 
@@ -167,8 +166,10 @@ class HomeViewModel(): ViewModel() {
             _userData.value = user
             val likes = user?.likes
             val cart = user?.cart
+            val balance = user?.wallet?.balance
             _userLikes.value = likes
             _cartItems.value = cart
+            _balance.value = balance
 
             productRepository.getProducts()
                 .addOnSuccessListener {

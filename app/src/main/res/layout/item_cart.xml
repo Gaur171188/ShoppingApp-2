@@ -102,13 +102,14 @@
                 android:contentDescription="@string/remove_product_button"
                 android:onClick="@{onDeleteClick}"
                 android:visibility="gone"
-                tools:visibility="visible"
                 setUserState="@{isSeller}"
+                tools:visibility="visible"
                 android:scaleType="fitXY"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_delete_24"
-                app:tint="@color/gray" />
+                app:tint="@color/gray"
+                />
 
             <TextView
                 android:id="@+id/cart_product_price"

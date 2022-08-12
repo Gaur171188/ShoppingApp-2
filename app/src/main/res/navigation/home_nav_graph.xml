@@ -11,7 +11,7 @@
         android:label="fragment_orders"
         tools:layout="@layout/orders">
         <action
-            android:id="@+id/action_orders_to_orderDetailsFragment"
+            android:id="@+id/action_orders_to_orderDetails"
             app:destination="@id/orderDetails" />
     </fragment>
     <fragment
@@ -36,14 +36,14 @@
             app:destination="@id/home" />
     </fragment>
     <fragment
-        android:id="@+id/selectPayment"
-        android:name="com.shoppingapp.info.screens.select_payment.SelectPayment"
+        android:id="@+id/payment"
+        android:name="com.shoppingapp.info.screens.payment.Payment"
         android:label="fragment_select_payment"
-        tools:layout="@layout/select_payment">
+        tools:layout="@layout/payment">
         <action
             android:id="@+id/action_selectPaymentFragment_to_orderSuccessFragment2"
             app:destination="@id/orderSuccess"
-            app:popUpTo="@id/selectPayment"
+            app:popUpTo="@id/payment"
             app:popUpToInclusive="true" />
     </fragment>
     <action
@@ -136,14 +136,15 @@
         app:destination="@id/addEditProduct" />
     <fragment
         android:id="@+id/orderDetails"
-        android:label="fragment_order_details"
+        android:label="order_details"
+        android:name="com.shoppingapp.info.screens.order_details.OrderDetails"
         tools:layout="@layout/order_details">
         <argument
             android:name="orderId"
             app:argType="string" />
         <action
-            android:id="@+id/action_orderDetails_to_selectPayment"
-            app:destination="@id/selectPayment" />
+            android:id="@+id/action_orderDetails_to_payment"
+            app:destination="@id/payment" />
     </fragment>
     <fragment
         android:id="@+id/home"
