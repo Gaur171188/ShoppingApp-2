@@ -6,12 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.PaymentBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.Constants
+import com.shoppingapp.info.utils.DataStatus
+import com.shoppingapp.info.utils.hide
+import com.shoppingapp.info.utils.show
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
@@ -24,14 +28,18 @@ class Payment: Fragment() {
 
     private lateinit var binding: PaymentBinding
     private lateinit var order: User.OrderItem
+    private var orderPrice = 0
 
-    private val homeViewModel by sharedViewModel<HomeViewModel>()
+    private val hViewModel by sharedViewModel<HomeViewModel>()
+    private lateinit var viewModel: PaymentViewModel
     private var myBalance: Int? = null
+
+    private var userId = ""
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.payment, container, false)
-
+        viewModel = ViewModelProvider(this)[PaymentViewModel::class.java]
 
 
 
@@ -45,6 +53,40 @@ class Payment: Fragment() {
 
     private fun setObserves() {
 
+        binding.apply {
+
+
+            /** pay status **/
+            viewModel.payStatus.observe(viewLifecycleOwner){ status->
+                if (status != null){
+                    when(status){
+                        DataStatus.LOADING -> { loader.root.show() }
+                        DataStatus.SUCCESS -> {
+                            loader.root.hide()
+                            findNavController().navigate(R.id.action_payment_to_orderSuccess)
+                        }
+                        DataStatus.ERROR -> { loader.root.hide() }
+                    }
+                }else{
+                    loader.root.hide()
+                }
+            }
+
+            /** error message **/
+            viewModel.errorMessage.observe(viewLifecycleOwner){ message->
+                if (message != null){
+                    paymentError.text = message
+                    paymentError.show()
+                }else{
+                    paymentError.hide()
+                }
+            }
+
+
+        }
+
+
+
     }
 
 
@@ -57,8 +99,9 @@ class Payment: Fragment() {
 
             // set price and balance
             payment.apply {
-                price = 54
-                balance = myBalance
+                payment.homeViewModel = hViewModel
+//                price = orderPrice
+//                balance = myBalance
             }
 
 
@@ -68,11 +111,9 @@ class Payment: Fragment() {
             }
 
 
-
             /** button pay now **/
             btnPayNow.setOnClickListener {
-
-
+                viewModel.pay(myBalance!!, orderPrice, order, userId)
             }
 
 
@@ -84,8 +125,11 @@ class Payment: Fragment() {
         order = try { arguments?.getParcelable(Constants.KEY_ORDER)!! }
         catch (ex: Exception){ User.OrderItem() }
 
-        val balance = homeViewModel.balance.value ?: 0
+        val balance = hViewModel.balance.value ?: 0
         myBalance = balance
+
+        orderPrice = (hViewModel.totalItemsPrice.value ?: 0.0).toInt()
+        userId = hViewModel.userData.value?.userId!!
 
     }
 

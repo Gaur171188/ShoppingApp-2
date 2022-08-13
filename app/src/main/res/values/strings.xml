@@ -116,6 +116,9 @@
     <string name="pay_now">Pay Now</string>
     <string name="price">Price</string>
     <string name="my_balance">My Balance</string>
+    <string name="add_balance">Add Balance</string>
+    <string name="signout">SignOut</string>
+    <string name="my_wallet">My Wallet</string>
 
 
 </resources>

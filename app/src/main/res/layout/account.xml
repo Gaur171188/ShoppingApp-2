@@ -7,26 +7,28 @@
 
     </data>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         tools:context="com.shoppingapp.info.screens.add_edit_product.Account">
+
+
 
         <include
             android:id="@+id/account_top_app_bar"
             layout="@layout/app_bar_label_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
+            android:layout_height="wrap_content" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/account_top_app_bar">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/app_bar_height"
+            android:orientation="vertical" >
 
             <TextView
                 android:id="@+id/btn_profile"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
@@ -35,18 +37,15 @@
                 android:gravity="center_vertical"
                 android:includeFontPadding="false"
                 android:padding="16dp"
-                android:text="Profile"
+                android:text="@string/profile"
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:drawableStartCompat="@drawable/person_account_drawable"
-                app:drawableTint="@color/blue_accent_300"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:drawableTint="@color/blue_accent_300" />
+
 
             <View
-                android:id="@+id/divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="?android:attr/listDivider"
@@ -54,8 +53,8 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/btn_signout"
-                android:layout_width="0dp"
+                android:id="@+id/btn_Wallet"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="?attr/selectableItemBackground"
@@ -65,16 +64,46 @@
                 android:gravity="center_vertical"
                 android:includeFontPadding="false"
                 android:padding="16dp"
-                android:text="SignOut"
+                android:text="@string/my_wallet"
+                android:textAppearance="@style/TextAppearance.MyTheme.Body1"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:drawableStartCompat="@drawable/ic_wallet"
+                app:drawableTint="@color/blue_accent_300" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintBottom_toTopOf="@+id/btn_profile"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+
+            <TextView
+                android:id="@+id/btn_signOut"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:drawablePadding="16dp"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:includeFontPadding="false"
+                android:padding="16dp"
+                android:text="@string/signout"
                 android:textAppearance="@style/TextAppearance.MyTheme.Body1"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:drawableStartCompat="@drawable/signout_account_drawable"
-                app:drawableTint="@color/blue_accent_300"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btn_profile" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </RelativeLayout>
+                app:drawableTint="@color/blue_accent_300" />
+
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+
+
 </layout>

@@ -41,7 +41,7 @@
         android:label="fragment_select_payment"
         tools:layout="@layout/payment">
         <action
-            android:id="@+id/action_selectPaymentFragment_to_orderSuccessFragment2"
+            android:id="@+id/action_payment_to_orderSuccess"
             app:destination="@id/orderSuccess"
             app:popUpTo="@id/payment"
             app:popUpToInclusive="true" />
@@ -88,6 +88,9 @@
         <action
             android:id="@+id/action_accountFragment_to_orders4"
             app:destination="@id/orders" />
+        <action
+            android:id="@+id/action_account_to_wallet"
+            app:destination="@id/wallet" />
     </fragment>
     <fragment
         android:id="@+id/cart"
@@ -118,7 +121,7 @@
         android:label="fragment_order_success"
         tools:layout="@layout/order_success">
         <action
-            android:id="@+id/action_orderSuccessFragment_to_home"
+            android:id="@+id/action_success_to_home"
             app:destination="@id/home" />
     </fragment>
 
@@ -173,4 +176,8 @@
             android:id="@+id/action_selectAddress_to_orderDetails"
             app:destination="@id/orderDetails" />
     </fragment>
+    <fragment
+        android:id="@+id/wallet"
+        android:name="com.shoppingapp.info.screens.wallet.Wallet"
+        android:label="Wallet" />
 </navigation>

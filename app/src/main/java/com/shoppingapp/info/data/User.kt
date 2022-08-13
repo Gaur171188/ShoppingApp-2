@@ -28,7 +28,7 @@ data class User(
     var orders: List<OrderItem> = ArrayList(),
     var userType: String = UserType.CUSTOMER.name,
     var wallet: Wallet = Wallet(),
-    var country: String? = null
+    var country: String = ""
 ): Parcelable{
 
     fun toHashMap(): HashMap<String, Any> {
@@ -39,10 +39,17 @@ data class User(
             "mobile" to phone,
             "password" to password,
             "likes" to likes,
-            "userType" to userType
+            "cart" to cart,
+            "orders" to orders,
+            "userType" to userType,
+            "wallet" to wallet,
+            "country" to country
+
         )
     }
 
+
+    // todo: do not forget to add wallet screen to add data.
 
     @Parcelize
     data class Wallet(

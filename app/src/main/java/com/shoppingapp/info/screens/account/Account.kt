@@ -59,14 +59,16 @@ class Account : Fragment() {
 
             /** button profile **/
             btnProfile.setOnClickListener {
-                Log.d(TAG, "Profile Selected")
                 findNavController().navigate(R.id.action_accountFragment_to_profileFragment)
             }
 
+            /** button go to wallet **/
+            btnWallet.setOnClickListener {
+                findNavController().navigate(R.id.action_account_to_wallet)
+            }
 
             /** button sign out **/
-            btnSignout.setOnClickListener {
-                Log.d(TAG, "Sign Out Selected")
+            btnSignOut.setOnClickListener {
                 showSignOutDialog()
             }
 

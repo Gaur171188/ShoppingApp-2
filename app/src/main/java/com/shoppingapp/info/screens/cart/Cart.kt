@@ -123,8 +123,15 @@ class Cart : Fragment() {
                 loadData()
             }
 
+
+            /** button next **/
             btnNext.setOnClickListener {
                 findNavController().navigate(R.id.action_cart_to_selectAddress)
+            }
+
+            /** back button **/
+            cartAppBar.topAppBar.setOnClickListener {
+                findNavController().navigateUp()
             }
 
         }

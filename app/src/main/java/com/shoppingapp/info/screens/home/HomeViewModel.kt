@@ -55,7 +55,6 @@ class HomeViewModel(): ViewModel() {
 
 
 
-
 //    private val _itemsPrice = MutableLiveData<Map<String, Double>>()
 //    val itemsPrice: LiveData<Map<String, Double>> = _itemsPrice
 //
@@ -135,7 +134,7 @@ class HomeViewModel(): ViewModel() {
 //    val user: LiveData<User?> get() = _user
 
     private val _errorMessage = MutableLiveData<String?>()
-    val errorMessage: LiveData<String?> get() = _errorMessage
+    val errorMessage: LiveData<String?> = _errorMessage
 
     private val _isConnected = MutableLiveData<Boolean>()
     val isConnected: LiveData<Boolean> get() = _isConnected
@@ -277,6 +276,7 @@ class HomeViewModel(): ViewModel() {
             totalPrice += price * (_cartItems.value?.find { it.itemId == itemId }?.quantity ?: 1)
         }
          _totalItemsPrice.value = totalPrice
+
         return totalPrice
     }
 

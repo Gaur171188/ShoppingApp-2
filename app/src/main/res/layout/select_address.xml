@@ -157,6 +157,12 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
 
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"/>
+
+
+
                 <TextView
                     android:id="@+id/signup_error_message"
                     android:layout_width="wrap_content"

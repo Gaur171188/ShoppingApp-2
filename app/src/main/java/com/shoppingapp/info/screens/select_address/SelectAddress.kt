@@ -18,10 +18,9 @@ import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.SelectAddressBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
-import com.shoppingapp.info.utils.Constants
+import com.shoppingapp.info.utils.*
 import com.shoppingapp.info.utils.getAddressId
 import com.shoppingapp.info.utils.getOrderId
-import com.shoppingapp.info.utils.showMessage
 import org.koin.android.ext.android.bind
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
@@ -109,8 +108,6 @@ class SelectAddress : Fragment() {
                 sendData()
             }
 
-//            // set the libyan cities
-//            initCities()
 
         }
 
@@ -153,7 +150,10 @@ class SelectAddress : Fragment() {
 
             if (viewModel.mCity.value.isNullOrEmpty()) {
                 showMessage(requireContext(),"Please Select City")
-            }else {
+            }
+            if (viewModel.location.value == null){
+                // need a litte time until location load
+            } else {
                 val address = User.Address(
                     getAddressId(),
                     viewModel.mName.value.toString(),

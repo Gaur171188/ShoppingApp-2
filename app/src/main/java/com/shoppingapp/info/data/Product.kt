@@ -17,8 +17,8 @@ data class Product (
     var category: String = "",
     var price: Double = 0.0,
     var mrp: Double = 0.0,
-    var availableSizes: List<Int> = ArrayList(),
-    var availableColors: List<String> = ArrayList(),
+    var availableSizes: List<Int?> = ArrayList(),
+    var availableColors: List<String?> = ArrayList(),
     var images: List<String> = ArrayList(),
     var rating: Double = 0.0
 ): Parcelable {

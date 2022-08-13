@@ -4,7 +4,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -22,7 +21,9 @@ import com.shoppingapp.info.ShoeColors
 import com.shoppingapp.info.ShoeSizes
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.AddEditProductBinding
+import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.*
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 import kotlin.properties.Delegates
 
 
@@ -35,6 +36,7 @@ class AddEditProduct : Fragment() {
 
     private lateinit var binding: AddEditProductBinding
     private lateinit var viewModel: AddEditProductViewModel
+    private val homeViewModel by sharedViewModel<HomeViewModel>()
     private val focusChangeListener = MyOnFocusChangeListener()
 
     // arguments
@@ -42,8 +44,7 @@ class AddEditProduct : Fragment() {
     private lateinit var catName: String
     private lateinit var product: Product
 
-    var userId = ""
-
+    private var userId = ""
 
     private var sizeList = mutableSetOf<Int>()
     private var colorsList = mutableSetOf<String>()
@@ -72,8 +73,9 @@ class AddEditProduct : Fragment() {
         catch (ex: Exception){ Product() }
 
 
-        val sharePrefManager = SharePrefManager(requireContext())
-        userId = sharePrefManager.getUserIdFromSession()!!
+//        val sharePrefManager = SharePrefManager(requireContext())
+//        userId = sharePrefManager.getUserIdFromSession()!!
+        userId = homeViewModel.userData.value!!.userId
 
 
         showMessage(requireContext(),"colors: ${product.availableColors.size} ,sizes: ${product.availableSizes.size} ")
@@ -281,7 +283,7 @@ class AddEditProduct : Fragment() {
 
     }
 
-    private fun setShoeSizesChips(shoeList: List<Int>) {
+    private fun setShoeSizesChips(shoeList: List<Int?>) {
         binding.addProductSizeChipGroup.apply {
             removeAllViews()
             for ((_, v) in ShoeSizes) {
@@ -312,7 +314,7 @@ class AddEditProduct : Fragment() {
         }
     }
 
-    private fun setShoeColorsChips(colorList: List<String>? = emptyList()) {
+    private fun setShoeColorsChips(colorList: List<String?> = emptyList()) {
         binding.addProductColorChipGroup.apply {
             removeAllViews()
             var ind = 1

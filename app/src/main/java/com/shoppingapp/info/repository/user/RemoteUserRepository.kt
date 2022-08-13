@@ -11,11 +11,11 @@ import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.UserType
-import kotlinx.coroutines.async
-import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import java.lang.IndexOutOfBoundsException
 
+@OptIn(DelicateCoroutinesApi::class)
 class RemoteUserRepository() {
 
     private val fireStore by lazy { FirebaseFirestore.getInstance() }
@@ -138,63 +138,35 @@ class RemoteUserRepository() {
 
 
 
-    suspend fun insertOrder(order: User.OrderItem) {
 
+     suspend fun insertOrder(order: User.OrderItem, userId: String): Task<Void> {
         // owner
         val ownerId = order.items[0].ownerId
-        val ownerRef = usersPath().document(ownerId).get().await()
-        if (ownerRef != null){
-            usersPath().document(ownerId)
-                .update(ORDERS_FIELD, FieldValue.arrayUnion(order))
-        }
-
-        // customer
-        val customer = usersPath().document(order.customerId).get().await()
-        if (customer != null){
-            usersPath().document(ownerId)
-                .update(ORDERS_FIELD, FieldValue.arrayUnion(order))
-        }
-
-    }
-
-
-    suspend fun deleteOrder(order: User.OrderItem) {
-
-        // owner
-        val ownerId = order.items[0].ownerId
-        val ownerRef = usersPath().document(ownerId).get().await()
-        if (ownerRef != null){
-            usersPath().document(ownerId)
-                .update(ORDERS_FIELD, FieldValue.arrayRemove(order))
-        }
-
-        // customer
-        val customer = usersPath().document(order.customerId).get().await()
-        if (customer != null){
-            usersPath().document(ownerId)
-                .update(ORDERS_FIELD, FieldValue.arrayRemove(order))
-        }
-
-    }
-
-
-    suspend fun checkPassByUserId(userId: String ,password: String,onComplete: (Boolean) -> Unit) {
-        val ref = usersPath().whereEqualTo(USER_ID_FIELD,userId).get().await()
-        if (ref != null){
-            try {
-                val user = ref.toObjects(User::class.java)[0]
-                Log.i("Login","email: ${user.email}")
-                if (user.password == password){
-                    onComplete(true)
-                }else{
-                    onComplete(false)
+        return usersPath().document(ownerId)
+            .update(ORDERS_FIELD, FieldValue.arrayUnion(order))
+            .addOnSuccessListener {
+                // remove cart items from customer after send the order to owner
+                order.items.forEach { item->
+                    GlobalScope.launch(Dispatchers.IO) {
+                        removeCartItem(item.itemId,userId).await()
+                    }
                 }
-            }catch (ex: IndexOutOfBoundsException){
-                onComplete(false)
-            }
 
-        }
+//                // customer
+//                usersPath().document(ownerId)
+//                    .update(ORDERS_FIELD, FieldValue.arrayUnion(order))
+            }
     }
+
+
+     suspend fun deleteOrder(order: User.OrderItem): Task<Void> {
+        // owner
+        val ownerId = order.items[0].ownerId
+        return  usersPath().document(ownerId)
+            .update(ORDERS_FIELD, FieldValue.arrayRemove(order))
+    }
+
+
 
     suspend fun checkUserIsExist(email: String, isExist:(Boolean) -> Unit, onError:(String) -> Unit) {
             FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email).addOnCompleteListener {
@@ -214,9 +186,16 @@ class RemoteUserRepository() {
 
 
 
+    suspend fun updateUser(user: User) = usersPath().document(user.userId).update(user.toHashMap())
+
+
     private fun addUser(user: User) = usersPath().document(user.userId).set(user)
 
-    suspend fun deleteUser(userId: String) { usersPath().document(userId).delete().await() }
+    suspend fun deleteUser(userId: String) {
+
+        // if you want to delete user you must remove all data too, (products ,orders)
+        usersPath().document(userId).delete().await()
+    }
 
     suspend fun getUserById(userId: String) = usersPath().document(userId).get().await()
             .toObject(User::class.java)
@@ -230,7 +209,8 @@ class RemoteUserRepository() {
             Result.Error(Exception("User Not Found!"))
         }
     }
-//
+
+
 //    // return list of product id
 //    suspend fun getStuckLikes(userId: String, products: List<Product>): List<String> {
 //        var diff: List<String> = emptyList()
@@ -291,7 +271,7 @@ class RemoteUserRepository() {
     }
 
 
-    suspend fun insertCartItem(newItem: User.CartItem, userId: String): Task<Void> {
+     suspend fun insertCartItem(newItem: User.CartItem, userId: String): Task<Void> {
         val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
         val docId = userRef.documents[0].id
         return usersPath().document(docId)
@@ -303,8 +283,7 @@ class RemoteUserRepository() {
         val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
 
         val docId = userRef.documents[0].id
-        val oldCart =
-            userRef.documents[0].toObject(User::class.java)?.cart?.toMutableList()
+        val oldCart = userRef.documents[0].toObject(User::class.java)?.cart?.toMutableList()
         val idx = oldCart?.indexOfFirst { it.itemId == itemId } ?: -1
         if (idx != -1) {
             oldCart?.removeAt(idx)

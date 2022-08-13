@@ -18,6 +18,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <include
+            android:id="@+id/loader"
+            layout="@layout/circular_loader_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
 
 
         <LinearLayout
@@ -27,7 +35,7 @@
 
             <include
                 android:id="@+id/payment"
-                layout="@layout/wallet"
+                layout="@layout/item_wallet"
                 android:layout_margin="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="200dp" />
@@ -46,7 +54,7 @@
 
 
             <TextView
-                android:id="@+id/error_Message"
+                android:id="@+id/payment_Error"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"

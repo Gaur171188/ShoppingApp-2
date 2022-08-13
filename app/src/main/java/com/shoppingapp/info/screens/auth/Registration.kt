@@ -15,10 +15,7 @@ import com.hbb20.CountryCodePicker.OnCountryChangeListener
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.RegistrationBinding
-import com.shoppingapp.info.utils.DataStatus
-import com.shoppingapp.info.utils.UserType
-import com.shoppingapp.info.utils.hide
-import com.shoppingapp.info.utils.show
+import com.shoppingapp.info.utils.*
 
 
 class Registration : Fragment() {
@@ -32,6 +29,7 @@ class Registration : Fragment() {
     private var password = ""
     private var name = ""
     private var phone = ""
+    private var country = ""
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -44,19 +42,21 @@ class Registration : Fragment() {
 
         binding.apply {
 
-            selectCountry.setOnCountryChangeListener {
-                Toast.makeText(context, "Updated " + selectCountry.selectedCountryCode, Toast.LENGTH_SHORT).show()
 
+            /** select country **/
+            selectCountry.setOnCountryChangeListener {
+                country = selectCountry.selectedCountryName // set country name
             }
 
 
 
-
+            /** button login **/
             btnLogin.setOnClickListener {
                 findNavController().navigate(R.id.action_registration_to_login)
             }
 
 
+            /** button sign up **/
             btnSignup.setOnClickListener {
 
                 name = signupName.text!!.trim().toString()
@@ -114,6 +114,9 @@ class Registration : Fragment() {
                         binding.signupPassword.error = "6 char required!"
                         binding.signupPassword.requestFocus()
                         return@setOnClickListener
+                    }
+                    if (country.isEmpty()){
+                        showMessage(requireContext(),"please select your country")
                     }
 
                     if (signupPolicySwitch.isChecked){
