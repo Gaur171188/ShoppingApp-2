@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="homeViewModel"
+            type="com.shoppingapp.info.screens.home.HomeViewModel" />
+
     </data>
 
     <FrameLayout
@@ -21,6 +25,7 @@
             android:layout_gravity="bottom|end"
             android:visibility="gone"
             tools:visibility="visible"
+            setAddProductButtonStatus="@{homeViewModel.isUserSeller()}"
             android:contentDescription="@string/add_product"
             app:srcCompat="@drawable/ic_add_48" />
 
@@ -29,11 +34,7 @@
             layout="@layout/circular_loader_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"

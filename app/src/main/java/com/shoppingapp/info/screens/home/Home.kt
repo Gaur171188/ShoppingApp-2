@@ -1,5 +1,3 @@
-
-
 package com.shoppingapp.info.screens.home
 
 import android.annotation.SuppressLint
@@ -37,27 +35,18 @@ class Home : Fragment() {
 
     private lateinit var binding: HomeBinding
     private val viewModel by sharedViewModel<HomeViewModel>()
-//    private val favoritesViewModel by sharedViewModel<FavoritesViewModel>()
-    private lateinit var favoritesViewModel: FavoritesViewModel
+
+//    private lateinit var favoritesViewModel: FavoritesViewModel
 
     private val focusChangeListener = MyOnFocusChangeListener()
 
     private val productController by lazy { ProductController() }
 
 
-    private var userId = ""
-    private var isUserSeller: Boolean? = null
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(layoutInflater,R.layout.home,container,false)
-        favoritesViewModel = ViewModelProvider(this)[FavoritesViewModel::class.java]
-
-
-        val sharePrefManager = SharePrefManager(requireContext())
-        userId = sharePrefManager.getUserIdFromSession()!!
-        isUserSeller = sharePrefManager.isUserSeller()
-
+//        favoritesViewModel = ViewModelProvider(this)[FavoritesViewModel::class.java]
 
 
         setViews()
@@ -67,20 +56,12 @@ class Home : Fragment() {
     }
 
 
-//    override fun onStart() {
-//        super.onStart()
-//
-//
-////      refresh the data
-//        viewModel.loadData(userId)
-//
-//
-//    }
 
     override fun onResume() {
         super.onResume()
 
-        viewModel.loadData(userId)
+        viewModel.loadData()
+
     }
 
 
@@ -89,13 +70,12 @@ class Home : Fragment() {
 
         /** swipe to refresh **/
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.loadData(userId)
+            viewModel.loadData()
         }
 
         setUserViews()
         setHomeTopAppBar()
         setProductsAdapter()
-
 
 
         binding.btnAddProduct.setOnClickListener {
@@ -104,12 +84,9 @@ class Home : Fragment() {
 
     }
 
-    private fun setUserViews(){
-        binding.apply {
-            if (isUserSeller == true) {
-                btnAddProduct.show()
-            }
-        }
+    private fun setUserViews() {
+        binding.homeTopAppBar.homeViewModel = viewModel
+        binding.homeViewModel = viewModel
     }
 
 
@@ -118,19 +95,31 @@ class Home : Fragment() {
 
         binding.apply {
 
+
             /** products live data **/
             viewModel.products.observe(viewLifecycleOwner) {
-                val mix = getMixedDataList(it, getAdsList())
-                val likes = viewModel.userLikes.value ?: emptyList()
-                productController.likes = likes
-                productController.setData(mix)
-                swipeRefreshLayout.isRefreshing = false
+                if (!it.isNullOrEmpty()){
+                    val mix = getMixedDataList(it, getAdsList())
+                    val likes = viewModel.userLikes.value ?: emptyList()
+                    productController.likes = likes
+                    productController.setData(mix)
+                    swipeRefreshLayout.isRefreshing = false
+                }else{
+
+                }
+
             }
+
 
             /** products status **/
             viewModel.productsStatus.observe(viewLifecycleOwner) { status ->
                 when (status){
-                    DataStatus.LOADING -> { loaderLayout.root.show() }
+                    DataStatus.LOADING -> {
+                        val isFirstLoad = viewModel.products.value.isNullOrEmpty()
+                        if (isFirstLoad){ // show progress only for first time load
+                            loaderLayout.root.show()
+                        }
+                    }
                     DataStatus.SUCCESS -> {loaderLayout.root.hide()}
                     DataStatus.ERROR -> {loaderLayout.root.hide()}
                 }
@@ -141,24 +130,12 @@ class Home : Fragment() {
                 viewModel.addLikeStatus.observe(viewLifecycleOwner) { status ->
                 if (status != null){
                     when(status){
-                        DataStatus.SUCCESS -> {
-                            showMessage(requireContext(),"liked")
-                            viewModel.resetProgress()
-                        }
+                        DataStatus.SUCCESS -> { viewModel.resetProgress() }
                         DataStatus.LOADING -> {}
                         DataStatus.ERROR -> {}
                         else -> {}
                     }
                 }
-            }
-
-
-            /** favorites error message **/
-            favoritesViewModel.errorMessage.observe(viewLifecycleOwner) { message ->
-               if (message != null){
-                   showMessage(requireContext(),message)
-                   favoritesViewModel.resetData()
-               }
             }
 
 
@@ -198,48 +175,26 @@ class Home : Fragment() {
 
     private fun setHomeTopAppBar() {
         binding.apply {
-            var lastInput = ""
-            val debounceJob: Job? = null
-            val uiScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+            /** set app bar menu **/
             homeTopAppBar.topAppBar.inflateMenu(R.menu.home_app_bar_menu)
-            if (isUserSeller == true) {
-                homeTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites)
-                homeTopAppBar.topAppBar.menu.removeItem(R.id.item_cart)
-            }
-            homeTopAppBar.homeSearchEditText.onFocusChangeListener = focusChangeListener
-            homeTopAppBar.homeSearchEditText.doAfterTextChanged { editable ->
-                if (editable != null) {
-                    val newtInput = editable.toString()
-                    debounceJob?.cancel()
-                    if (lastInput != newtInput) {
-                        lastInput = newtInput
-                        uiScope.launch {
-                            delay(500)
-                            if (lastInput == newtInput) {
-                                performSearch(newtInput)
-                            }
-                        }
-                    }
-                }
-            }
-            homeTopAppBar.homeSearchEditText.setOnEditorActionListener { textView, actionId, _ ->
+
+            /** button search **/
+            homeTopAppBar.homeSearchEditText.setOnEditorActionListener { text, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    textView.clearFocus()
-                    val inputManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    inputManager.hideSoftInputFromWindow(textView.windowToken, 0)
-                    performSearch(textView.text.toString())
+                    performSearch(text.text.toString())
+                    homeTopAppBar.homeSearchEditText.setText("")
+                    hideKeyboard()
                     true
                 } else {
                     false
                 }
             }
+
+            /** button clear search edit text **/
             homeTopAppBar.searchOutlinedTextLayout.setEndIconOnClickListener {
-                it.clearFocus()
                 homeTopAppBar.homeSearchEditText.setText("")
-                val inputManager =
-                    requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputManager.hideSoftInputFromWindow(it.windowToken, 0)
-//			viewModel.filterProducts("All")
+                hideKeyboard()
             }
 
             /** app bar menu item **/
@@ -252,7 +207,8 @@ class Home : Fragment() {
 
     private fun setProductsAdapter() {
         val likesList = viewModel.userLikes.value ?: emptyList()
-        productController.isSeller = isUserSeller == true
+        val isSeller = viewModel.isUserSeller.value!!
+        productController.isSeller = isSeller
         productController.likes = likesList
         productController.setData(emptyList())
 
@@ -264,7 +220,7 @@ class Home : Fragment() {
 
             override fun onProductClick(product: Product) {
 
-                if (isUserSeller == true) { // go to add edit product
+                if (isSeller) { // go to add edit product
                     val data = bundleOf(Constants.KEY_IS_EDIT to true , Constants.KEY_PRODUCT to product )
                     findNavController().navigate(R.id.action_goto_addProduct, data)
                 }else { // go to product details
@@ -282,11 +238,12 @@ class Home : Fragment() {
             }
 
             override fun onLikeClick(product: Product) {
+
                 val isProductLiked = viewModel.likedProducts.value?.contains(product)!!
-                if (!isProductLiked){ // insert like
-                    viewModel.insertLikeByProductId(product,userId)
+                if (!isProductLiked) { // insert like
+                    viewModel.insertLikeByProductId(product)
                 }else{ // remove like
-                    viewModel.removeLikeByProductId(product, userId)
+                    viewModel.removeLikeByProductId(product)
                 }
 
             }

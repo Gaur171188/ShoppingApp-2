@@ -1,7 +1,14 @@
+import com.shoppingapp.info.repository.product.ProductRepository
+import com.shoppingapp.info.repository.product.RemoteProductRepository
+import com.shoppingapp.info.repository.user.RemoteUserRepository
+import com.shoppingapp.info.repository.user.UserRepository
+import com.shoppingapp.info.screens.account.AccountViewModel
+import com.shoppingapp.info.screens.auth.AuthViewModel
 import com.shoppingapp.info.screens.favorites.FavoritesViewModel
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.screens.product_details.ProductDetailsViewModel
 import com.shoppingapp.info.screens.select_address.SelectAddressViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -49,11 +56,27 @@ import org.koin.dsl.module
 
 
 val viewModelModules = module {
-    viewModel { HomeViewModel() }
+    viewModel { HomeViewModel(userRepo = get(),productRepo = get()) }
     viewModel { FavoritesViewModel() }
     viewModel { ProductDetailsViewModel() }
     viewModel { SelectAddressViewModel() }
+    viewModel { AccountViewModel(userRepo = get() ) }
+    viewModel { AuthViewModel(userRepo = get() ) }
 }
+
+
+val productRepoModule = module {
+    single { RemoteProductRepository() }
+    single { ProductRepository(context = androidContext(), remote = get()) }
+}
+
+
+val userRepoModule = module {
+    single { RemoteUserRepository() }
+    single { UserRepository(context = androidContext(), remote = get()) }
+}
+
+
 
 
 //val viewModelsModules = module {

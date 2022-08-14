@@ -21,6 +21,7 @@ data class User(
     var phone: String = "",
     var email: String = "",
     var password: String = "",
+    var imageProfile: String = "",
     var likes: List<String> = ArrayList(),
     @TypeConverters(ObjectListTypeConvertor::class)
     var cart: List<CartItem> = ArrayList(),
@@ -38,6 +39,7 @@ data class User(
             "email" to email,
             "mobile" to phone,
             "password" to password,
+            "imageProfile" to imageProfile,
             "likes" to likes,
             "cart" to cart,
             "orders" to orders,
@@ -49,7 +51,6 @@ data class User(
     }
 
 
-    // todo: do not forget to add wallet screen to add data.
 
     @Parcelize
     data class Wallet(
@@ -62,6 +63,7 @@ data class User(
                 "promotional" to promotional!!
             )
         }
+
     }
 
 

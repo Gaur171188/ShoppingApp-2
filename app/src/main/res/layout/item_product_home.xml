@@ -74,7 +74,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_marginStart="5dp"
                     setLike="@{isLiked}"
-                    isSeller="@{isSeller}"
+                    setLikeButtonStatus="@{isSeller}"
                     android:visibility="visible"
                     tools:checked="true"
                     android:onClick="@{onItemLiked}"

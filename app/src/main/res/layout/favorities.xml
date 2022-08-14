@@ -7,51 +7,46 @@
 
     </data>
 
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         tools:context="com.shoppingapp.info.screens.favorites.Favorites">
 
         <include
             android:id="@+id/fav_top_app_bar"
             layout="@layout/layout_top_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true" />
+            android:layout_height="wrap_content" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <include
+            android:id="@+id/loader_layout"
+            layout="@layout/circular_loader_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/fav_top_app_bar">
+            android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/favorites_empty_message"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:fontFamily="@font/nunito_sans"
-                android:text="@string/no_product_liked_yet"
-                android:textAlignment="center"
-                android:visibility="gone"
-                android:textAppearance="@style/TextAppearance.MyTheme.Headline5"
-                android:textColor="@color/blue_accent_300"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/tv_EmptyFavorits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_gravity="center"
+            android:fontFamily="@font/nunito_sans"
+            android:text="@string/no_product_liked_yet"
+            android:textAlignment="center"
+            android:visibility="gone"
+            android:textAppearance="@style/TextAppearance.MyTheme.Headline5"
+            android:textColor="@color/blue_accent_300"
+            android:textStyle="bold" />
 
-            <include
-                android:id="@+id/loader_layout"
-                layout="@layout/circular_loader_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/app_bar_height"
+            android:orientation="vertical">
+
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/favorite_products_recycler_view"
@@ -67,6 +62,6 @@
                 tools:itemCount="10"
                 android:visibility="visible"
                 tools:listitem="@layout/item_product_favorites" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </RelativeLayout>
+        </LinearLayout>
+    </FrameLayout>
 </layout>

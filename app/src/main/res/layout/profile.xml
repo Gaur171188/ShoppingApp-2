@@ -5,6 +5,10 @@
 
     <data>
 
+        <variable
+            name="userData"
+            type="com.shoppingapp.info.data.User" />
+
     </data>
 
     <RelativeLayout
@@ -19,11 +23,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true" />
 
-        <include
-            android:id="@+id/loader"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            layout="@layout/circular_loader_layout"/>
+<!--        <include-->
+<!--            android:id="@+id/loader"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            layout="@layout/circular_loader_layout"/>-->
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/profile_layout"
@@ -33,6 +37,7 @@
 
             <ImageView
                 android:id="@+id/btn_image_account"
+                setImageProfile="@{userData.imageProfile}"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_marginStart="16dp"
@@ -42,27 +47,30 @@
                 android:scaleType="center"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_baseline_person_24"
-                app:tint="@color/blue_accent_300" />
+                app:tint="@color/blue_accent_300"
+                tools:srcCompat="@drawable/ic_baseline_person_24" />
+
 
             <TextView
-                android:id="@+id/user_name"
+                android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginStart="24dp"
+                android:text="@{userData.name}"
                 android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/btn_image_account"
                 app:layout_constraintStart_toEndOf="@+id/btn_image_account"
                 app:layout_constraintTop_toTopOf="@+id/btn_image_account"
+                app:layout_constraintVertical_bias="0.534"
                 tools:text="User Name" />
 
             <TextView
                 android:id="@+id/profile_email_label_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="64dp"
                 android:drawablePadding="16dp"
                 android:padding="16dp"
                 android:text="@string/email"
@@ -75,11 +83,11 @@
                 app:layout_constraintTop_toBottomOf="@+id/btn_image_account" />
 
             <TextView
-                android:id="@+id/email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:padding="16dp"
+                android:text="@{userData.email}"
                 android:textAlignment="viewEnd"
                 android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
                 app:layout_constraintBottom_toBottomOf="@+id/profile_email_label_tv"
@@ -106,11 +114,11 @@
                 app:layout_constraintTop_toBottomOf="@+id/profile_email_label_tv" />
 
             <TextView
-                android:id="@+id/phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:padding="16dp"
+                android:text="@{userData.phone}"
                 android:textAlignment="viewEnd"
                 android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
                 app:layout_constraintBottom_toBottomOf="@+id/profile_mobile_label_tv"

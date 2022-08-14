@@ -64,7 +64,7 @@ class ProductDetails: Fragment() {
     override fun onPause() {
         super.onPause()
 
-        homeViewModel.loadData(userId)
+        homeViewModel.loadData()
         homeViewModel.loadProductDetails(product)
 
     }
@@ -213,9 +213,9 @@ class ProductDetails: Fragment() {
             /** button like product **/
             btnLikeProduct.setOnClickListener {
                 if (!isLiked) { // add like
-                    homeViewModel.insertLikeByProductId(product, userId)
+                    homeViewModel.insertLikeByProductId(product)
                 }else{ // remove like
-                    homeViewModel.removeLikeByProductId(product, userId)
+                    homeViewModel.removeLikeByProductId(product)
                 }
             }
 

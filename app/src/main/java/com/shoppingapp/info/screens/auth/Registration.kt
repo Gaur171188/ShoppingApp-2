@@ -5,24 +5,20 @@ import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.hbb20.CountryCodePicker
-import com.hbb20.CountryCodePicker.OnCountryChangeListener
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.RegistrationBinding
 import com.shoppingapp.info.utils.*
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
 class Registration : Fragment() {
 
 
-//    private val viewModel by activityViewModels<RegistrationViewModel>()
-    private lateinit var viewModel: AuthViewModel
+    private val viewModel by sharedViewModel<AuthViewModel>()
     private lateinit var binding : RegistrationBinding
 
     private var email = ""
@@ -35,7 +31,7 @@ class Registration : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
 
-        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
 
         binding = DataBindingUtil.inflate(inflater, R.layout.registration,container,false)
 
@@ -164,7 +160,7 @@ class Registration : Fragment() {
 
 
             /** live data progress **/
-            inProgress.observe(viewLifecycleOwner) {
+            registerStatus.observe(viewLifecycleOwner) {
                 if (it != null) {
                     when (it) {
                         DataStatus.LOADING -> {

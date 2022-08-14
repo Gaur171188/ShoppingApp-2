@@ -1,7 +1,6 @@
 package com.shoppingapp.info.screens.auth
 
 import android.content.Intent
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -14,7 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
 import com.shoppingapp.info.activities.MainActivity
 import com.shoppingapp.info.databinding.LunchBinding
-import com.shoppingapp.info.utils.SharePrefManager
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class Lunch : Fragment() {
 
@@ -26,18 +25,17 @@ class Lunch : Fragment() {
         private const val TAG = "Lunch"
     }
 
-    private lateinit var viewModel: AuthViewModel
+    private val viewModel by sharedViewModel<AuthViewModel>()
+
     private lateinit var binding: LunchBinding
     private lateinit var timer: CountDownTimer
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater,R.layout.lunch, container, false)
-        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
 
 
-
-        viewModel.isUserLogged(requireContext())
 
         timer = object : CountDownTimer(THREE_SECOND, ONE_SECOND){
             override fun onTick(p0: Long) {}
@@ -48,14 +46,16 @@ class Lunch : Fragment() {
 
         return binding.root
 
-
     }
 
 
 
+
+
     fun isUserLogged() {
-        val isLogged = viewModel.isLogged.value
-        if (isLogged == true) { // user is logged
+        val isRem = viewModel.isRem
+        val isLogged = viewModel.isUserLogged
+        if (isRem && isLogged) { // user is rem me  and logged
             val intent = Intent(requireContext(), MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)

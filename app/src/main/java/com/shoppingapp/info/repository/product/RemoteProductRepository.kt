@@ -25,9 +25,9 @@ class RemoteProductRepository() {
 	val products: LiveData<List<Product>?> = _products
 
 
-	init {
-	    observeProducts()
-	}
+//	init {
+//	    observeProducts()
+//	}
 
 
 	private fun observeProducts() {

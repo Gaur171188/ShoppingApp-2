@@ -14,7 +14,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
 class Account : Fragment() {
@@ -24,13 +24,14 @@ class Account : Fragment() {
     }
 
 
-    private lateinit var viewModel: AccountViewModel
+
+    private val viewModel by sharedViewModel<AccountViewModel>()
     private lateinit var binding: AccountBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = DataBindingUtil.inflate(inflater,R.layout.account, container, false)
-        viewModel = ViewModelProvider(this)[AccountViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[AccountViewModel::class.java]
 
         setViews()
         setObserves()
@@ -90,7 +91,7 @@ class Account : Fragment() {
                     dialog.cancel()
                 }
                 .setPositiveButton(getString(R.string.dialog_sign_out_btn_text)) { _, _ ->
-                   viewModel.signOut(requireContext())
+                   viewModel.signOut()
                 }
                 .show()
         }

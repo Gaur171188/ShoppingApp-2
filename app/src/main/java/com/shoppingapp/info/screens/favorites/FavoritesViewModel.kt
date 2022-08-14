@@ -34,24 +34,24 @@ class FavoritesViewModel(): ViewModel() {
 
 
 
-
-    fun removeLikeByProductId (productId: String,userId: String) {
-        Log.d(TAG,"OnLikeProduct: Loading..")
-        resetData()
-        _removeLikeStatus.value = DataStatus.LOADING
-        viewModelScope.launch {
-            userRepository.dislikeProduct(productId,userId)
-                .addOnSuccessListener {
-                    Log.d(TAG,"OnLikeProduct: like has been removed success")
-                    _removeLikeStatus.value = DataStatus.SUCCESS
-                }
-                .addOnFailureListener { e ->
-                    Log.d(TAG,"OnLikeProduct: error happen during removing due to ${e.message}")
-                    _removeLikeStatus.value = DataStatus.ERROR
-                    _errorMessage.value = e.message
-                }
-        }
-    }
+//
+//    fun removeLikeByProductId (productId: String,userId: String) {
+//        Log.d(TAG,"OnLikeProduct: Loading..")
+//        resetData()
+//        _removeLikeStatus.value = DataStatus.LOADING
+//        viewModelScope.launch {
+//            userRepository.dislikeProduct(productId,userId)
+//                .addOnSuccessListener {
+//                    Log.d(TAG,"OnLikeProduct: like has been removed success")
+//                    _removeLikeStatus.value = DataStatus.SUCCESS
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.d(TAG,"OnLikeProduct: error happen during removing due to ${e.message}")
+//                    _removeLikeStatus.value = DataStatus.ERROR
+//                    _errorMessage.value = e.message
+//                }
+//        }
+//    }
 
 
 

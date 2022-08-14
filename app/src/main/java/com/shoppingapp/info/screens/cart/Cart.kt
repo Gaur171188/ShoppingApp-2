@@ -16,6 +16,7 @@ import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.*
 import com.shoppingapp.info.priceCardLayout
+import com.shoppingapp.info.screens.auth.AuthViewModel
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.screens.product_details.ProductDetailsViewModel
 import com.shoppingapp.info.utils.Constants
@@ -29,6 +30,8 @@ class Cart : Fragment() {
 
 
     private val homeViewModel by sharedViewModel<HomeViewModel>()
+    private val authViewModel by sharedViewModel<AuthViewModel>()
+
     private val productDetailsViewModel by sharedViewModel<ProductDetailsViewModel>()
 
     private lateinit var binding: CartBinding
@@ -149,9 +152,7 @@ class Cart : Fragment() {
             when (status) {
                 DataStatus.LOADING -> {}
                 DataStatus.SUCCESS -> {
-
-//                    loadData()
-                    homeViewModel.loadData(userId)
+                    homeViewModel.loadData()
                 }
                 DataStatus.ERROR ->{}
 

@@ -9,14 +9,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.activities.MainActivity
 import com.shoppingapp.info.R
 import com.shoppingapp.info.databinding.LoginBinding
+import com.shoppingapp.info.utils.Constants
 import com.shoppingapp.info.utils.DataStatus
 import com.shoppingapp.info.utils.hide
 import com.shoppingapp.info.utils.show
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
 class Login : Fragment() {
@@ -25,7 +26,7 @@ class Login : Fragment() {
         const val TAG = "Login"
     }
 
-    private lateinit var viewModel: AuthViewModel
+    private val viewModel by sharedViewModel<AuthViewModel>()
     private lateinit var binding: LoginBinding
 
     private var email: String = ""
@@ -35,7 +36,7 @@ class Login : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.login, container, false)
-        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
 
 
 
@@ -92,7 +93,7 @@ class Login : Fragment() {
                         binding.loginPassword.requestFocus()
                         return@setOnClickListener
                     }else{
-                        viewModel.login(requireContext(),email, password,isRemOn)
+                        viewModel.login(email, password,isRemOn)
                     }
 
 
@@ -120,7 +121,7 @@ class Login : Fragment() {
 
 
         /** live data progress **/
-        viewModel.inProgress.observe(viewLifecycleOwner) {
+        viewModel.loggingStatus.observe(viewLifecycleOwner) {
             if (it != null) {
                 when (it) {
                     DataStatus.LOADING -> {
@@ -140,8 +141,7 @@ class Login : Fragment() {
 
         /** live data isLogin **/
         viewModel.isLogged.observe(viewLifecycleOwner) { isLogged ->
-            if (isLogged) {
-
+            if (isLogged != null) {
                 val intent = Intent(activity, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 startActivity(intent)

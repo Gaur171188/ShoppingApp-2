@@ -5,9 +5,8 @@ import android.content.SharedPreferences
 
 class SharePrefManager(context: Context) {
 
-	var userSession: SharedPreferences =
-		context.getSharedPreferences("userSessionData", Context.MODE_PRIVATE)
-	var editor: SharedPreferences.Editor = userSession.edit()
+	var userSession: SharedPreferences = context.getSharedPreferences("userSessionData", Context.MODE_PRIVATE)
+	private val editor = userSession.edit()
 
 
 	fun createLoginSession (
@@ -15,13 +14,9 @@ class SharePrefManager(context: Context) {
 		isRemOn: Boolean,
 		isSeller: Boolean
 	) {
-
-		editor.putBoolean(IS_LOGIN, true)
 		editor.putString(KEY_ID, id)
 		editor.putBoolean(KEY_REMEMBER_ME, isRemOn)
 		editor.putBoolean(KEY_IS_SELLER, isSeller)
-
-
 		editor.commit()
 	}
 
@@ -46,8 +41,6 @@ class SharePrefManager(context: Context) {
 
 	fun getUserIdFromSession(): String? = userSession.getString(KEY_ID, "")
 
-	fun isLoggedIn(): Boolean = userSession.getBoolean(IS_LOGIN, false)
-
 	fun signOut() {
 		editor.clear()
 		editor.commit()
@@ -62,4 +55,5 @@ class SharePrefManager(context: Context) {
 		private const val KEY_IS_SELLER = "isSeller"
 		private const val KEY_FAV_PRODUCTS_IDs = "favoriteProductsIds"
 	}
+
 }

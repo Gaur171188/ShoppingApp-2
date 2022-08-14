@@ -7,9 +7,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.shoppingapp.info.R
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.ActivityMainBinding
 import com.shoppingapp.info.receiver.NetworkReceiver
+import com.shoppingapp.info.utils.Constants
 import com.shoppingapp.info.utils.SharePrefManager
+import com.shoppingapp.info.utils.showMessage
 
 class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverListener {
 
@@ -18,9 +21,11 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
     private var isConnected: Boolean? = null
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
 
 
         // set up navigation bottom

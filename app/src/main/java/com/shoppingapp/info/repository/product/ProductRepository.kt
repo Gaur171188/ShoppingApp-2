@@ -1,3 +1,52 @@
+package com.shoppingapp.info.repository.product
+
+import android.content.Context
+import android.net.Uri
+import android.util.Log
+import androidx.core.net.toUri
+import com.google.android.gms.tasks.Task
+import com.shoppingapp.info.data.Product
+import com.shoppingapp.info.utils.ERR_UPLOAD
+import com.shoppingapp.info.utils.SharePrefManager
+import kotlinx.coroutines.tasks.await
+import java.util.*
+
+
+class ProductRepository(val context: Context, private val remote: RemoteProductRepository) {
+
+//    private val sharePref = SharePrefManager(context)
+//    private val userId = sharePref.getUserIdFromSession()
+
+
+    suspend fun getProducts() = remote.getProducts()
+
+    suspend fun insertProduct(product: Product) = remote.insertProduct(product)
+
+    suspend fun updateProduct(proData: Product) = remote.updateProduct(proData)
+
+    suspend fun deleteProduct(productId: String) = remote.deleteProduct(productId)
+
+    suspend fun uploadFile(uri: Uri, fileName: String) = remote.uploadFile(uri, fileName)
+
+
+    suspend fun insertFiles(filesUri: List<Uri>) = remote.insertFiles(filesUri)
+
+
+    suspend fun updateFiles(newList: List<Uri>, oldList: List<String>) = remote.updateFiles(newList, oldList)
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
 //package com.shoppingapp.info.repository.product
 //
 //import android.net.Uri

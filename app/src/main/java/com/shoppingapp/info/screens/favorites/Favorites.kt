@@ -20,6 +20,8 @@ import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.screens.home.RecyclerViewPaddingItemDecoration
 import com.shoppingapp.info.utils.Constants
 import com.shoppingapp.info.utils.DataStatus
+import com.shoppingapp.info.utils.hide
+import com.shoppingapp.info.utils.show
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class Favorites : Fragment() {
@@ -35,7 +37,7 @@ class Favorites : Fragment() {
 
     private lateinit var binding: FavoritiesBinding
     private val favoritesController by lazy { FavoritesController() }
-    private var likedProducts = ArrayList<Product>()
+//    private var likedProducts = ArrayList<Product>()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -45,8 +47,6 @@ class Favorites : Fragment() {
         viewModel = ViewModelProvider(this)[FavoritesViewModel::class.java]
 
 //        likedProducts = arguments?.get("userLikes") as List<Product>
-
-
 
 
 
@@ -64,31 +64,43 @@ class Favorites : Fragment() {
 
 
 
-    private fun setObserves(){
+    private fun setObserves() {
 
-        with(viewModel){
-
-            /** remove like status **/
-            removeLikeStatus.observe(viewLifecycleOwner) { status ->
-                when(status){
-                    DataStatus.SUCCESS -> { favoritesController.setData(likedProducts) } // once the data it will updated once the item is removed.
-                    DataStatus.LOADING -> {}
-                    DataStatus.ERROR -> {}
-                    else -> {}
-                }
+        /** liked products **/
+        homeViewModel.likedProducts.observe(viewLifecycleOwner) { likedProducts ->
+            if (!likedProducts.isNullOrEmpty()){
+                favoritesController.setData(likedProducts)
+                binding.tvEmptyFavorits.hide()
+            }else{
+                favoritesController.setData(emptyList())
+                binding.tvEmptyFavorits.show()
             }
-
-
-
         }
 
+//        with(viewModel) {
+//
+//            /** remove like status **/
+//            removeLikeStatus.observe(viewLifecycleOwner) { status ->
+//                when (status) {
+//                    DataStatus.SUCCESS -> {
+//                        favoritesController.setData(likedProducts)
+//                    } // once the data it will updated once the item is removed.
+//                    DataStatus.LOADING -> {}
+//                    DataStatus.ERROR -> {}
+//                    else -> {}
+//                }
+//
+//
+//            }
+//
+//        }
     }
 
 
     private fun setProductsAdapter() {
-        val products = homeViewModel.likedProducts.value ?: emptyList()
-        likedProducts.addAll(products)
-        favoritesController.setData(products)
+//        val products = homeViewModel.likedProducts.value ?: emptyList()
+//        likedProducts.addAll(products)
+//        favoritesController.setData(emptyList())
 
 
         /** click listener **/
@@ -103,9 +115,9 @@ class Favorites : Fragment() {
 
 
             override fun onLikeClick(product: Product) {
-                val userId = homeViewModel.userData.value?.userId!!
-                viewModel.removeLikeByProductId(product.productId,userId)
-                likedProducts.remove(product)
+//                val userId = homeViewModel.userData.value?.userId!!
+                homeViewModel.removeLikeByProductId(product)
+//                likedProducts.remove(product)
 
             }
 

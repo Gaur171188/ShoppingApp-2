@@ -5,17 +5,17 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.*
 import com.shoppingapp.info.repository.user.RemoteUserRepository
+import com.shoppingapp.info.repository.user.UserRepository
 import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.utils.SharePrefManager
 import kotlinx.coroutines.launch
 
-class AccountViewModel(): ViewModel() {
+class AccountViewModel(val userRepo: UserRepository): ViewModel() {
 
     companion object{
         private const val TAG = "AccountViewModel"
     }
 
-    private val repository = RemoteUserRepository()
 
     private var _isSignOut = MutableLiveData<Boolean?>()
     val isSignOut: LiveData<Boolean?> get() = _isSignOut
@@ -25,10 +25,9 @@ class AccountViewModel(): ViewModel() {
 
 
 
-    fun signOut(context: Context) {
+    fun signOut() {
         viewModelScope.launch {
-            repository.signOut()
-            SharePrefManager(context).signOut()
+            userRepo.signOut()
             _isSignOut.value = true
             Log.d(TAG,"signOut Success")
         }

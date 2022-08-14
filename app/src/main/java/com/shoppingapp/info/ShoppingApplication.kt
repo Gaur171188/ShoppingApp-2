@@ -3,6 +3,8 @@ import android.app.Application
 import com.shoppingapp.info.utils.x
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import productRepoModule
+import userRepoModule
 import viewModelModules
 
 
@@ -16,7 +18,13 @@ class ShoppingApplication() : Application() {
 		startKoin {
 			androidContext(this@ShoppingApplication)
 
-			modules(listOf( viewModelModules ))
+			modules(
+				listOf(
+				viewModelModules,
+				productRepoModule,
+				userRepoModule
+			))
+
 //			modules(listOf(
 //				productLiveDataModule,
 //				viewModelsModules,

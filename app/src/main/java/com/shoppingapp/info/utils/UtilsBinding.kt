@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
+import com.google.android.material.appbar.MaterialToolbar
 import com.shoppingapp.info.R
 import com.shoppingapp.info.utils.x.context
 import java.text.SimpleDateFormat
@@ -26,29 +27,65 @@ object x{
 fun setImage(image: ImageView, images: List<String>?) {
     try {
         val imgUrl = images?.get(0)?.toUri()?.buildUpon()?.scheme("https")?.build()
-        Glide.with(context)
+        Glide.with(image.context)
             .asBitmap()
             .load(imgUrl)
             .into(image)
-    }catch (ex: Exception){
+    }catch (ex: Exception){ }
+}
 
-    }
+@BindingAdapter("setImageProfile")
+fun imageProfile(image: ImageView, imageUri: String?) {
+    try {
+        if (imageUri != null){
+            Glide.with(image.context)
+                .load(imageUri.toUri())
+                .placeholder(R.drawable.ic_baseline_person_24)
+                .into(image)
+        }
 
-//    image.clipToOutline = true
+    }catch (ex: Exception){}
 }
 
 
-@BindingAdapter("isSeller")
-fun isSeller(checkBox: CheckBox , isSeller: Boolean){
+@BindingAdapter("setAppBarItems")
+fun setAppBarItems(topAppBar: MaterialToolbar, isSeller: Boolean){
     if (isSeller){
-        checkBox.visibility = View.GONE
-    }else{
-        checkBox.visibility = View.VISIBLE
+        topAppBar.menu.removeItem(R.id.item_favorites)
+        topAppBar.menu.removeItem(R.id.item_cart)
     }
 }
 
 
 
+
+//@BindingAdapter("isSeller")
+//fun isSeller(v: View , isSeller: Boolean){
+//    if (isSeller){
+//        checkBox.visibility = View.GONE
+//    }else{
+//        checkBox.visibility = View.VISIBLE
+//    }
+//}
+
+@BindingAdapter("setLikeButtonStatus")
+fun setLikeButtonStatus(v: View, isSeller: Boolean){
+    if (isSeller){
+        v.hide()
+    }else{
+        v.show()
+    }
+}
+
+
+@BindingAdapter("setAddProductButtonStatus")
+fun setAddProductButtonStatus(v: View, isSeller: Boolean){
+    if (isSeller){
+        v.show()
+    }else{
+        v.hide()
+    }
+}
 
 @BindingAdapter("setTitle")
 fun setProductTitle(tv: TextView, title: String){

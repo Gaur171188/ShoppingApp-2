@@ -1,9 +1,11 @@
 package com.shoppingapp.info.utils
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.fragment.app.Fragment
 import androidx.room.TypeConverter
 import com.shoppingapp.info.data.User
 import java.util.*
@@ -14,7 +16,7 @@ import kotlin.math.roundToInt
 const val ERR_UPLOAD = "UploadErrorException"
 
 enum class DataStatus { LOADING, ERROR, SUCCESS }
-enum class UserType { CUSTOMER, SELLER }
+enum class UserType { CUSTOMER, SELLER, ADMIN}
 enum class OrderStatus { CONFIRMED, SPOON, ARRIVING, DELIVERED }
 enum class AddProductViewErrors { NONE, EMPTY, ERR_PRICE_0 }
 enum class AddProductErrors { NONE, ERR_ADD, ERR_ADD_IMG, ADDING }
@@ -84,6 +86,18 @@ internal fun getAddressId(): String {
 
 
 
+fun Fragment.hideKeyboard() {
+    view?.let { activity?.hideKeyboard(it) }
+}
+
+fun Activity.hideKeyboard() {
+    hideKeyboard(currentFocus ?: View(this))
+}
+
+fun Context.hideKeyboard(view: View) {
+    val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+}
 
 
 internal fun getOfferPercentage(costPrice: Double, sellingPrice: Double): Int {

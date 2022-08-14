@@ -2,37 +2,43 @@ package com.shoppingapp.info.screens.home
 
 
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.*
+import com.google.firebase.auth.FirebaseAuth
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
-import com.shoppingapp.info.repository.product.RemoteProductRepository
-import com.shoppingapp.info.repository.user.RemoteUserRepository
-import com.shoppingapp.info.screens.product_details.ProductDetailsViewModel
+import com.shoppingapp.info.repository.product.ProductRepository
+import com.shoppingapp.info.repository.user.UserRepository
 import com.shoppingapp.info.utils.DataStatus
+import com.shoppingapp.info.utils.UserType
+import com.shoppingapp.info.utils.showMessage
 import kotlinx.coroutines.*
 import java.util.*
 
 
 @Suppress("DeferredResultUnused")
-class HomeViewModel(): ViewModel() {
+class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductRepository): ViewModel() {
 
     companion object {
         private const val TAG = "HomeViewModel"
     }
 
-    private val userRepository = RemoteUserRepository()
-    private val productRepository = RemoteProductRepository()
+//    private val userRepo = RemoteUserRepository()
+//    private val productRepo = RemoteProductRepository()
+//
 
 
-    private val _products = MutableLiveData<List<Product>>()
-    val products: LiveData<List<Product>> = _products
+
+    private val _products = MutableLiveData<List<Product>?>()
+    val products: LiveData<List<Product>?> = _products
 
     private val _userData = MutableLiveData<User?>()
     val userData: LiveData<User?> = _userData
 
     private val _balance = MutableLiveData<Int?>()
     val balance: LiveData<Int?> = _balance
+
 
 
     /** progress **/
@@ -50,6 +56,16 @@ class HomeViewModel(): ViewModel() {
     private val _cartItems= MutableLiveData<List<User.CartItem>?>()
     val cartItems: LiveData<List<User.CartItem>?> = _cartItems
 
+//    val isUserSeller = userRepo.isUserSeller
+
+
+    private val _isUserSeller = MutableLiveData<Boolean?>()
+    val isUserSeller: LiveData<Boolean?> = _isUserSeller
+
+
+    init {
+        _isUserSeller.value = userRepo.isUserSeller
+    }
 //    private val _cartProducts = MutableLiveData<List<Product>>()
 //    val cartProducts: LiveData<List<Product>> = _cartProducts
 
@@ -64,6 +80,7 @@ class HomeViewModel(): ViewModel() {
     /** progress **/
     private val _updateCartStatus = MutableLiveData<DataStatus?>()
     val updateCartStatus: LiveData<DataStatus?> = _updateCartStatus
+
 
     /** progress **/
     private val _removeCartStatus = MutableLiveData<DataStatus?>()
@@ -97,14 +114,6 @@ class HomeViewModel(): ViewModel() {
 
 
 
-
-
-
-
-
-
-
-
     private var _userOrders = MutableLiveData<List<User.OrderItem>>()
     val userOrders: LiveData<List<User.OrderItem>> get() = _userOrders
 
@@ -115,13 +124,13 @@ class HomeViewModel(): ViewModel() {
     val orderProducts: LiveData<List<Product>> get() = _orderProducts
 
     private var _likedProducts = MutableLiveData<List<Product>?>()
-    val likedProducts: LiveData<List<Product>?> get() = _likedProducts
+    val likedProducts: LiveData<List<Product>?> = _likedProducts
 
     private var _userLikes = MutableLiveData<List<String>?>()
     val userLikes: LiveData<List<String>?> get() = _userLikes
 
     private var _filterCategory = MutableLiveData("All")
-    val filterCategory: LiveData<String> get() = _filterCategory
+    val filterCategory: LiveData<String> = _filterCategory
 
     private val _DataStatus = MutableLiveData<DataStatus>()
     val storeDataStatus: LiveData<DataStatus> get() = _DataStatus
@@ -141,15 +150,13 @@ class HomeViewModel(): ViewModel() {
 
 
 
-
     private val _orders= MutableLiveData<List<User.OrderItem>?>()
     val orders: LiveData<List<User.OrderItem>?> = _orders
 
-
-
-
-
-
+    init {
+//        _isUserSeller.value = userRepo.isUserSeller
+        Log.d(TAG,userRepo.isUserSeller.toString())
+    }
 
     // load products
     // load liked products
@@ -157,20 +164,33 @@ class HomeViewModel(): ViewModel() {
     // load user data
     // load cart products
 
-    fun loadData(userId: String) {
+
+    fun loadData() {
         Log.d(TAG,"OnGettingData: Loading..")
         _productsStatus.value = DataStatus.LOADING
         viewModelScope.launch {
-            val user = userRepository.getUserById(userId)
-            _userData.value = user
+
+            val user = userRepo.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
+            val isSeller = user?.userType == UserType.SELLER.name
+
+            if(isSeller){
+               Log.d(TAG,"Seller")
+            }else{
+                Log.d(TAG,"customer")
+            }
+
+
             val likes = user?.likes
             val cart = user?.cart
             val balance = user?.wallet?.balance
+
+//            _isUserSeller.value = isSeller
+            _userData.value = user
             _userLikes.value = likes
             _cartItems.value = cart
             _balance.value = balance
 
-            productRepository.getProducts()
+            productRepo.getProducts()
                 .addOnSuccessListener {
                     _productsStatus.value = DataStatus.SUCCESS
                     val products = it.toObjects(Product::class.java)
@@ -191,6 +211,23 @@ class HomeViewModel(): ViewModel() {
     }
 
 
+
+    fun updateImageProfile(uri: Uri?) {
+        viewModelScope.launch {
+
+            val fileName = uri.toString()
+            val imageUri = userRepo.uploadFile(uri!!, fileName).toString()
+            Log.d("Images",imageUri)
+//            val user = _userData.value!!
+//            user.imageProfile = imageUri
+//            _userData.value = user
+//            userRepository.updateUser(user)
+
+
+
+
+        }
+    }
 
 
 
@@ -275,7 +312,7 @@ class HomeViewModel(): ViewModel() {
         price.forEach { (itemId, price) ->
             totalPrice += price * (_cartItems.value?.find { it.itemId == itemId }?.quantity ?: 1)
         }
-         _totalItemsPrice.value = totalPrice
+        _totalItemsPrice.value = totalPrice
 
         return totalPrice
     }
@@ -298,7 +335,7 @@ class HomeViewModel(): ViewModel() {
         viewModelScope.launch {
             val itemId = UUID.randomUUID().toString()
             val newItem = User.CartItem(itemId, product.productId, product.owner, _productQuantity.value!!)
-            userRepository.insertCartItem(newItem,userId)
+            userRepo.insertCartItem(newItem)
                 .addOnSuccessListener {
                     Log.d(TAG, "onAddingCartItem: Item has been added success")
                     _insertCartStatus.value = DataStatus.SUCCESS
@@ -308,7 +345,7 @@ class HomeViewModel(): ViewModel() {
 //                    cart?.add(newItem)
 //                    _cartItems.value = cart
 
-                    loadData(userId)
+                    loadData()
 
                 }
                 .addOnFailureListener { e ->
@@ -325,7 +362,7 @@ class HomeViewModel(): ViewModel() {
         Log.d(TAG, "onRemovingCartItem: Loading..")
         _removeCartStatus.value = DataStatus.LOADING
         viewModelScope.launch {
-            userRepository.removeCartItem(itemId,userId)
+            userRepo.removeCartItem(itemId)
                 .addOnSuccessListener {
                     Log.d(TAG, "onRemovingCartItem: Item has been removed success")
                     _removeCartStatus.value = DataStatus.SUCCESS
@@ -355,7 +392,7 @@ class HomeViewModel(): ViewModel() {
             if (item != null){
                 // update the element that you want from here
                 item.quantity = _productQuantity.value!!
-                userRepository.updateCartItem(item,userId)
+                userRepo.updateCartItem(item)
                     .addOnSuccessListener {
                         Log.d("ProductDetails",item.toString())
                         Log.d(TAG, "onUpdatingCartItem: Item has been update success")
@@ -440,12 +477,12 @@ class HomeViewModel(): ViewModel() {
 
 
 
-    fun insertLikeByProductId (product: Product, userId: String) {
+    fun insertLikeByProductId (product: Product) {
         Log.d(TAG,"OnLikeProduct: Loading..")
         resetProgress()
         _addLikeStatus.value = DataStatus.LOADING
         viewModelScope.launch {
-            userRepository.likeProduct(product.productId,userId)
+            userRepo.likeProduct(product.productId)
                 .addOnSuccessListener {
                     Log.d(TAG,"OnLikeProduct: like has been added success")
                     _addLikeStatus.value = DataStatus.SUCCESS
@@ -461,15 +498,16 @@ class HomeViewModel(): ViewModel() {
         }
     }
 
-    fun removeLikeByProductId (product: Product, userId: String) {
+    fun removeLikeByProductId (product: Product) {
         Log.d(TAG,"OnLikeProduct: Loading..")
         resetProgress()
         _removeLikeStatus.value = DataStatus.LOADING
         viewModelScope.launch {
-            userRepository.dislikeProduct(product.productId,userId)
+            userRepo.dislikeProduct(product.productId)
                 .addOnSuccessListener {
                     Log.d(TAG,"OnLikeProduct: like has been removed success")
                     _removeLikeStatus.value = DataStatus.SUCCESS
+//                    val likedProducts = _likedProducts.value?.filter { it.productId != product.productId }
                     val likedProducts = _likedProducts.value?.toMutableList()
                     likedProducts?.remove(product)
                     _likedProducts.value = likedProducts

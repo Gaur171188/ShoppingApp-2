@@ -1,4 +1,91 @@
-//package com.shoppingapp.info.repository.user
+package com.shoppingapp.info.repository.user
+
+import android.content.Context
+import android.net.Uri
+import android.util.Log
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.shoppingapp.info.data.User
+import com.shoppingapp.info.utils.Result
+import com.shoppingapp.info.utils.SharePrefManager
+import com.shoppingapp.info.utils.UserType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+
+
+class UserRepository(val context: Context, private val remote: RemoteUserRepository) {
+
+    private val sharePref = SharePrefManager(context)
+    private val userId = sharePref.getUserIdFromSession()!!
+    val isUserSeller = sharePref.isUserSeller()
+    val isRem = sharePref.isRememberMeOn()
+
+
+    suspend fun signWithEmailAndPassword(email: String,
+                                         password: String) =
+        remote.signWithEmailAndPassword(email, password)
+
+
+    suspend fun createUserAccount(user: User, onSuccess: (Boolean) -> Unit, onError: (String) -> Unit) =
+        remote.createUserAccount(user,onSuccess, onError)
+
+
+    suspend fun signOut() {
+        sharePref.signOut()
+        remote.signOut()
+    }
+
+    fun createUserLogging(id: String, isRemOn: Boolean, isSeller: Boolean) = sharePref.createLoginSession(id, isRemOn, isSeller)
+
+    fun isUserLogged() = remote.isUserLogged()
+
+    suspend fun uploadFile(uri: Uri, fileName: String) = remote.uploadFile(uri,fileName)
+
+    suspend fun getOrders() = remote.getOrders(userId)
+
+    suspend fun insertOrder(order: User.OrderItem, userId: String) = remote.insertOrder(order, userId)
+
+    suspend fun deleteOrder(order: User.OrderItem) = remote.deleteOrder(order)
+
+    suspend fun checkUserIsExist(email: String, isExist:(Boolean) -> Unit, onError:(String)-> Unit ) = remote.checkUserIsExist(email,isExist,onError )
+
+    suspend fun updateUser(user: User) = remote.updateUser(user)
+
+
+    suspend fun deleteUser() = remote.deleteUser(userId)
+
+    suspend fun getUser() = remote.getUserById(userId)
+
+    suspend fun getUserById(userId: String) = remote.getUserById(userId)
+
+    suspend fun getOrdersByUserId() = remote.getOrdersByUserId(userId)
+
+    suspend fun likeProduct(productId: String) = remote.likeProduct(productId, userId)
+
+    suspend fun dislikeProduct(productId: String) = remote.dislikeProduct(productId, userId)
+
+    suspend fun insertCartItem(newItem: User.CartItem) = remote.insertCartItem(newItem, userId)
+
+    suspend fun removeCartItem(itemId: String) = remote.removeCartItem(itemId, userId)
+
+    suspend fun updateCartItem(item: User.CartItem) = remote.updateCartItem(item, userId)
+
+
+    suspend fun placeOrder(newOrder: User.OrderItem) = remote.placeOrder(newOrder, userId)
+
+    // update both customer and owner order status
+    suspend fun updateOrderStatus(orderId: String, status: String) = remote.setStatusOfOrderByUserId(orderId, userId, status)
+
+
+}
+
+
+
+
+
 //
 //import android.content.Context
 //import android.util.Log
