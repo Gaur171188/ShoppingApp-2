@@ -243,49 +243,6 @@ class RemoteUserRepository() {
     }
 
 
-//    // return list of product id
-//    suspend fun getStuckLikes(userId: String, products: List<Product>): List<String> {
-//        var diff: List<String> = emptyList()
-//            val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
-//             if (!userRef.isEmpty){
-//                val userData = userRef.documents[0].toObject(User::class.java)
-//                val likes = userData?.likes
-//                val productsId = products.map { it.productId }
-//                diff = likes?.minus(productsId.toSet())!!
-//
-//            }
-//        return diff
-//    }
-
-
-//    // return list of product id
-//    suspend fun getStuckCartItems (userId: String,products: List<Product>): List<String> {
-//        var diff: List<String> = emptyList()
-//        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
-//        if (!userRef.isEmpty){
-//            val userData = userRef.documents[0].toObject(User::class.java)
-//            val cart = userData?.cart?.map { it.productId }
-//            val productsId = products.map { it.productId }
-//            diff = cart?.minus(productsId.toSet())!!
-//        }
-//        return diff
-//    }
-
-
-//    // return list of orders id
-//    suspend fun getStuckOrdersIds (userId: String,orders: List<User.OrderItem>): List<String> {
-//        var diff: List<String> = emptyList()
-//        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
-//        if (!userRef.isEmpty){
-//            val userData = userRef.documents[0].toObject(User::class.java)
-//            val order = userData?.orders?.map { it.orderId }
-//            val orderId = orders.map { it.orderId }
-//            diff = order?.minus(orderId.toSet())!!
-//        }
-//        return diff
-//    }
-
-
 
     suspend fun likeProduct(productId: String, userId: String): Task<Void> {
         val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
@@ -303,20 +260,10 @@ class RemoteUserRepository() {
     }
 
 
-//     suspend fun insertCartItem(newItem: User.CartItem, userId: String): Task<Void> {
-//        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
-//        val docId = userRef.documents[0].id
-//        return usersPath().document(docId)
-//            .update(CART_FIELD, FieldValue.arrayUnion(newItem.toHashMap()))
-//    }
 
-    suspend fun insertCartItem(newItem: User.CartItem, userId: String): Task<Void> {
-       return usersPath().document(userId).update(CART_FIELD, FieldValue.arrayUnion(newItem.toHashMap()))
-//        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
-//        val docId = userRef.documents[0].id
-//        return usersPath().document(docId)
-//            .update(CART_FIELD, FieldValue.arrayUnion(newItem.toHashMap()))
-    }
+
+    suspend fun insertCartItem(newItem: User.CartItem, userId: String) =
+        usersPath().document(userId).update(CART_FIELD, FieldValue.arrayUnion(newItem.toHashMap()))
 
 
     suspend fun removeCartItem(itemId: String, userId: String): Task<Void> {
@@ -445,6 +392,8 @@ class RemoteUserRepository() {
             }
         }
     }
+
+
 
 
     companion object {

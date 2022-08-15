@@ -1,29 +1,23 @@
 package com.shoppingapp.info.screens.home
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
-import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.shoppingapp.info.ProductCategories
+import com.shoppingapp.info.utils.ProductCategories
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.HomeBinding
-import com.shoppingapp.info.screens.favorites.FavoritesViewModel
 import com.shoppingapp.info.utils.*
-import kotlinx.coroutines.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
@@ -181,6 +175,9 @@ class Home : Fragment() {
 
             /** set app bar menu **/
             homeTopAppBar.topAppBar.inflateMenu(R.menu.home_app_bar_menu)
+
+            /** set hint **/
+            homeTopAppBar.homeSearchEditText.hint = resources.getString(R.string.search_product)
 
             /** button search **/
             homeTopAppBar.homeSearchEditText.setOnEditorActionListener { text, actionId, _ ->

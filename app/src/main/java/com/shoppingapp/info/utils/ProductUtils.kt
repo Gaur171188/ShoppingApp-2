@@ -1,4 +1,4 @@
-package com.shoppingapp.info
+package com.shoppingapp.info.utils
 
 val ShoeSizes = mapOf(
 	"UK4" to 4,
@@ -23,4 +23,14 @@ val ShoeColors = mapOf(
 	"magenta" to "#FF00FF"
 )
 
+
 val ProductCategories = arrayOf("Shoes", "Slippers")
+
+val orderStatusFilters = arrayOf(
+	"ALL",
+	OrderStatus.CONFIRMED.name,
+	OrderStatus.BINDING.name,
+	OrderStatus.ARRIVING.name,
+	OrderStatus.DELIVERED.name,
+	OrderStatus.REJECT.name
+)

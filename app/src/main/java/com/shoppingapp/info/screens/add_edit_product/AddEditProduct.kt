@@ -17,8 +17,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import com.shoppingapp.info.R
-import com.shoppingapp.info.ShoeColors
-import com.shoppingapp.info.ShoeSizes
+import com.shoppingapp.info.utils.ShoeColors
+import com.shoppingapp.info.utils.ShoeSizes
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.AddEditProductBinding
 import com.shoppingapp.info.screens.home.HomeViewModel

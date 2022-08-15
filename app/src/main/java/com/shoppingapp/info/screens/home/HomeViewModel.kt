@@ -317,6 +317,8 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
 
 
 
+
+
     fun addToCart(product: Product,userId: String) {
         Log.d(TAG, "onAddingCartItem: Loading..")
         _insertCartStatus.value = DataStatus.LOADING

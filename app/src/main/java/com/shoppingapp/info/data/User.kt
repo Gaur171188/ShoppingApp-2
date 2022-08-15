@@ -79,7 +79,7 @@ data class User(
         var paymentMethod: String = "",
         var address: Address = Address(),
         var orderDate: Date = Date(),
-        var status: String = OrderStatus.SPOON.name
+        var status: String = OrderStatus.BINDING.name
     ) : Parcelable {
         fun toHashMap(): HashMap<String, Any> {
             return hashMapOf(

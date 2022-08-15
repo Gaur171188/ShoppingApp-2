@@ -104,7 +104,7 @@ class OrderDetails: Fragment() {
     }
 
 
-    fun setUserViews(){
+    private fun setUserViews(){
 
         binding.apply {
 
