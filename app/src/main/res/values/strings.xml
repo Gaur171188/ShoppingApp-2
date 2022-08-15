@@ -40,7 +40,7 @@
     <string name="product_add_to_cart_button">Product add to cart button</string>
     <string name="add_product">Add Product</string>
     <string name="search_product">Search Product</string>
-    <string name="search_order">Search Order</string>
+    <string name="search_order">Search Order By Id</string>
     <string name="products">Products</string>
     <string name="shipping_details">Shipping Details</string>
     <string name="change_order_status_button">Change Order Status Button</string>

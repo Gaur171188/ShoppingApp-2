@@ -15,6 +15,7 @@ import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shoppingapp.info.activities.MainActivity
+import com.shoppingapp.info.data.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -71,6 +72,7 @@ fun <T> debounce(
         }
     }
 }
+
 
 class DotsIndicatorDecoration(
     private val radius: Float,

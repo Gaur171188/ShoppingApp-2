@@ -239,7 +239,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     }
 
 
-    fun loadQuantity(productId: String, cartItem: List<User.CartItem>) {
+    private fun loadQuantity(productId: String, cartItem: List<User.CartItem>) {
         val quantity = cartItem.find { it.productId == productId }?.quantity
         if (quantity != null) {
             _productQuantity.value = quantity
@@ -248,7 +248,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
         }
     }
 
-    fun loadCartItems(cartItem: List<User.CartItem>) {
+    private fun loadCartItems(cartItem: List<User.CartItem>) {
         _cartItems.value = cartItem
     }
 
@@ -271,7 +271,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     }
 
 
-    fun loadCardProducts(){
+    private fun loadCardProducts(){
         val cartProducts = ArrayList<Product>()
         val cartItems = _cartItems.value?.map { it.productId }
         _products.value?.forEach { product->
@@ -284,7 +284,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     }
 
     // load items price
-    fun loadItemsPrice() {
+    private fun loadItemsPrice() {
         val priceMap = mutableMapOf<String, Double>()
         _cartItems.value?.forEach { item ->
             val cartProduct = _products.value?.find { it.productId == item.productId }!!
@@ -295,7 +295,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     }
 
 
-    fun loadItemsPriceTotal(price: Map<String, Double>): Double {
+    private fun loadItemsPriceTotal(price: Map<String, Double>): Double {
         var totalPrice = 0.0
         price.forEach { (itemId, price) ->
             totalPrice += price * (_cartItems.value?.find { it.itemId == itemId }?.quantity ?: 1)
@@ -306,7 +306,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     }
 
 
-    fun loadQuantityCount(): Int {
+    private fun loadQuantityCount(): Int {
         var totalCount = 0
         _cartItems.value?.forEach {
             totalCount += it.quantity
@@ -316,10 +316,18 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     }
 
 
+    fun searchByProductName(query: String?): List<Product> {
+        val result = if (!query.isNullOrEmpty()) {
+            _products.value?.filter { it.name.contains(query) }
+        }else {
+            _products.value
+        }
+        return result!!
+    }
 
 
 
-    fun addToCart(product: Product,userId: String) {
+    fun addToCart(product: Product) {
         Log.d(TAG, "onAddingCartItem: Loading..")
         _insertCartStatus.value = DataStatus.LOADING
         viewModelScope.launch {
@@ -374,7 +382,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
 
 
 
-    fun updateCartItem(productId: String,userId: String) {
+    fun updateCartItem(productId: String) {
         Log.d(TAG, "onUpdatingCartItem: Loading..")
         _updateCartStatus.value = DataStatus.LOADING
         viewModelScope.launch {

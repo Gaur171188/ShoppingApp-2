@@ -277,13 +277,15 @@ class ProductDetails: Fragment() {
             if(isItemInCart){
                 findNavController().navigate(R.id.action_productDetails_to_cart)
             }else{
-                homeViewModel.addToCart(product,userId)
+                homeViewModel.addToCart(product)
             }
         }else {
-            homeViewModel.updateCartItem(product.productId,userId)
+            homeViewModel.updateCartItem(product.productId)
         }
 
     }
+
+
 
 
 //    private fun setShoeSizeButtons() {

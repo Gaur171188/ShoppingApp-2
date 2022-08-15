@@ -11,7 +11,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.room.Index
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.User
@@ -20,7 +19,6 @@ import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.Constants
 import com.shoppingapp.info.utils.hideKeyboard
 import com.shoppingapp.info.utils.orderStatusFilters
-import com.shoppingapp.info.utils.showMessage
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
@@ -42,20 +40,20 @@ class Orders: Fragment() {
         viewModel = ViewModelProvider(this)[OrdersViewModel::class.java]
 
 
-
         setViews()
         setObservers()
 
         return binding.root
-
     }
+
 
     private fun navigateToOrderDetails(order: User.OrderItem) {
         val data = bundleOf(Constants.KEY_ORDER to order)
         findNavController().navigate(R.id.action_orders_to_orderDetails,data)
     }
 
-    private fun setAdapter(){
+
+    private fun setAdapter() {
 //        val orders = homeViewModel.orders.value ?: emptyList()
         orderController.setData(emptyList())
 
@@ -63,12 +61,6 @@ class Orders: Fragment() {
 
             override fun onItemClick(order: User.OrderItem) {
                 navigateToOrderDetails(order)
-
-//                if(homeViewModel.){
-//                    navigateToOrderDetails(order.orderId)
-//                }else{
-//                    Toast.makeText(requireContext(),"click",Toast.LENGTH_SHORT).show()
-//                }
 
             }
 
@@ -111,15 +103,14 @@ class Orders: Fragment() {
 
 
             /** button search **/
-            orderTopAppBar.homeSearchEditText.setOnEditorActionListener { text, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-//                    performSearch(text.text.toString())
-                    orderTopAppBar.homeSearchEditText.setText("")
+            orderTopAppBar.homeSearchEditText.setOnEditorActionListener { textView, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) { // search
+                    val orders = homeViewModel.orders.value ?: emptyList()
+                    val query = textView.text.trim().toString()
+                    orderController.setData(viewModel.searchByOrderId(query,orders))
                     hideKeyboard()
-                    true
-                } else {
-                    false
-                }
+                    true }
+                else { false }
             }
 
             /** button clear search edit text **/
@@ -142,7 +133,7 @@ class Orders: Fragment() {
     private fun setObservers() {
 
         /** orders live data **/
-        homeViewModel.orders.observe(viewLifecycleOwner){ orders->
+        homeViewModel.orders.observe(viewLifecycleOwner) { orders->
             if (!orders.isNullOrEmpty()) {
                 orderController.setData(orders)
                 binding.swipeRefreshLayout.isRefreshing = false
@@ -154,8 +145,6 @@ class Orders: Fragment() {
     private fun setAppBarItemClicks(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.item_filter -> {
-//                val extraFilters = arrayOf("All", "None")
-//                val categoryList = ProductCategories.plus(filters)
                 val checkedItem = orderStatusFilters.indexOf(viewModel.filterOrderStatus.value)
                 showDialogWithItems(orderStatusFilters, checkedItem)
                 true
@@ -167,8 +156,7 @@ class Orders: Fragment() {
 
     private fun showDialogWithItems(
         categoryItems: Array<String>,
-        checkedOption: Int = 0
-    ) {
+        checkedOption: Int = 0) {
         var checkedItem = checkedOption
 
         MaterialAlertDialogBuilder(requireContext())
@@ -191,8 +179,8 @@ class Orders: Fragment() {
                     dialog.cancel()
                 }
                 .show()
-
     }
+
 
 
 

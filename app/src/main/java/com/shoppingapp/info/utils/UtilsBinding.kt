@@ -126,8 +126,11 @@ fun setPrice(tv: TextView, v: Double) {
 
 @BindingAdapter("setOrderDate")
 fun setOrderDate(tv: TextView, date: Date){
-    tv.text = SimpleDateFormat("dd/MM/yyyy").format(date)
+    val date = SimpleDateFormat("dd/MM/yyyy").format(date)
+    tv.text = "Ordered on: $date"
 }
+
+
 
 
 //@BindingAdapter(value = ["date","status"], requireAll = true)

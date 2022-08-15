@@ -27,10 +27,13 @@ class OrdersViewModel(): ViewModel() {
     }
 
 
-    fun search(query: String){
-        viewModelScope.launch {
-
+    fun searchByOrderId(query: String?, orders: List<User.OrderItem>): List<User.OrderItem> {
+        val result = if (!query.isNullOrEmpty()){
+            orders.filter { it.orderId.contains(query) }
+        }else{
+            orders
         }
+        return result
     }
 
 

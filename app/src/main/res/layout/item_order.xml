@@ -44,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                setTitle="@{order.orderId}"
+                android:text="@{order.orderId}"
                 android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"

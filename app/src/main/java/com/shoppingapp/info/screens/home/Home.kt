@@ -142,15 +142,14 @@ class Home : Fragment() {
 
     }
 
-    private fun performSearch(query: String) {
-//        viewModel.filterBySearch(query)
-    }
 
 
     private fun setAppBarItemClicks(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.item_filter -> {
                 val extraFilters = arrayOf("All", "None")
+
+                // todo replace product categories with categories filter data.
                 val categoryList = ProductCategories.plus(extraFilters)
                 val checkedItem = categoryList.indexOf(viewModel.filterCategory.value)
                 showDialogWithItems(categoryList, checkedItem, true)
@@ -180,16 +179,17 @@ class Home : Fragment() {
             homeTopAppBar.homeSearchEditText.hint = resources.getString(R.string.search_product)
 
             /** button search **/
-            homeTopAppBar.homeSearchEditText.setOnEditorActionListener { text, actionId, _ ->
+            homeTopAppBar.homeSearchEditText.setOnEditorActionListener { textView, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    performSearch(text.text.toString())
-                    homeTopAppBar.homeSearchEditText.setText("")
+                    val query = textView.text.trim().toString()
+                    productController.setData(viewModel.searchByProductName(query))
                     hideKeyboard()
                     true
                 } else {
                     false
                 }
             }
+
 
             /** button clear search edit text **/
             homeTopAppBar.searchOutlinedTextLayout.setEndIconOnClickListener {
