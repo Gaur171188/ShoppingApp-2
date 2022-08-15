@@ -65,6 +65,7 @@
     <string name="phone">Phone</string>
     <string name="payment_error">Payment Error</string>
     <string name="next">Next</string>
+    <string name="accept_order">Accept Order</string>
     <string name="name">Name</string>
     <string name="password">Password</string>
     <string name="sign_up">Sign Up</string>

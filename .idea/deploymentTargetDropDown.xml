@@ -1,13 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="deploymentTargetDropDown">
+    <targetSelectedWithDropDown>
+      <Target>
+        <type value="QUICK_BOOT_TARGET" />
+        <deviceKey>
+          <Key>
+            <type value="VIRTUAL_DEVICE_PATH" />
+            <value value="C:\Users\Mamon Aburawi\.android\avd\Pixel_4_Android_10.avd" />
+          </Key>
+        </deviceKey>
+      </Target>
+    </targetSelectedWithDropDown>
+    <timeTargetWasSelectedWithDropDown value="2022-08-15T09:29:21.557412900Z" />
+    <multipleDevicesSelectedInDropDown value="true" />
     <runningDeviceTargetsSelectedWithDialog>
       <Target>
         <type value="RUNNING_DEVICE_TARGET" />
         <deviceKey>
           <Key>
-            <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\Mamon Aburawi\.android\avd\Pixel_4_Android_10.avd" />
+            <type value="SERIAL_NUMBER" />
+            <value value="520086c6b8db7559" />
           </Key>
         </deviceKey>
       </Target>
@@ -18,16 +31,7 @@
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\Mamon Aburawi\.android\avd\Pixel_4_Android_11.avd" />
-          </Key>
-        </deviceKey>
-      </Target>
-      <Target>
-        <type value="QUICK_BOOT_TARGET" />
-        <deviceKey>
-          <Key>
-            <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\Mamon Aburawi\.android\avd\Pixel_4_Android_10.avd" />
+            <value value="C:\Users\Mamon Aburawi\.android\avd\Pixel_3a_Android_10.avd" />
           </Key>
         </deviceKey>
       </Target>

@@ -149,14 +149,12 @@ class Cart : Fragment() {
 
         /** live data insert Cart Status **/
         homeViewModel.removeCartStatus.observe(viewLifecycleOwner) { status ->
-            when (status) {
-                DataStatus.LOADING -> {}
-                DataStatus.SUCCESS -> {
-                    homeViewModel.loadData()
+            if (status != null){
+                when (status) {
+                    DataStatus.LOADING -> {}
+                    DataStatus.SUCCESS -> { homeViewModel.loadData() }
+                    DataStatus.ERROR ->{}
                 }
-                DataStatus.ERROR ->{}
-
-                else -> {}
             }
         }
 

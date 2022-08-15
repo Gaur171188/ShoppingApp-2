@@ -303,11 +303,19 @@ class RemoteUserRepository() {
     }
 
 
-     suspend fun insertCartItem(newItem: User.CartItem, userId: String): Task<Void> {
-        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
-        val docId = userRef.documents[0].id
-        return usersPath().document(docId)
-            .update(CART_FIELD, FieldValue.arrayUnion(newItem.toHashMap()))
+//     suspend fun insertCartItem(newItem: User.CartItem, userId: String): Task<Void> {
+//        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
+//        val docId = userRef.documents[0].id
+//        return usersPath().document(docId)
+//            .update(CART_FIELD, FieldValue.arrayUnion(newItem.toHashMap()))
+//    }
+
+    suspend fun insertCartItem(newItem: User.CartItem, userId: String): Task<Void> {
+       return usersPath().document(userId).update(CART_FIELD, FieldValue.arrayUnion(newItem.toHashMap()))
+//        val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
+//        val docId = userRef.documents[0].id
+//        return usersPath().document(docId)
+//            .update(CART_FIELD, FieldValue.arrayUnion(newItem.toHashMap()))
     }
 
 

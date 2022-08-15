@@ -1,6 +1,7 @@
 package com.shoppingapp.info.screens.order_details
 
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -18,6 +19,7 @@ import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.Constants
 import com.shoppingapp.info.utils.SharePrefManager
 import com.shoppingapp.info.utils.getItemsPriceTotal
+import com.shoppingapp.info.utils.hide
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import kotlin.properties.Delegates
 
@@ -102,14 +104,33 @@ class OrderDetails: Fragment() {
     }
 
 
+    fun setUserViews(){
+
+        binding.apply {
+
+            if (homeViewModel.isUserSeller.value!!){ // seller
+                btnNextAccept.text = resources.getString(R.string.accept_order)
+                btnNextAccept.setTextColor(Color.WHITE)
+                btnNextAccept.setBackgroundColor(Color.GREEN)
+            }else{ // admin or customer
+                btnNextAccept.text = resources.getString(R.string.next)
+            }
+        }
+    }
+
+
     private fun setViews() {
 
 
-        setAdapter()
 
         binding.apply {
 
             orderDetailAppBar.topAppBar.title = "Order Details"
+
+
+            setUserViews()
+            setAdapter()
+
 
             /** back button **/
             orderDetailAppBar.topAppBar.setOnClickListener {
@@ -132,14 +153,25 @@ class OrderDetails: Fragment() {
             }
 
 
-            /** button next **/
-            btnNext.setOnClickListener {
+            /** button next, accept **/
+            btnNextAccept.setOnClickListener {
                 val data = bundleOf(Constants.KEY_ORDER to order)
-                findNavController().navigate(R.id.action_orderDetails_to_payment,data)
+                if (homeViewModel.isUserSeller.value!!){ // seller
+                    acceptOrder()
+                }else{ // admin or customer
+                    findNavController().navigate(R.id.action_orderDetails_to_payment,data)
+                }
+
             }
 
 
+
+
         }
+    }
+
+    fun acceptOrder() {
+
     }
 
 }

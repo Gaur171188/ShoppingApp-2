@@ -113,15 +113,17 @@ class Home : Fragment() {
 
             /** products status **/
             viewModel.productsStatus.observe(viewLifecycleOwner) { status ->
-                when (status){
-                    DataStatus.LOADING -> {
-                        val isFirstLoad = viewModel.products.value.isNullOrEmpty()
-                        if (isFirstLoad){ // show progress only for first time load
-                            loaderLayout.root.show()
+                if (status != null){
+                    when (status){
+                        DataStatus.LOADING -> {
+                            val isFirstLoad = viewModel.products.value.isNullOrEmpty()
+                            if (isFirstLoad){ // show progress only for first time load
+                                loaderLayout.root.show()
+                            }
                         }
+                        DataStatus.SUCCESS -> {loaderLayout.root.hide()}
+                        DataStatus.ERROR -> {loaderLayout.root.hide()}
                     }
-                    DataStatus.SUCCESS -> {loaderLayout.root.hide()}
-                    DataStatus.ERROR -> {loaderLayout.root.hide()}
                 }
             }
 
@@ -133,7 +135,6 @@ class Home : Fragment() {
                         DataStatus.SUCCESS -> { viewModel.resetProgress() }
                         DataStatus.LOADING -> {}
                         DataStatus.ERROR -> {}
-                        else -> {}
                     }
                 }
             }
@@ -172,6 +173,8 @@ class Home : Fragment() {
             else -> false
         }
     }
+
+
 
     private fun setHomeTopAppBar() {
         binding.apply {

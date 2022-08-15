@@ -139,9 +139,6 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     val dataStatus: LiveData<DataStatus> get() = _dataStatus
 
 
-//    private val _user = MutableLiveData<User?>()
-//    val user: LiveData<User?> get() = _user
-
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
@@ -153,10 +150,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     private val _orders= MutableLiveData<List<User.OrderItem>?>()
     val orders: LiveData<List<User.OrderItem>?> = _orders
 
-    init {
-//        _isUserSeller.value = userRepo.isUserSeller
-        Log.d(TAG,userRepo.isUserSeller.toString())
-    }
+
 
     // load products
     // load liked products
@@ -165,26 +159,20 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     // load cart products
 
 
+
     fun loadData() {
         Log.d(TAG,"OnGettingData: Loading..")
         _productsStatus.value = DataStatus.LOADING
         viewModelScope.launch {
 
             val user = userRepo.getUserById(FirebaseAuth.getInstance().currentUser!!.uid)
-            val isSeller = user?.userType == UserType.SELLER.name
 
-            if(isSeller){
-               Log.d(TAG,"Seller")
-            }else{
-                Log.d(TAG,"customer")
-            }
-
-
+            val orders = user?.orders
             val likes = user?.likes
             val cart = user?.cart
             val balance = user?.wallet?.balance
 
-//            _isUserSeller.value = isSeller
+            _orders.value = orders
             _userData.value = user
             _userLikes.value = likes
             _cartItems.value = cart

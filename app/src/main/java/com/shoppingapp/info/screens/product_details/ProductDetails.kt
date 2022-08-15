@@ -57,6 +57,7 @@ class ProductDetails: Fragment() {
         super.onResume()
 
 
+
         homeViewModel.loadProductDetails(product)
 
     }
@@ -96,24 +97,24 @@ class ProductDetails: Fragment() {
         }
 
 
-//        /** cart Items **/
-//        homeViewModel.cartItems.observe(viewLifecycleOwner) { items ->
-//
-//            isItemInCart = items?.map{ it.productId }?.contains(product.productId)!!
-//            // set button text
-//
-//            if (isItemInCart) {
-//                binding.btnAddToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
-//            } else {
-//                binding.btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
-//            }
-//
+        /** cart Items **/
+        homeViewModel.cartItems.observe(viewLifecycleOwner) { items ->
+
+            isItemInCart = items?.map{ it.productId }?.contains(product.productId)!!
+            // set button text
+
+            if (isItemInCart) {
+                binding.btnAddToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
+            } else {
+                binding.btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
+            }
+
 //            if(isEdit){
 //                binding.btnAddToCart.text = getString(R.string.update_cart)
 //            }
-//
-//
-//        }
+
+
+        }
 
 
         /** insert Cart Status **/
@@ -221,12 +222,12 @@ class ProductDetails: Fragment() {
 
             binding.btnLikeProduct.isChecked = isLiked
 
-            // set button text
-            if (isItemInCart) {
-                    btnAddToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
-                } else {
-                    btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
-                }
+//            // set button text
+//            if (isItemInCart) {
+//                    btnAddToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
+//                } else {
+//                    btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
+//                }
 
             if(isEdit){
                 binding.btnAddToCart.text = getString(R.string.update_cart)

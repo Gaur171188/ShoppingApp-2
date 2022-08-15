@@ -36,7 +36,7 @@
 
             <include
                 android:id="@+id/orders_app_bar"
-                layout="@layout/layout_top_bar"
+                layout="@layout/app_bar_label_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
