@@ -12,6 +12,7 @@ import com.shoppingapp.info.databinding.ActivityMainBinding
 import com.shoppingapp.info.receiver.NetworkReceiver
 import com.shoppingapp.info.utils.Constants
 import com.shoppingapp.info.utils.SharePrefManager
+import com.shoppingapp.info.utils.UserType
 import com.shoppingapp.info.utils.showMessage
 
 class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverListener {
@@ -19,6 +20,8 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
     private lateinit var binding: ActivityMainBinding
     private val networkReceiver = NetworkReceiver()
     private var isConnected: Boolean? = null
+
+
 
 
 
@@ -30,7 +33,7 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
 
         // set up navigation bottom
         setUpNav()
-
+        setUserTypeViews()
 
 //        registerReceiver(networkReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
 //
@@ -62,6 +65,28 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
     }
 
 
+
+    private fun setUserTypeViews() {
+        val sessionManager = SharePrefManager(this.applicationContext)
+        when(sessionManager.loadUser().userType){ // user type
+            UserType.CUSTOMER.name-> {
+                binding.homeBottomNavigation.menu.removeItem(R.id.orders)
+                binding.homeBottomNavigation.menu.removeItem(R.id.users)
+                binding.homeBottomNavigation.menu.removeItem(R.id.statistics)
+            }
+            UserType.SELLER.name-> {
+                binding.homeBottomNavigation.menu.removeItem(R.id.users)
+                binding.homeBottomNavigation.menu.removeItem(R.id.statistics)
+            }
+            UserType.ADMIN.name-> {
+                binding.homeBottomNavigation.menu.removeItem(R.id.orders)
+                binding.homeBottomNavigation.menu.removeItem(R.id.account)
+
+            }
+        }
+        
+    }
+
     private fun setUpNav() {
         val navFragment =
             supportFragmentManager.findFragmentById(R.id.home_nav_host_fragment) as NavHostFragment
@@ -73,16 +98,13 @@ class MainActivity : AppCompatActivity(),NetworkReceiver.ConnectivityReceiverLis
                 R.id.account -> setBottomNavVisibility(View.VISIBLE)
                 R.id.orders -> setBottomNavVisibility(View.VISIBLE)
                 R.id.orderSuccess -> setBottomNavVisibility(View.VISIBLE)
+                R.id.users -> setBottomNavVisibility(View.VISIBLE)
+                R.id.statistics -> setBottomNavVisibility(View.VISIBLE)
                 else -> setBottomNavVisibility(View.GONE)
             }
         }
 
-        val sessionManager = SharePrefManager(this.applicationContext)
-        if (sessionManager.isUserSeller()) { // Seller
-            binding.homeBottomNavigation.menu.removeItem(R.id.cart)
-        }else { // customer
-            binding.homeBottomNavigation.menu.removeItem(R.id.orders)
-        }
+
     }
 
     private fun setBottomNavVisibility(visibility: Int) {

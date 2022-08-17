@@ -11,7 +11,12 @@
         android:id="@+id/item_cart"
         android:icon="@drawable/ic_outlined_shopping_cart_24"
         android:title="@string/cart"
-        android:titleCondensed="@string/cart"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/item_options"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/options"
         app:showAsAction="ifRoom" />
 
     <item

@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.shoppingapp.info.R
 import com.shoppingapp.info.activities.MainActivity
 import com.shoppingapp.info.databinding.LunchBinding
+import com.shoppingapp.info.utils.showMessage
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class Lunch : Fragment() {
@@ -50,11 +51,11 @@ class Lunch : Fragment() {
 
 
 
-
-
     fun isUserLogged() {
         val isRem = viewModel.isRem
         val isLogged = viewModel.isUserLogged
+//        showMessage(requireContext(),viewModel.userType!!)
+
         if (isRem && isLogged) { // user is rem me  and logged
             val intent = Intent(requireContext(), MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)

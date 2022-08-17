@@ -2,6 +2,7 @@ package com.shoppingapp.info.screens.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.firestore.auth.User
 import com.shoppingapp.info.utils.ProductCategories
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.Product
@@ -40,8 +42,9 @@ class Home : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(layoutInflater,R.layout.home,container,false)
-//        favoritesViewModel = ViewModelProvider(this)[FavoritesViewModel::class.java]
 
+
+        initData()
 
         setViews()
         setObservers()
@@ -49,10 +52,21 @@ class Home : Fragment() {
         return binding.root
     }
 
+    private fun initData() {
+//        val userType = SharePrefManager(requireContext()).getUserType().toString()
+//        val isUserSeller = SharePrefManager(requireContext()).isUserSeller()
+        val user = SharePrefManager(requireContext()).loadUser()
+
+
+        viewModel.setData(user)
+//        showMessage(requireContext(), user.userType)
+    }
 
 
     override fun onResume() {
         super.onResume()
+
+//        showMessage(requireContext(), viewModel.userType.value!!)
 
         viewModel.loadData()
 
@@ -61,26 +75,52 @@ class Home : Fragment() {
 
 
     private fun setViews() {
+        binding.apply {
 
-        /** swipe to refresh **/
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.loadData()
+            /** swipe to refresh **/
+            swipeRefreshLayout.setOnRefreshListener {
+                viewModel.loadData()
+            }
+
+            setHomeTopAppBar()
+            setProductsAdapter()
+
+
+            /** button add product **/
+            btnAddProduct.setOnClickListener {
+                showDialogWithItems(ProductCategories, 0, false)
+            }
+
         }
 
-        setUserViews()
-        setHomeTopAppBar()
-        setProductsAdapter()
-
-
-        binding.btnAddProduct.setOnClickListener {
-            showDialogWithItems(ProductCategories, 0, false)
-        }
 
     }
 
     private fun setUserViews() {
-        binding.homeTopAppBar.homeViewModel = viewModel
-        binding.homeViewModel = viewModel
+        binding.apply {
+
+            when(SharePrefManager(requireContext()).loadUser().userType) {
+                UserType.CUSTOMER.name -> { /** customer **/
+                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_options)
+                    btnAddProduct.hide()
+
+                }
+                UserType.SELLER.name -> { /** seller **/
+                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites)
+                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_cart)
+                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_options)
+                    btnAddProduct.show()
+
+                }
+                UserType.ADMIN.name ->{ /** admin **/
+                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites)
+                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_cart)
+                    btnAddProduct.hide()
+
+                }
+            }
+
+        }
     }
 
 
@@ -175,6 +215,9 @@ class Home : Fragment() {
             /** set app bar menu **/
             homeTopAppBar.topAppBar.inflateMenu(R.menu.home_app_bar_menu)
 
+            setUserViews()
+
+
             /** set hint **/
             homeTopAppBar.homeSearchEditText.hint = resources.getString(R.string.search_product)
 
@@ -207,8 +250,9 @@ class Home : Fragment() {
 
     private fun setProductsAdapter() {
         val likesList = viewModel.userLikes.value ?: emptyList()
-        val isSeller = viewModel.isUserSeller.value!!
-        productController.isSeller = isSeller
+        val isSeller = viewModel.userData.value?.userType == UserType.SELLER.name
+        val userType = viewModel.userData.value?.userType!!
+        productController.userType = userType
         productController.likes = likesList
         productController.setData(emptyList())
 
@@ -219,12 +263,7 @@ class Home : Fragment() {
             override fun onAdClicked() {}
 
             override fun onProductClick(product: Product) {
-
-                if (isSeller) { // go to add edit product
-                    val data = bundleOf(Constants.KEY_IS_EDIT to true , Constants.KEY_PRODUCT to product )
-                    findNavController().navigate(R.id.action_goto_addProduct, data)
-                }else { // go to product details
-
+                if (viewModel.userData.value?.userType == UserType.CUSTOMER.name) {
                     val isProductInCart = viewModel.cartItems.value?.map{ it.productId }?.contains(product.productId)
                     val isLiked = viewModel.likedProducts.value?.contains(product)!!
                     val data =  bundleOf(
@@ -233,7 +272,27 @@ class Home : Fragment() {
                         Constants.KEY_CHECK_IN_CART to isProductInCart,
                         Constants.KEY_IS_LIKED to isLiked)
                     findNavController().navigate(R.id.action_home_to_productDetails,data)
+                }else{
+                    val data = bundleOf(
+                        Constants.KEY_IS_EDIT to true,
+                        Constants.KEY_PRODUCT to product )
+                    findNavController().navigate(R.id.action_goto_addProduct, data)
                 }
+
+//                if (isSeller) { // go to add edit product
+//                    val data = bundleOf(Constants.KEY_IS_EDIT to true , Constants.KEY_PRODUCT to product )
+//                    findNavController().navigate(R.id.action_goto_addProduct, data)
+//                }else { // go to product details
+//
+//                    val isProductInCart = viewModel.cartItems.value?.map{ it.productId }?.contains(product.productId)
+//                    val isLiked = viewModel.likedProducts.value?.contains(product)!!
+//                    val data =  bundleOf(
+//                        Constants.KEY_PRODUCT to product,
+//                        Constants.KEY_IS_EDIT to false,
+//                        Constants.KEY_CHECK_IN_CART to isProductInCart,
+//                        Constants.KEY_IS_LIKED to isLiked)
+//                    findNavController().navigate(R.id.action_home_to_productDetails,data)
+//                }
 
             }
 

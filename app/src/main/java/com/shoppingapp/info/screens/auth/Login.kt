@@ -31,6 +31,7 @@ class Login : Fragment() {
 
     private var email: String = ""
     private var password: String = ""
+    private var isRemOn: Boolean? = null
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -63,7 +64,7 @@ class Login : Fragment() {
             btnLogin.setOnClickListener {
                 email = loginEmail.text!!.trim().toString()
                 password = loginPassword.text!!.trim().toString()
-                val isRemOn = binding.loginRememberSwitch.isChecked
+                isRemOn = binding.loginRememberSwitch.isChecked
 
                 if (email.isEmpty() && password.isEmpty()){
                     viewModel.errorMessage.value = "all fields is required!"
@@ -92,8 +93,8 @@ class Login : Fragment() {
                         binding.loginPassword.error = "6 char required!"
                         binding.loginPassword.requestFocus()
                         return@setOnClickListener
-                    }else{
-                        viewModel.login(email, password,isRemOn)
+                    }else {
+                        viewModel.login(email, password, isRemOn!!)
                     }
 
 
@@ -141,7 +142,7 @@ class Login : Fragment() {
 
         /** live data isLogin **/
         viewModel.isLogged.observe(viewLifecycleOwner) { isLogged ->
-            if (isLogged != null) {
+            if (isLogged != null && isLogged) {
                 val intent = Intent(activity, MainActivity::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 startActivity(intent)

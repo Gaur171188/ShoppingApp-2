@@ -10,17 +10,18 @@ import kotlinx.parcelize.Parcelize
 @Entity(tableName = "products")
 data class Product (
     @PrimaryKey
-    var productId: String = "",
+    val productId: String = "",
     var name: String = "",
-    var owner: String = "",
+    val owner: String = "",
     var description: String = "",
-    var category: String = "",
+    val category: String = "",
     var price: Double = 0.0,
     var mrp: Double = 0.0,
     var availableSizes: List<Int?> = ArrayList(),
     var availableColors: List<String?> = ArrayList(),
     var images: List<String> = ArrayList(),
-    var rating: Double = 0.0
+    val country: String = "",
+    val rating: Double = 0.0
 ): Parcelable {
     fun toHashMap(): HashMap<String, Any> {
         return hashMapOf(
@@ -33,6 +34,7 @@ data class Product (
             "availableSizes" to availableSizes,
             "availableColors" to availableColors,
             "images" to images,
+            "country" to country,
             "rating" to rating
         )
     }

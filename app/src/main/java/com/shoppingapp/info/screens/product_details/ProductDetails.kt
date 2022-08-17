@@ -33,7 +33,6 @@ class ProductDetails: Fragment() {
 
 
     private lateinit var product: Product
-    private var userId = ""
     private var isItemInCart by Delegates.notNull<Boolean>()
     private var isLiked by Delegates.notNull<Boolean>()
     private var isEdit by Delegates.notNull<Boolean>()
@@ -79,7 +78,7 @@ class ProductDetails: Fragment() {
         isItemInCart = arguments?.getBoolean(Constants.KEY_CHECK_IN_CART)!!
         isLiked = arguments?.getBoolean(Constants.KEY_IS_LIKED)!!
         isEdit = arguments?.getBoolean(Constants.KEY_IS_EDIT)!!
-        userId = homeViewModel.userData.value?.userId ?: ""
+
     }
 
 
@@ -109,9 +108,9 @@ class ProductDetails: Fragment() {
                 binding.btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
             }
 
-//            if(isEdit){
-//                binding.btnAddToCart.text = getString(R.string.update_cart)
-//            }
+            if(isEdit){
+                binding.btnAddToCart.text = getString(R.string.update_cart)
+            }
 
 
         }
@@ -229,9 +228,9 @@ class ProductDetails: Fragment() {
 //                    btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
 //                }
 
-            if(isEdit){
-                binding.btnAddToCart.text = getString(R.string.update_cart)
-            }
+//            if(isEdit){
+//                binding.btnAddToCart.text = getString(R.string.update_cart)
+//            }
 
             // set images and dots
             setImagesView()

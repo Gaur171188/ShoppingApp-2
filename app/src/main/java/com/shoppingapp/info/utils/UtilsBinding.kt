@@ -48,13 +48,13 @@ fun imageProfile(image: ImageView, imageUri: String?) {
 }
 
 
-@BindingAdapter("setAppBarItems")
-fun setAppBarItems(topAppBar: MaterialToolbar, isSeller: Boolean){
-    if (isSeller){
-        topAppBar.menu.removeItem(R.id.item_favorites)
-        topAppBar.menu.removeItem(R.id.item_cart)
-    }
-}
+//@BindingAdapter("setAppBarItems")
+//fun setAppBarItems(topAppBar: MaterialToolbar, isSeller: Boolean){
+//    if (isSeller){
+//        topAppBar.menu.removeItem(R.id.item_favorites)
+//        topAppBar.menu.removeItem(R.id.item_cart)
+//    }
+//}
 
 
 
@@ -69,11 +69,11 @@ fun setAppBarItems(topAppBar: MaterialToolbar, isSeller: Boolean){
 //}
 
 @BindingAdapter("setLikeButtonStatus")
-fun setLikeButtonStatus(v: View, isSeller: Boolean){
-    if (isSeller){
-        v.hide()
-    }else{
+fun setLikeButtonStatus(v: View, isCustomer: Boolean) {
+    if (isCustomer){
         v.show()
+    }else{
+        v.hide()
     }
 }
 

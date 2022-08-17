@@ -122,6 +122,11 @@
     <string name="add_balance">Add Balance</string>
     <string name="signout">SignOut</string>
     <string name="my_wallet">My Wallet</string>
+    <string name="statistics">Statistics</string>
+    <string name="users">Users</string>
+    <string name="user">User</string>
+    <string name="options">Options</string>
+    <string name="cart_items">Cart Items</string>
 
 
 </resources>

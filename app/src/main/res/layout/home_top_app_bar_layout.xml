@@ -6,10 +6,6 @@
     <data>
 
 
-        <variable
-            name="homeViewModel"
-            type="com.shoppingapp.info.screens.home.HomeViewModel" />
-
     </data>
 
     <com.google.android.material.appbar.AppBarLayout
@@ -26,7 +22,6 @@
             android:layout_height="72dp"
             android:background="@color/white"
             app:buttonGravity="center_vertical"
-            setAppBarItems="@{homeViewModel.isUserSeller()}"
             app:contentInsetStartWithNavigation="0dp"
             app:titleTextAppearance="@style/TextAppearance.MyTheme.Headline6"
             app:titleTextColor="@color/black">

@@ -183,5 +183,15 @@
         android:name="com.shoppingapp.info.screens.wallet.Wallet"
         android:label="Wallet"
         tools:layout="@layout/wallet"/>
+    <fragment
+        android:id="@+id/statistics"
+        android:name="com.shoppingapp.info.screens.statistics.Statistics"
+        android:label="Statistics"
+        tools:layout="@layout/statistics"/>
+    <fragment
+        android:id="@+id/users"
+        android:name="com.shoppingapp.info.screens.users.Users"
+        android:label="Users"
+        tools:layout="@layout/users"/>
 
 </navigation>

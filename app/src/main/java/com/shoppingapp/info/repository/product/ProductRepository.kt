@@ -6,8 +6,12 @@ import android.util.Log
 import androidx.core.net.toUri
 import com.google.android.gms.tasks.Task
 import com.shoppingapp.info.data.Product
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.ERR_UPLOAD
+import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.utils.SharePrefManager
+import kotlinx.coroutines.async
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.tasks.await
 import java.util.*
 
@@ -19,6 +23,20 @@ class ProductRepository(val context: Context, private val remote: RemoteProductR
 
 
     suspend fun getProducts() = remote.getProducts()
+
+
+    suspend fun loadProducts(): Result<List<Product>> {
+        return supervisorScope {
+            try {
+                val task = async { remote.loadProducts() }
+                Result.Success(task.await())
+            }catch (ex: Exception){
+                Result.Error(Exception(ex.message))
+            }
+        }
+    }
+
+
 
     suspend fun insertProduct(product: Product) = remote.insertProduct(product)
 
@@ -33,6 +51,7 @@ class ProductRepository(val context: Context, private val remote: RemoteProductR
 
 
     suspend fun updateFiles(newList: List<Uri>, oldList: List<String>) = remote.updateFiles(newList, oldList)
+
 
 
 

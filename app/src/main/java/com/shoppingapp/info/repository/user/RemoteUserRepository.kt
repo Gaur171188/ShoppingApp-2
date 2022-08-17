@@ -30,96 +30,13 @@ class RemoteUserRepository() {
 
 
 
-
-//    private suspend fun signInWithEmailAndPassword(
-//        email: String,
-//        password: String,
-//        onSuccess: (Boolean) -> Unit,
-//        onError: (String) -> Unit
-//    ) {
-//        return supervisorScope {
-//            val task = async {
-//                auth.signInWithEmailAndPassword(email, password)
-//                    .addOnCompleteListener {
-//                        if (it.isSuccessful){
-//                            if (it.result.user!!.isEmailVerified){
-//                                Log.d(TAG,"Login Success: ${it.result}")
-//                                onSuccess(true)
-//
-//                            }else{
-//                                val error = "email is not verified!"
-//                                Log.d(TAG,"Login Error: $error")
-//                                onError(error)
-//                            }
-//                        }
-//                    }
-//                    .addOnFailureListener {
-//                        Log.d(TAG,"Login Error: ${it.message}")
-//                        onError(it.message.toString())
-//                    }
-//            }
-//            try {
-//                task.await()
-//            }catch (ex: Exception){
-//                Log.d(TAG,"Login Error: ${ex.message}")
-//                onError(ex.message.toString())
-//            }
-//        }
-//    }
-//
-//
-//
-//    suspend fun signIn(email: String,
-//                       password: String,
-//                       onSuccess:(Boolean)-> Unit,
-//                       onError:(String)-> Unit) =
-//        signInWithEmailAndPassword(email,password,onSuccess, onError)
-
-
     fun isUserLogged() = auth.currentUser != null
-
-
-//    suspend fun signWithEmailAndPassword(context: Context,email: String, password: String,isRemOn:Boolean,onSuccess: (Boolean) -> Unit,onError: (String) -> Unit) {
-//       auth.signInWithEmailAndPassword(email, password)
-//           .addOnSuccessListener { authResult ->
-//               if (authResult.user?.isEmailVerified!!){
-//                   Log.d(TAG,"onSuccess: userId: ${authResult.user!!.uid}")
-//                   usersPath().document(authResult.user!!.uid).get().addOnSuccessListener {
-//
-//                       val user = it.toObject(User::class.java)
-//                       val isSeller = user?.userType == UserType.SELLER.name
-//
-//                       val sharePrefManager = SharePrefManager(context)
-//                       sharePrefManager.createLoginSession(
-//                           id = authResult.user!!.uid,
-//                           isRemOn = isRemOn,
-//                           isSeller = isSeller)
-//                       onSuccess(true)
-//                   }
-//               }else{
-//                   Log.d(TAG,"onFailed: sign failed due to email is not verified")
-//                   onError("email is not verified")
-//               }
-//           }
-//           .addOnFailureListener { e ->
-//               Log.d(TAG,"onFailed: sign failed due to ${e.message}")
-//               onError(e.message!!)
-//           }
-//   }
 
     suspend fun signWithEmailAndPassword(email: String, password: String): AuthResult? {
         return auth.signInWithEmailAndPassword(email, password).await()
-
     }
 
-//    val isSeller = user?.userType == UserType.SELLER.name
-//
-//    val sharePrefManager = SharePrefManager(context)
-//    sharePrefManager.createLoginSession(
-//    id = authResult.user!!.uid,
-//    isRemOn = isRemOn,
-//    isSeller = isSeller)
-
+    suspend fun getUsers(): List<User> = usersPath().get().await().toObjects(User::class.java)
 
     suspend fun createUserAccount(user: User,onSuccess: (Boolean) -> Unit, onError: (String) -> Unit) {
         auth.createUserWithEmailAndPassword(user.email, user.password)
@@ -283,18 +200,16 @@ class RemoteUserRepository() {
     suspend fun updateCartItem(item: User.CartItem, userId: String): Task<Void> {
         val userRef = usersPath().whereEqualTo(USER_ID_FIELD, userId).get().await()
 
-            val docId = userRef.documents[0].id
-            val oldCart = userRef.documents[0].toObject(User::class.java)?.cart?.toMutableList()
-            val idx = oldCart?.indexOfFirst { it.itemId == item.itemId } ?: -1
-            if (idx != -1) {
-                oldCart?.set(idx, item)
-            }
-           return usersPath().document(docId)
-                .update(CART_FIELD, oldCart?.map { it.toHashMap() })
+        val docId = userRef.documents[0].id
+        val oldCart = userRef.documents[0].toObject(User::class.java)?.cart?.toMutableList()
+        val idx = oldCart?.indexOfFirst { it.itemId == item.itemId } ?: -1
+        if (idx != -1) {
+            oldCart?.set(idx, item)
+        }
+        return usersPath().document(docId)
+            .update(CART_FIELD, oldCart?.map { it.toHashMap() })
 
     }
-
-
 
 
 

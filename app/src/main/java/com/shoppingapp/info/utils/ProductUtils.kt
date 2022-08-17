@@ -33,5 +33,5 @@ val orderStatusFilters = arrayOf(
 	OrderStatus.BINDING.name,
 	OrderStatus.ARRIVING.name,
 	OrderStatus.DELIVERED.name,
-	OrderStatus.REJECT.name
+	OrderStatus.REJECTED.name
 )

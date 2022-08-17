@@ -16,7 +16,7 @@
             type="Boolean" />
 
         <variable
-            name="isSeller"
+            name="isCustomer"
             type="Boolean" />
 
 
@@ -74,7 +74,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_marginStart="5dp"
                     setLike="@{isLiked}"
-                    setLikeButtonStatus="@{isSeller}"
+                    setLikeButtonStatus="@{isCustomer}"
                     android:visibility="visible"
                     tools:checked="true"
                     android:onClick="@{onItemLiked}"

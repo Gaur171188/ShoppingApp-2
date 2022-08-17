@@ -8,11 +8,21 @@
     <item
         android:id="@+id/orders"
         android:enabled="true"
-        android:icon="@drawable/ic_outline_library_books_24"
+        android:icon="@drawable/ic_orders"
         android:title="@string/orders" />
     <item
         android:id="@+id/account"
         android:enabled="true"
         android:icon="@drawable/ic_outlined_person_24"
         android:title="@string/account"/>
+    <item
+        android:id="@+id/statistics"
+        android:enabled="true"
+        android:icon="@drawable/ic_statistics"
+        android:title="@string/statistics"/>
+    <item
+        android:id="@+id/users"
+        android:enabled="true"
+        android:icon="@drawable/ic_users"
+        android:title="@string/users"/>
 </menu>

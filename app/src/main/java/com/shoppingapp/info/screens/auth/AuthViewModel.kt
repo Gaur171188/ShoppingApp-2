@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.user.UserRepository
 import com.shoppingapp.info.utils.DataStatus
+import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.utils.UserType
 import kotlinx.coroutines.*
 
@@ -23,6 +24,7 @@ class AuthViewModel (val userRepo: UserRepository): ViewModel() {
 //
     val isUserLogged = userRepo.isUserLogged()
     val isRem = userRepo.isRem
+//    val userType = userRepo.userType
 
 
     private val _loggingStatus = MutableLiveData<DataStatus?>()
@@ -43,17 +45,6 @@ class AuthViewModel (val userRepo: UserRepository): ViewModel() {
 
 
 
-
-//    fun isUserLogged(context: Context){
-//        val sharePrefManager = SharePrefManager(context)
-//        val isRemOn = sharePrefManager.isRememberMeOn()
-//        val isLogged = sharePrefManager.isLoggedIn()
-//        if (isRemOn && isLogged){
-//            // if user logged go to main
-//            _isLogged.value = sharePrefManager.isLoggedIn()
-//        }
-//    }
-
     private fun resetData() {
         _isLogged.value = null
         _loggingStatus.value = null
@@ -64,36 +55,55 @@ class AuthViewModel (val userRepo: UserRepository): ViewModel() {
 
 
 
+
     fun login(email: String, password: String,isRemOn: Boolean) {
         resetData()
         _loggingStatus.value = DataStatus.LOADING
         viewModelScope.launch {
-            try {
-                val userId = userRepo.signWithEmailAndPassword(email,password)?.user!!.uid
-                val user = userRepo.getUserById(userId)
-                val isSeller = user?.userType == UserType.SELLER.name
-                userRepo.createUserLogging(userId,isRemOn,isSeller)
+            val task = userRepo.login(email, password, isRemOn)
+            if (task is Result.Success) {
                 _loggingStatus.value = DataStatus.SUCCESS
                 _isLogged.value = true
-            }catch (ex: FirebaseAuthInvalidUserException) {
-                val message = "user is not exist"
-                Log.d(TAG, message)
+            }else if (task is Result.Error){
                 _loggingStatus.value = DataStatus.ERROR
-                errorMessage.value = message
-            }catch (ex: FirebaseAuthInvalidCredentialsException) {
-                val message = "incorrect password"
-                Log.d(TAG, message)
-                _loggingStatus.value = DataStatus.ERROR
-                errorMessage.value = message
-            }catch (ex: FirebaseNetworkException) {
-                val message = "network connection required"
-                Log.d(TAG, message)
-                errorMessage.value = message
-                _loggingStatus.value = DataStatus.ERROR
+                errorMessage.value = task.exception.message
             }
-
         }
     }
+
+
+
+//    fun login(email: String, password: String,isRemOn: Boolean) {
+//        resetData()
+//        _loggingStatus.value = DataStatus.LOADING
+//        viewModelScope.launch {
+//            try {
+//                val userId = userRepo.signWithEmailAndPassword(email,password)?.user!!.uid
+//                val user = userRepo.getUserById(userId)
+//                val isSeller = user?.userType == UserType.SELLER.name
+//                val userType = user?.userType!!
+//                userRepo.createUserLogging(userId,isRemOn,userType,isSeller)
+//                _loggingStatus.value = DataStatus.SUCCESS
+//                _isLogged.value = user
+//            }catch (ex: FirebaseAuthInvalidUserException) {
+//                val message = "user is not exist"
+//                Log.d(TAG, message)
+//                _loggingStatus.value = DataStatus.ERROR
+//                errorMessage.value = message
+//            }catch (ex: FirebaseAuthInvalidCredentialsException) {
+//                val message = "incorrect password"
+//                Log.d(TAG, message)
+//                _loggingStatus.value = DataStatus.ERROR
+//                errorMessage.value = message
+//            }catch (ex: FirebaseNetworkException) {
+//                val message = "network connection required"
+//                Log.d(TAG, message)
+//                errorMessage.value = message
+//                _loggingStatus.value = DataStatus.ERROR
+//            }
+//
+//        }
+//    }
 
 
     fun signUp(user: User) {

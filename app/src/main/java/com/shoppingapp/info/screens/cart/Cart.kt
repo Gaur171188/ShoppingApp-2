@@ -147,16 +147,16 @@ class Cart : Fragment() {
 
 
 
-        /** live data insert Cart Status **/
-        homeViewModel.removeCartStatus.observe(viewLifecycleOwner) { status ->
-            if (status != null){
-                when (status) {
-                    DataStatus.LOADING -> {}
-                    DataStatus.SUCCESS -> { homeViewModel.loadData() }
-                    DataStatus.ERROR ->{}
-                }
-            }
-        }
+//        /** live data insert Cart Status **/
+//        homeViewModel.removeCartStatus.observe(viewLifecycleOwner) { status ->
+//            if (status != null){
+//                when (status) {
+//                    DataStatus.LOADING -> {}
+//                    DataStatus.SUCCESS -> { }
+//                    DataStatus.ERROR ->{}
+//                }
+//            }
+//        }
 
 
 
@@ -199,8 +199,9 @@ class Cart : Fragment() {
         }
 
 
+
         // total items price
-        homeViewModel.totalItemsPrice.observe(viewLifecycleOwner){ totalPrice ->
+        homeViewModel.totalItemsPrice.observe(viewLifecycleOwner) { totalPrice ->
             binding.swipeRefreshCartItems.isRefreshing = false
             if (totalPrice != null){
                 priceCartController.totalItemsPrice = totalPrice
@@ -250,7 +251,7 @@ class Cart : Fragment() {
                 }
                 // TODO: make delete item from cart require network
                 .setPositiveButton(getString(R.string.delete_dialog_delete_btn_text)) { dialog, _ ->
-                    homeViewModel.removeCartItem(itemId,userId)
+                    homeViewModel.removeCartItem(itemId)
 
 
 

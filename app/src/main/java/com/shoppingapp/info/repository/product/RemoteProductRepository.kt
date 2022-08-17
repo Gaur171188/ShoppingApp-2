@@ -43,7 +43,10 @@ class RemoteProductRepository() {
 		}
 	}
 
+
 	suspend fun getProducts() = productsPath().get()
+
+	suspend fun loadProducts(): List<Product> = productsPath().get().await().toObjects(Product::class.java)
 
 	suspend fun insertProduct(product: Product) = productsPath().document(product.productId).set(product.toHashMap())
 

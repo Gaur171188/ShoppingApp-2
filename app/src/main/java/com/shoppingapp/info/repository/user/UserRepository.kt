@@ -3,25 +3,29 @@ package com.shoppingapp.info.repository.user
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
+import com.airbnb.epoxy.stickyheader.StickyHeaderCallbacks
+import com.google.firebase.FirebaseNetworkException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.Result
 import com.shoppingapp.info.utils.SharePrefManager
-import com.shoppingapp.info.utils.UserType
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.*
+import java.util.*
 
 
 class UserRepository(val context: Context, private val remote: RemoteUserRepository) {
 
+
+    companion object{
+        const val TAG = "UserRepository"
+    }
+
     private val sharePref = SharePrefManager(context)
-    private val userId = sharePref.getUserIdFromSession()!!
+//    private val userId = sharePref.loadUser().userId
     val isUserSeller = sharePref.isUserSeller()
     val isRem = sharePref.isRememberMeOn()
+//    val userType = sharePref.getUserType()
 
 
     suspend fun signWithEmailAndPassword(email: String,
@@ -29,22 +33,82 @@ class UserRepository(val context: Context, private val remote: RemoteUserReposit
         remote.signWithEmailAndPassword(email, password)
 
 
+
+
+    suspend fun login(email: String, password: String,isRemOn: Boolean): Result<Boolean> {
+        return supervisorScope {
+            try {
+                val signOutPref = async { sharePref.signOut() }
+                val loginTask = async {
+                    val userId = remote.signWithEmailAndPassword(email,password)?.user!!.uid
+                    val user = remote.getUserById(userId)!!
+                    createUserLogging(user,isRemOn)
+                }
+                Log.d(TAG,"sign out pref start: ${Calendar.getInstance().time.seconds}")
+                signOutPref.await()
+                Log.d(TAG,"sign out pref end: ${Calendar.getInstance().time.seconds}")
+                Log.d(TAG,"login task start: ${Calendar.getInstance().time.seconds}")
+                loginTask.await()
+                Log.d(TAG,"login task end: ${Calendar.getInstance().time.seconds}")
+                Result.Success(true)
+            }catch (ex: FirebaseAuthInvalidUserException) {
+                val message = "user is not exist"
+                Log.d(TAG, message)
+                Result.Error(Exception(message))
+            }catch (ex: FirebaseAuthInvalidCredentialsException) {
+                val message = "incorrect password"
+                Log.d(TAG, message)
+                Result.Error(Exception(message))
+
+            }catch (ex: FirebaseNetworkException) {
+                val message = "network connection required"
+                Log.d(TAG, message)
+                Result.Error(Exception(message))
+
+            }
+        }
+    }
+
+
+    suspend fun loadUsers(): Result<List<User>> {
+        return supervisorScope {
+            try {
+                val adminId = "rB2sqfqafrZnBCB2wcszcnvi44D3"
+                val task = async { remote.getUsers().filter { it.userId != adminId } }
+                Result.Success(task.await())
+            }catch (ex: Exception){
+                Result.Error(Exception(ex.message))
+            }
+        }
+    }
+
+
     suspend fun createUserAccount(user: User, onSuccess: (Boolean) -> Unit, onError: (String) -> Unit) =
         remote.createUserAccount(user,onSuccess, onError)
 
 
     suspend fun signOut() {
-        sharePref.signOut()
-        remote.signOut()
+        return supervisorScope {
+            val sharePrefSignOut = async {  sharePref.signOut() }
+            val remoteSignOut = async {   remote.signOut() }
+            try {
+                sharePrefSignOut.await()
+                remoteSignOut.await()
+            }catch (ex: Exception){}
+        }
+
+
     }
 
-    fun createUserLogging(id: String, isRemOn: Boolean, isSeller: Boolean) = sharePref.createLoginSession(id, isRemOn, isSeller)
+    fun createUserLogging(user: User,isRemOn: Boolean) = sharePref.saveUser(user,isRemOn)
+
+//    fun createUserLogging(id: String, isRemOn: Boolean,userType: String, isSeller: Boolean) = sharePref.createLoginSession(id, isRemOn, userType,isSeller)
 
     fun isUserLogged() = remote.isUserLogged()
 
     suspend fun uploadFile(uri: Uri, fileName: String) = remote.uploadFile(uri,fileName)
 
-    suspend fun getOrders() = remote.getOrders(userId)
+    suspend fun getOrders(userId: String) = remote.getOrders(userId)
 
     suspend fun insertOrder(order: User.OrderItem, userId: String) = remote.insertOrder(order, userId)
 
@@ -55,29 +119,29 @@ class UserRepository(val context: Context, private val remote: RemoteUserReposit
     suspend fun updateUser(user: User) = remote.updateUser(user)
 
 
-    suspend fun deleteUser() = remote.deleteUser(userId)
+    suspend fun deleteUser(userId: String) = remote.deleteUser(userId)
 
-    suspend fun getUser() = remote.getUserById(userId)
+    suspend fun getUser(userId: String) = remote.getUserById(userId)
 
     suspend fun getUserById(userId: String) = remote.getUserById(userId)
 
-    suspend fun getOrdersByUserId() = remote.getOrdersByUserId(userId)
+    suspend fun getOrdersByUserId(userId: String) = remote.getOrdersByUserId(userId)
 
-    suspend fun likeProduct(productId: String) = remote.likeProduct(productId, userId)
+    suspend fun likeProduct(productId: String,userId: String) = remote.likeProduct(productId, userId)
 
-    suspend fun dislikeProduct(productId: String) = remote.dislikeProduct(productId, userId)
+    suspend fun dislikeProduct(productId: String,userId: String) = remote.dislikeProduct(productId, userId)
 
-    suspend fun insertCartItem(newItem: User.CartItem) = remote.insertCartItem(newItem, userId)
+    suspend fun insertCartItem(newItem: User.CartItem,userId: String) = remote.insertCartItem(newItem, userId)
 
-    suspend fun removeCartItem(itemId: String) = remote.removeCartItem(itemId, userId)
+    suspend fun removeCartItem(itemId: String, userId: String) = remote.removeCartItem(itemId, userId)
 
-    suspend fun updateCartItem(item: User.CartItem) = remote.updateCartItem(item, userId)
+    suspend fun updateCartItem(item: User.CartItem, userId: String) = remote.updateCartItem(item, userId)
 
 
-    suspend fun placeOrder(newOrder: User.OrderItem) = remote.placeOrder(newOrder, userId)
+    suspend fun placeOrder(newOrder: User.OrderItem,userId: String) = remote.placeOrder(newOrder, userId)
 
     // update both customer and owner order status
-    suspend fun updateOrderStatus(orderId: String, status: String) = remote.setStatusOfOrderByUserId(orderId, userId, status)
+    suspend fun updateOrderStatus(orderId: String, status: String,userId: String) = remote.setStatusOfOrderByUserId(orderId, userId, status)
 
 
 }

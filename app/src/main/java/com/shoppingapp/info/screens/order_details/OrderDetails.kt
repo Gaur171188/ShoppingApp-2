@@ -16,10 +16,7 @@ import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.OrderDetailsBinding
 import com.shoppingapp.info.screens.cart.CartController
 import com.shoppingapp.info.screens.home.HomeViewModel
-import com.shoppingapp.info.utils.Constants
-import com.shoppingapp.info.utils.SharePrefManager
-import com.shoppingapp.info.utils.getItemsPriceTotal
-import com.shoppingapp.info.utils.hide
+import com.shoppingapp.info.utils.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 import kotlin.properties.Delegates
 
@@ -50,6 +47,7 @@ class OrderDetails: Fragment() {
 
         initData()
         setViews()
+
 //        setObserves()
 
 
@@ -90,7 +88,7 @@ class OrderDetails: Fragment() {
 
                 // you can delete the cart item only from the customer side.
                 val userId = homeViewModel.userData.value?.userId!!
-                homeViewModel.removeCartItem(cartItem.itemId,userId)
+                homeViewModel.removeCartItem(cartItem.itemId)
             }
 
             override fun onItemClick(product: Product) {}
@@ -107,8 +105,8 @@ class OrderDetails: Fragment() {
     private fun setUserViews(){
 
         binding.apply {
-
-            if (homeViewModel.isUserSeller.value!!){ // seller
+            val isSeller = homeViewModel.userData.value?.userType == UserType.SELLER.name
+            if (isSeller){ // seller
                 btnNextAccept.text = resources.getString(R.string.accept_order)
                 btnNextAccept.setTextColor(Color.WHITE)
                 btnNextAccept.setBackgroundColor(Color.GREEN)
@@ -156,7 +154,8 @@ class OrderDetails: Fragment() {
             /** button next, accept **/
             btnNextAccept.setOnClickListener {
                 val data = bundleOf(Constants.KEY_ORDER to order)
-                if (homeViewModel.isUserSeller.value!!){ // seller
+                val isSeller = homeViewModel.userData.value?.userType == UserType.SELLER.name
+                if (isSeller){ // seller
                     acceptOrder()
                 }else{ // admin or customer
                     findNavController().navigate(R.id.action_orderDetails_to_payment,data)

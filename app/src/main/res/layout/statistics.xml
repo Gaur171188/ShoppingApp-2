@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".screens.statistics.Statistics">
+
+        <include
+            android:id="@+id/statistics_top_app_bar"
+            layout="@layout/app_bar_label_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginBottom="50dp"
+            android:layout_marginTop="@dimen/app_bar_height">
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <FrameLayout
+                        android:id="@+id/usersCartLayout"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+
+                        <include
+                            android:id="@+id/loader_Users"
+                            layout="@layout/circular_loader_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            tools:visibility="visible"
+                            android:visibility="gone"/>
+
+                        <include
+                            android:id="@+id/chart_Users"
+                            layout="@layout/item_chart_core"
+                            android:visibility="visible"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+
+                    </FrameLayout>
+
+
+
+
+
+                    <FrameLayout
+                        android:id="@+id/productsChartLayout"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+
+                        <include
+                            android:id="@+id/loader_Products"
+                            layout="@layout/circular_loader_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            tools:visibility="visible"
+                            android:visibility="gone"/>
+
+                        <include
+                            android:id="@+id/chart_Products"
+                            layout="@layout/item_chart_core"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </FrameLayout>
+
+
+
+                    <FrameLayout
+                        android:id="@+id/ordersChartLayout"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+
+                        <include
+                            android:id="@+id/loader_Orders"
+                            layout="@layout/circular_loader_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            tools:visibility="visible"
+                            android:visibility="gone"/>
+
+                        <include
+                            android:id="@+id/chart_orders"
+                            layout="@layout/item_chart_core"
+                            android:visibility="visible"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+
+                    </FrameLayout>
+
+
+                    <FrameLayout
+                        android:id="@+id/cartItemsChartLayout"
+                        android:layout_height="match_parent"
+                        android:layout_width="match_parent">
+
+                        <include
+                            android:id="@+id/loader_CartItems"
+                            layout="@layout/circular_loader_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            tools:visibility="visible"
+                            android:visibility="gone"/>
+
+                        <include
+                            android:id="@+id/chart_cartItems"
+                            layout="@layout/item_chart_core"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                    </FrameLayout>
+
+
+
+
+                </LinearLayout>
+
+
+
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+
+        </LinearLayout>
+
+
+        <RadioGroup
+            android:id="@+id/chartsGroup"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/users"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:checked="true"
+                android:textSize="13sp"
+                android:layout_height="wrap_content"
+                android:text="@string/users" />
+
+
+            <RadioButton
+                android:id="@+id/products"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="13sp"
+                android:layout_height="wrap_content"
+                android:text="@string/products" />
+
+
+            <RadioButton
+                android:id="@+id/cartItems"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="13sp"
+                android:layout_height="wrap_content"
+                android:text="@string/cart_items" />
+
+            <RadioButton
+                android:id="@+id/orders"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="13sp"
+                android:layout_height="wrap_content"
+                android:text="@string/orders" />
+
+
+        </RadioGroup>
+
+
+    </FrameLayout>
+
+
+</layout>

@@ -35,7 +35,7 @@ class AddEditProduct : Fragment() {
     }
 
     private lateinit var binding: AddEditProductBinding
-    private lateinit var viewModel: AddEditProductViewModel
+    private val viewModel by sharedViewModel<AddEditProductViewModel>()
     private val homeViewModel by sharedViewModel<HomeViewModel>()
     private val focusChangeListener = MyOnFocusChangeListener()
 
@@ -44,7 +44,6 @@ class AddEditProduct : Fragment() {
     private lateinit var catName: String
     private lateinit var product: Product
 
-    private var userId = ""
 
     private var sizeList = mutableSetOf<Int>()
     private var colorsList = mutableSetOf<String>()
@@ -63,33 +62,29 @@ class AddEditProduct : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.add_edit_product,container,false)
-        viewModel = ViewModelProvider(this)[AddEditProductViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[AddEditProductViewModel::class.java]
 
 
-        isEdit = arguments?.getBoolean(Constants.KEY_IS_EDIT) == true
-        catName = arguments?.getString(Constants.KEY_CATEGORY).toString()
 
-        product = try { arguments?.getParcelable<Product>(Constants.KEY_PRODUCT)!! }
-        catch (ex: Exception){ Product() }
-
-
-//        val sharePrefManager = SharePrefManager(requireContext())
-//        userId = sharePrefManager.getUserIdFromSession()!!
-        userId = homeViewModel.userData.value!!.userId
-
-
-        showMessage(requireContext(),"colors: ${product.availableColors.size} ,sizes: ${product.availableSizes.size} ")
-
-
-//        productId = arguments?.getString("productId").toString()
-
-
+        initData()
         setViews()
         setObservers()
 
 
 
         return binding.root
+    }
+
+
+    private fun initData() {
+        isEdit = arguments?.getBoolean(Constants.KEY_IS_EDIT) == true
+//        catName = arguments?.getString(Constants.KEY_CATEGORY).toString()
+
+        catName = try { arguments?.getString(Constants.KEY_CATEGORY).toString() }
+        catch (ex: Exception){ ""}
+
+        product = try { arguments?.getParcelable<Product>(Constants.KEY_PRODUCT)!! }
+        catch (ex: Exception){ Product() }
     }
 
 
@@ -100,17 +95,19 @@ class AddEditProduct : Fragment() {
 
             /** product update status **/
             viewModel.productUpdateStatus.observe(viewLifecycleOwner) { status ->
-                when (status) {
-                    DataStatus.LOADING -> {
-                        binding.loaderLayout.loaderFrameLayout.show()
-                    }
-                    DataStatus.SUCCESS -> {
-                        binding.loaderLayout.loaderFrameLayout.hide()
-                        findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
-
-                    }
-                    DataStatus.ERROR ->{
-                        loaderLayout.loaderFrameLayout.hide()
+                if (status != null){
+                    when (status) {
+                        DataStatus.LOADING -> {
+                            binding.loaderLayout.loaderFrameLayout.show()
+                        }
+                        DataStatus.SUCCESS -> {
+                            binding.loaderLayout.loaderFrameLayout.hide()
+                            viewModel.resetStatus()
+                            findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
+                        }
+                        DataStatus.ERROR ->{
+                            loaderLayout.loaderFrameLayout.hide()
+                        }
                     }
                 }
             }
@@ -118,17 +115,19 @@ class AddEditProduct : Fragment() {
 
             /** product update status **/
             viewModel.productDeleteStatus.observe(viewLifecycleOwner) { status ->
-                when (status) {
-                    DataStatus.LOADING -> {
-                        binding.loaderLayout.loaderFrameLayout.show()
-                    }
-                    DataStatus.SUCCESS -> {
-                        binding.loaderLayout.loaderFrameLayout.hide()
-                        findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
-
-                    }
-                    DataStatus.ERROR ->{
-                        loaderLayout.loaderFrameLayout.hide()
+                if (status != null){
+                    when (status) {
+                        DataStatus.LOADING -> {
+                            binding.loaderLayout.loaderFrameLayout.show()
+                        }
+                        DataStatus.SUCCESS -> {
+                            binding.loaderLayout.loaderFrameLayout.hide()
+                            viewModel.resetStatus()
+                            findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
+                        }
+                        DataStatus.ERROR -> {
+                            loaderLayout.loaderFrameLayout.hide()
+                        }
                     }
                 }
             }
@@ -137,19 +136,22 @@ class AddEditProduct : Fragment() {
 
             /** product submit status **/
             viewModel.productSubmitStatus.observe(viewLifecycleOwner) { status ->
-                when (status) {
-                    DataStatus.LOADING -> {
-                        binding.loaderLayout.loaderFrameLayout.show()
-                    }
-                    DataStatus.SUCCESS -> {
-                        binding.loaderLayout.loaderFrameLayout.hide()
-                        findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
-
-                    }
-                    DataStatus.ERROR -> {
-                        loaderLayout.loaderFrameLayout.hide()
+                if (status != null){
+                    when (status) {
+                        DataStatus.LOADING -> {
+                            binding.loaderLayout.loaderFrameLayout.show()
+                        }
+                        DataStatus.SUCCESS -> {
+                            binding.loaderLayout.loaderFrameLayout.hide()
+                            viewModel.resetStatus()
+                            findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
+                        }
+                        DataStatus.ERROR -> {
+                            loaderLayout.loaderFrameLayout.hide()
+                        }
                     }
                 }
+
             }
 
 
@@ -264,7 +266,20 @@ class AddEditProduct : Fragment() {
                 showMessage(requireContext(), "one image at least required!")
             }
             else {
-                val newProduct = Product(getProductId(userId),name,userId,desc,catName, price ?: 0.0,mrp ?: 0.0,sizeList.toList(),colorsList.toList())
+                val user = homeViewModel.userData.value!!
+                val userId = user.userId
+                val country = user.country
+                val newProduct = Product(getProductId(userId),
+                    name,
+                    userId,
+                    desc,
+                    catName,
+                    price ?: 0.0,
+                    mrp ?: 0.0 ,
+                    sizeList.toList(),
+                    colorsList.toList(),
+                    country = country
+                )
                 if (!isEdit){ // insert new product
                     viewModel.submitProduct(newProduct,imgList)
                 }else{ // update product

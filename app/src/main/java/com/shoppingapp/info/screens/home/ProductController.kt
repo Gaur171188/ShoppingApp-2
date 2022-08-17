@@ -5,6 +5,7 @@ import com.shoppingapp.info.data.Ad
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.homeAd
 import com.shoppingapp.info.productHome
+import com.shoppingapp.info.utils.UserType
 import kotlin.properties.Delegates
 
 
@@ -13,9 +14,7 @@ class ProductController(): TypedEpoxyController<List<Any>>() {
 
     lateinit var clickListener: OnClickListener
     lateinit var likes: List<String>
-
-//    var isSeller by Delegates.notNull<Boolean>()
-var isSeller = false
+    var userType = ""
 
 
     override fun buildModels(list: List<Any>?) {
@@ -27,12 +26,13 @@ var isSeller = false
 
                 is Product -> {
                     val isLiked = likes.contains(data.productId)
-
+                    val isCustomer = userType == UserType.CUSTOMER.name
                     productHome {
                         id(data.productId)
                         productData(data)
                         isLiked(isLiked)
-                        isSeller(isSeller)
+//                        isSeller(isSeller)
+                        isCustomer(isCustomer)
                         onItemClick { v->
                             clickListener.onProductClick(data)
                         }
