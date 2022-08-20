@@ -56,11 +56,16 @@
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/menu/app_bar_menu.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/menu/bottom_navigation_menu.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Desktop/ShoppingApp/app/src/main/res/menu/home_app_bar_menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/bg_field.xml" value="0.226" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/bg_item_user.xml" value="0.11" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/bg_profile.xml" value="0.226" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/bg_wallet.xml" value="0.1975" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/ic_add_shopping_cart_24.xml" value="0.1645" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/ic_filter_alt_24.xml" value="0.203" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/ic_notification.xml" value="0.1645" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/ic_outlined_person_24.xml" value="0.1015" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/ic_outlined_shopping_cart_24.xml" value="0.203" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/ic_product_manager.xml" value="0.1645" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/ic_settings.xml" value="0.1735" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/drawable/signout_account_drawable.xml" value="0.205" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/account.xml" value="0.264" />
@@ -69,17 +74,23 @@
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/activity_registration.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/add_edit_product.xml" value="0.2" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/app_bar_label_layout.xml" value="0.24547101449275363" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/bottom_sheet.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/cart.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/circular_loader_layout.xml" value="0.24547101449275363" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/extra_filters_product.xml" value="0.2" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/extra_filters_user.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/favorities.xml" value="0.2" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/filters.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/home.xml" value="0.24547101449275363" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/home_top_app_bar_layout.xml" value="0.24547101449275363" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/image_item.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/item_cart.xml" value="0.24547101449275363" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/item_chart_core.xml" value="0.24010416666666667" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/item_order.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/item_price_card_layout.xml" value="0.24547101449275363" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/item_product_favorites.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/item_product_home.xml" value="0.2" />
-        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/item_user.xml" value="0.264" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/item_user.xml" value="0.4" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/layout_top_bar.xml" value="0.24547101449275363" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/login.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/lunch.xml" value="0.24547101449275363" />
@@ -89,17 +100,20 @@
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/payment.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/payment_item.xml" value="0.24547101449275363" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/product_details.xml" value="0.264" />
-        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/profile.xml" value="0.33" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/profile.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/registration.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/select_address.xml" value="0.25" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/select_payment.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/shipping_card_layout.xml" value="0.2" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/statistics.xml" value="0.264" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/user.xml" value="0.264" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/user_profile.xml" value="0.1" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/users.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/layout/wallet.xml" value="0.264" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/menu-v26/home_app_bar_menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/menu/admin_options_menu.xml" value="0.253125" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/menu/app_bar_menu.xml" value="0.25416666666666665" />
-        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/menu/bottom_navigation_menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/menu/bottom_navigation_menu.xml" value="0.4" />
         <entry key="..\:/Users/Mamon Aburawi/Disktop/ShoppingApp/app/src/main/res/menu/home_app_bar_menu.xml" value="0.25416666666666665" />
       </map>
     </option>

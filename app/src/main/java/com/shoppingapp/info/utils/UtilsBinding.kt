@@ -7,11 +7,13 @@ import android.graphics.Color
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
+import android.widget.Switch
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.switchmaterial.SwitchMaterial
 import com.shoppingapp.info.R
 import com.shoppingapp.info.utils.x.context
 import java.text.SimpleDateFormat
@@ -46,6 +48,11 @@ fun imageProfile(image: ImageView, imageUri: String?) {
 
     }catch (ex: Exception){}
 }
+@BindingAdapter("joinedAt")
+fun joinedAt(tv: TextView, date: Date) {
+    val date  = SimpleDateFormat("DD Mon yyyy").format(date)
+    tv.text = "Joined At: $date"
+}
 
 
 //@BindingAdapter("setAppBarItems")
@@ -68,8 +75,31 @@ fun imageProfile(image: ImageView, imageUri: String?) {
 //    }
 //}
 
+@BindingAdapter("isPublic")
+fun isPublic(switch: SwitchMaterial, isPublic: Boolean?){
+    if (isPublic != null){
+        switch.isChecked = isPublic
+    }
+}
+
+@BindingAdapter("isActive")
+fun isActive(switch: SwitchMaterial, isActive: Boolean?){
+    if (isActive != null){
+        switch.isChecked = isActive
+    }
+}
+
 @BindingAdapter("setLikeButtonStatus")
 fun setLikeButtonStatus(v: View, isCustomer: Boolean) {
+    if (isCustomer){
+        v.show()
+    }else{
+        v.hide()
+    }
+}
+
+@BindingAdapter("showViewIfCustomer")
+fun showViewIfCustomer(v: View, isCustomer: Boolean) {
     if (isCustomer){
         v.show()
     }else{

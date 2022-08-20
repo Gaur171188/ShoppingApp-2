@@ -1,5 +1,7 @@
 package com.shoppingapp.info.utils
 
+import java.util.*
+
 val ShoeSizes = mapOf(
 	"UK4" to 4,
 	"UK5" to 5,
@@ -25,7 +27,6 @@ val ShoeColors = mapOf(
 
 
 
-val ProductCategories = arrayOf("Shoes", "Slippers")
 
 val orderStatusFilters = arrayOf(
 	"ALL",
@@ -35,3 +36,10 @@ val orderStatusFilters = arrayOf(
 	OrderStatus.DELIVERED.name,
 	OrderStatus.REJECTED.name
 )
+
+//val prices = arrayOf(
+//	Prices.LESS_THAN_100.name.lowercase(Locale.ROOT),
+//	Prices.FROM_50_TO_250.name.lowercase(Locale.ROOT),
+//	Prices.FROM_500_TO_1500.name.lowercase(Locale.ROOT),
+//	Prices.MORE_THAN_1500.name.lowercase(Locale.ROOT)
+//)

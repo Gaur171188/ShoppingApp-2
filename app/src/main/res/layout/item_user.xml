@@ -7,6 +7,12 @@
         <variable
             name="user"
             type="com.shoppingapp.info.data.User" />
+
+        <variable
+            name="isCustomer"
+            type="Boolean" />
+
+
     </data>
 
     <FrameLayout
@@ -21,10 +27,8 @@
             android:layout_height="match_parent"
             app:contentPadding="4dp"
             android:shadowColor="@color/white"
-            android:shadowRadius="5"
-            android:elevation="8dp"
-            app:cardCornerRadius="8dp"
-            app:cardBackgroundColor="#B2FFFFFF">
+            android:shadowRadius="4"
+            app:cardCornerRadius="8dp">
 
 
             <LinearLayout
@@ -51,6 +55,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="10sp"
+                        android:padding="2dp"
+                        android:text="@{user.userType}"
                         tools:text="CUSTOMER" />
 
 
@@ -72,7 +78,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_gravity="center"
                     android:orientation="vertical">
 
 
@@ -83,6 +89,7 @@
                         android:textStyle="bold"
                         android:textColor="@color/black"
                         android:textSize="14sp"
+                        android:text="@{user.name}"
                         tools:text="Ahmed Mohamed" />
 
 
@@ -118,6 +125,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="11sp"
+                                android:text="@{String.valueOf(user.cart.size)}"
                                 android:layout_marginStart="2dp"
                                 tools:text="25" />
 
@@ -146,6 +154,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:textSize="11sp"
+                                android:text="@{String.valueOf(user.orders.size)}"
                                 android:layout_marginStart="2dp"
                                 tools:text="40" />
 
@@ -167,7 +176,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="11sp"
+                            android:text="@{user.country}"
                             tools:text="Libya" />
+
 
 
                     </LinearLayout>
@@ -185,6 +196,7 @@
 
 
             <ImageView
+                android:id="@+id/btn_Item"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center|end"

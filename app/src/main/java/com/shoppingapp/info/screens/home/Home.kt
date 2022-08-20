@@ -1,28 +1,33 @@
 package com.shoppingapp.info.screens.home
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
+import android.widget.PopupMenu
+import androidx.annotation.RequiresApi
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.firebase.firestore.auth.User
-import com.shoppingapp.info.utils.ProductCategories
 import com.shoppingapp.info.R
+import com.shoppingapp.info.activities.RegistrationActivity
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.HomeBinding
+import com.shoppingapp.info.screens.profile.ProfileViewModel
 import com.shoppingapp.info.utils.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-
+@RequiresApi(Build.VERSION_CODES.Q)
 class Home : Fragment() {
 
     companion object{
@@ -31,6 +36,7 @@ class Home : Fragment() {
 
     private lateinit var binding: HomeBinding
     private val viewModel by sharedViewModel<HomeViewModel>()
+    private val profileViewModel by sharedViewModel<ProfileViewModel>()
 
 //    private lateinit var favoritesViewModel: FavoritesViewModel
 
@@ -51,6 +57,8 @@ class Home : Fragment() {
 
         return binding.root
     }
+
+
 
     private fun initData() {
 //        val userType = SharePrefManager(requireContext()).getUserType().toString()
@@ -85,16 +93,58 @@ class Home : Fragment() {
             setHomeTopAppBar()
             setProductsAdapter()
 
+//
+//            /** button add product **/
+//            btnAddProduct.setOnClickListener {
+//                showDialogWithItems(ProductCategories, 0, false)
+//            }
 
-            /** button add product **/
-            btnAddProduct.setOnClickListener {
-                showDialogWithItems(ProductCategories, 0, false)
-            }
+
+
 
         }
 
-
     }
+
+
+
+    private fun productFilterSheet() {
+        binding.apply {
+            filterSheet.apply {
+                specificFiltersUser.root.hide()
+                setRate()
+                val bottom = BottomSheetBehavior.from(filterSheet)
+                bottom.state = BottomSheetBehavior.STATE_EXPANDED
+                btnAddProduct.hide()
+                specificFiltersUser.apply {
+
+                    /** button close sheet **/
+                    btnClose.setOnClickListener {
+                        bottom.state = BottomSheetBehavior.STATE_COLLAPSED
+                        btnAddProduct.show()
+                    }
+
+                    /** button apply **/
+                    btnApply.setOnClickListener {
+                        val city = selectCity.text.toString()
+                        val country = selectCountry.selectedCountryName.toString()
+                        val rate = selectRate.text.toString()
+
+                        val minPrice = specificFiltersProduct.minPrice.text.trim().toString()
+                        val maxPrice = specificFiltersProduct.maxPrice.text.trim().toString()
+
+                        val filter = viewModel.filter(city, country, rate,minPrice,maxPrice)
+                        productController.setData(filter)
+
+                        bottom.state = BottomSheetBehavior.STATE_COLLAPSED
+                        btnAddProduct.show()
+                    }
+
+                }
+            }
+        }
+    }
+
 
     private fun setUserViews() {
         binding.apply {
@@ -175,6 +225,16 @@ class Home : Fragment() {
 
 
 
+            /** is sign out **/
+            profileViewModel.isSignOut.observe(viewLifecycleOwner){isSignOut->
+                if (isSignOut == true){
+                    val intent = Intent(requireContext(), RegistrationActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    startActivity(intent)
+                }
+            }
+
+
 
         }
 
@@ -183,16 +243,29 @@ class Home : Fragment() {
     }
 
 
+//    private fun setPrices() {
+//        val adapter = ArrayAdapter(requireContext(),android.R.layout.simple_list_item_1, prices)
+//        binding.filterSheet.specificFiltersProduct.selectPrice.setAdapter(adapter)
+//    }
+
+        private fun setRate() {
+            val rateValues = arrayOf("1","2","3","4","5")
+        val adapter = ArrayAdapter(requireContext(),android.R.layout.simple_list_item_1, rateValues)
+        binding.filterSheet.selectRate.setAdapter(adapter)
+    }
+
+
 
     private fun setAppBarItemClicks(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.item_filter -> {
-                val extraFilters = arrayOf("All", "None")
+                productFilterSheet()
+//                val extraFilters = arrayOf("All", "None")
 
-                // todo replace product categories with categories filter data.
-                val categoryList = ProductCategories.plus(extraFilters)
-                val checkedItem = categoryList.indexOf(viewModel.filterCategory.value)
-                showDialogWithItems(categoryList, checkedItem, true)
+//                // todo replace product categories with categories filter data.
+//                val categoryList = ProductCategories.plus(extraFilters)
+//                val checkedItem = categoryList.indexOf(viewModel.filterCategory.value)
+//                showDialogWithItems(categoryList, checkedItem, true)
                 true
             }
             R.id.item_favorites -> {
@@ -203,12 +276,18 @@ class Home : Fragment() {
                 findNavController().navigate(R.id.action_home_to_cart)
                 true
             }
+            R.id.item_options-> {
+                val view = requireView().findViewById<View>(R.id.item_options)
+                showAdminOptionMenu(view)
+                true
+            }
             else -> false
         }
     }
 
 
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun setHomeTopAppBar() {
         binding.apply {
 
@@ -248,6 +327,28 @@ class Home : Fragment() {
         }
     }
 
+    // the icons in menu does not appear in android version below 10
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun showAdminOptionMenu(v: View) {
+        val popupMenu = PopupMenu(requireContext(),v)
+        popupMenu.menuInflater.inflate(R.menu.admin_options_menu,popupMenu.menu)
+        popupMenu.setForceShowIcon(true)
+        popupMenu.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.item_notification -> {}
+
+                R.id.item_productManager -> {}
+
+                R.id.item_signOut -> {
+                    profileViewModel.signOut()
+                }
+
+            }
+            true
+        }
+        popupMenu.show()
+    }
+
     private fun setProductsAdapter() {
         val likesList = viewModel.userLikes.value ?: emptyList()
         val isSeller = viewModel.userData.value?.userType == UserType.SELLER.name
@@ -279,20 +380,6 @@ class Home : Fragment() {
                     findNavController().navigate(R.id.action_goto_addProduct, data)
                 }
 
-//                if (isSeller) { // go to add edit product
-//                    val data = bundleOf(Constants.KEY_IS_EDIT to true , Constants.KEY_PRODUCT to product )
-//                    findNavController().navigate(R.id.action_goto_addProduct, data)
-//                }else { // go to product details
-//
-//                    val isProductInCart = viewModel.cartItems.value?.map{ it.productId }?.contains(product.productId)
-//                    val isLiked = viewModel.likedProducts.value?.contains(product)!!
-//                    val data =  bundleOf(
-//                        Constants.KEY_PRODUCT to product,
-//                        Constants.KEY_IS_EDIT to false,
-//                        Constants.KEY_CHECK_IN_CART to isProductInCart,
-//                        Constants.KEY_IS_LIKED to isLiked)
-//                    findNavController().navigate(R.id.action_home_to_productDetails,data)
-//                }
 
             }
 
@@ -343,11 +430,7 @@ class Home : Fragment() {
 
 
 
-    private fun showDialogWithItems(
-        categoryItems: Array<String>,
-        checkedOption: Int = 0,
-        isFilter: Boolean
-    ) {
+    private fun showDialogWithItems(categoryItems: Array<String>, checkedOption: Int = 0, ) {
         var checkedItem = checkedOption
         context?.let {
             MaterialAlertDialogBuilder(it)
@@ -362,19 +445,14 @@ class Home : Fragment() {
                     if (checkedItem == -1) {
                         dialog.cancel()
                     } else {
-                        if (isFilter) {
-//                            viewModel.filterProducts(categoryItems[checkedItem])
-                        } else {
-                            val data = bundleOf(Constants.KEY_IS_EDIT to false , Constants.KEY_CATEGORY to categoryItems[checkedItem] )
-                            findNavController().navigate(R.id.action_goto_addProduct,data)
-
-                        }
+                        val selectedItem = categoryItems[checkedItem]
                     }
                     dialog.cancel()
                 }
                 .show()
         }
     }
+
 
 //    private fun navigateToAddEditProductScreen(isEdit: Boolean, catName: String? = null) {
 //        findNavController().navigate(

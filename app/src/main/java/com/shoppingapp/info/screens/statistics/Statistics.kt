@@ -25,7 +25,6 @@ class Statistics : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
-//        viewModel = ViewModelProvider(this)[StatisticsViewModel::class.java]
         binding = DataBindingUtil.inflate(inflater,R.layout.statistics, container, false)
 
 
@@ -245,8 +244,6 @@ class Statistics : Fragment() {
     private fun configureProductsChart(chartType: AAChartType) {
         val countries = viewModel.productsCountries.value?.toTypedArray()!!
         val cartsCountries: Array<Any> = viewModel.getProductsCountInEachCountry().toTypedArray()
-
-        showMessage(requireContext(),cartsCountries.size.toString())
         val model = Chart.configureChartModel(chartType,
             charTitle = "Products",
             itemName = "number of products",
@@ -271,109 +268,6 @@ class Statistics : Fragment() {
         )
         binding.chartUsers.chartView.aa_drawChartWithChartModel(model)
     }
-
-
-
-
-
-
-//
-//    fun configureUsersChart() {
-//
-//        val countries = viewModel.countries.value
-//        val usersCounties = viewModel.getUsersCountInEachCountry()
-//
-//        val backgroundColorGradientColor = AAGradientColor.linearGradient(
-//            AALinearGradientDirection.ToBottom,
-//            "#4F00BC",
-//            "#29ABE2"// Color string setting supports hex type and rgba type
-//        )
-//
-//        val fillColorGradientColor = AAGradientColor.linearGradient(
-//            AALinearGradientDirection.ToBottom,
-//            "rgba(256,256,256,0.3)",
-//            "rgba(256,256,256,1.0)"// Color string setting supports hex type and rgba type
-//        )
-//
-//
-//        val aaChartModel = AAChartModel()
-//            .chartType(AAChartType.Areaspline)
-//            .title("Users")
-//            .subtitle("")
-//            .backgroundColor(backgroundColorGradientColor)
-//            .yAxisVisible(true)
-//            .yAxisTitle("number of users")
-//            .categories(countries!!.toTypedArray())
-////            .categories(arrayOf("Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec"))
-////            .categories(arrayOf(countries!![0],countries[1]))
-//            .markerRadius(0f)
-//            .series(arrayOf(
-//                AASeriesElement()
-//                    .name(resources.getString(R.string.user))
-//                    .color(AAColor.White)
-//                    .lineWidth(7f)
-//                    .fillColor(fillColorGradientColor)
-//                    .data(usersCounties.toTypedArray())
-////                    .data(arrayOf(usersCounties))
-////                    .data(arrayOf(usersCounties[0],usersCounties[1]))
-////                    .data(arrayOf(7.0, 6.9, 2.5, 14.5, 18.2, 21.5, 5.2, 26.5, 23.3, 45.3, 13.9, 9.6))
-//            ))
-//        val aaOptions = aaChartModel.aa_toAAOptions()
-//        aaOptions.plotOptions?.areaspline
-//            ?.dataLabels(
-//                AADataLabels()
-//                    .enabled(true)
-//                    .style(
-//                        AAStyle()
-//                            .color(AAColor.Black)
-//                            .fontSize(14f)
-//                            .fontWeight(AAChartFontWeightType.Thin)))
-//
-//        /** Cross Hair option **/
-//        val aaCrossHair = AACrosshair()
-//            .dashStyle(AAChartLineDashStyleType.LongDashDot)
-//            .color(AAColor.White)
-//            .width(1f)
-//
-//        val aaLabels = AALabels()
-//            .useHTML(true)
-//            .style(
-//                AAStyle()
-//                    .fontSize(10f)
-//                    .fontWeight(AAChartFontWeightType.Bold)
-//                    .color(AAColor.White))
-//
-//        /** y axis option **/
-//        aaOptions.yAxis?.apply {
-//            opposite(false)
-//                .tickWidth(2f)
-//                .lineWidth(1.5f)
-//                .lineColor(AAColor.White)
-//                .gridLineWidth(0f)
-//                .crosshair(aaCrossHair)
-//                .labels(aaLabels)
-//        }
-//
-//        /** x axis option **/
-//        aaOptions.xAxis?.apply {
-//            tickWidth(1f)// X axis thick Width
-//                .lineWidth(1.0f)//X axis width
-//                .lineColor(AAColor.White)//color of axis X
-//                .crosshair(aaCrossHair)
-//                .labels(aaLabels)
-//        }
-//
-//        aaOptions.legend?.apply {
-//            itemStyle(
-//                AAItemStyle()
-//                    .color(AAColor.White)
-//                    .fontSize(13f)
-//                    .fontWeight("thin")
-//            )}
-//
-//        binding.chartUsers.chartView.aa_drawChartWithChartOptions(aaOptions)
-//
-//    }
 
 
 

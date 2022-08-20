@@ -18,10 +18,7 @@ const val ERR_UPLOAD = "UploadErrorException"
 enum class DataStatus { LOADING, ERROR, SUCCESS }
 enum class UserType { CUSTOMER, SELLER, ADMIN}
 enum class OrderStatus { CONFIRMED, BINDING, ARRIVING, DELIVERED, REJECTED }
-enum class AddProductViewErrors { NONE, EMPTY, ERR_PRICE_0 }
-enum class AddProductErrors { NONE, ERR_ADD, ERR_ADD_IMG, ADDING }
-enum class AddItemErrors { ERROR_SIZE, ERROR_COLOR }
-enum class AddObjectStatus { DONE, ERR_ADD, ADDING }
+enum class Prices { LESS_THAN_100,FROM_50_TO_250,FROM_500_TO_1500,MORE_THAN_1500 }
 
 
 

@@ -116,7 +116,17 @@ class UserRepository(val context: Context, private val remote: RemoteUserReposit
 
     suspend fun checkUserIsExist(email: String, isExist:(Boolean) -> Unit, onError:(String)-> Unit ) = remote.checkUserIsExist(email,isExist,onError )
 
-    suspend fun updateUser(user: User) = remote.updateUser(user)
+    suspend fun updateUser(user: User): Result<Boolean> {
+        return supervisorScope {
+            val task = async { remote.updateUser(user) }
+            try {
+                task.await()
+                Result.Success(true)
+            }catch (ex: Exception){
+                Result.Error(Exception(ex))
+            }
+        }
+    }
 
 
     suspend fun deleteUser(userId: String) = remote.deleteUser(userId)

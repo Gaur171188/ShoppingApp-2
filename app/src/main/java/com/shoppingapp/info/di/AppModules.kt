@@ -8,6 +8,7 @@ import com.shoppingapp.info.screens.auth.AuthViewModel
 import com.shoppingapp.info.screens.favorites.FavoritesViewModel
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.screens.product_details.ProductDetailsViewModel
+import com.shoppingapp.info.screens.profile.ProfileViewModel
 import com.shoppingapp.info.screens.select_address.SelectAddressViewModel
 import com.shoppingapp.info.screens.statistics.StatisticsViewModel
 import org.koin.android.ext.koin.androidApplication
@@ -67,6 +68,7 @@ val viewModelModules = module {
     viewModel { SelectAddressViewModel() }
     viewModel { AccountViewModel(userRepo = get() ) }
     viewModel { AuthViewModel(userRepo = get() ) }
+    viewModel { ProfileViewModel(userRepo = get()) }
 }
 
 

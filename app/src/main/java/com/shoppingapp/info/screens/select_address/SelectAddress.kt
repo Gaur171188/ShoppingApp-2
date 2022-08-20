@@ -1,8 +1,6 @@
 package com.shoppingapp.info.screens.select_address
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,17 +9,13 @@ import android.widget.ArrayAdapter
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
-import com.birjuvachhani.locus.Locus
 import com.shoppingapp.info.R
-import com.shoppingapp.info.data.Location
-import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.SelectAddressBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.*
 import com.shoppingapp.info.utils.getAddressId
 import com.shoppingapp.info.utils.getOrderId
-import org.koin.android.ext.android.bind
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class SelectAddress : Fragment() {
@@ -54,9 +48,9 @@ class SelectAddress : Fragment() {
             homeViewModel.userData.observe(viewLifecycleOwner){user->
                 if (user != null){
                     name.setText(user.name)
-                    phone.setText(user.phone)
+                    phone.setText(user.mobile)
                     viewModel.mName.value = user.name
-                    viewModel.mPhone.value = user.phone
+                    viewModel.mPhone.value = user.mobile
                 }
             }
 

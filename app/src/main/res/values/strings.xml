@@ -40,6 +40,7 @@
     <string name="product_add_to_cart_button">Product add to cart button</string>
     <string name="add_product">Add Product</string>
     <string name="search_product">Search Product</string>
+    <string name="search_user">Search User</string>
     <string name="search_order">Search Order By Id</string>
     <string name="products">Products</string>
     <string name="shipping_details">Shipping Details</string>
@@ -64,6 +65,8 @@
     <string name="add_to_cart">Add To Cart</string>
     <string name="email">Email</string>
     <string name="phone">Phone</string>
+    <string name="public_user">Public</string>
+    <string name="active_user">Active</string>
     <string name="payment_error">Payment Error</string>
     <string name="next">Next</string>
     <string name="accept_order">Accept Order</string>
@@ -127,6 +130,19 @@
     <string name="user">User</string>
     <string name="options">Options</string>
     <string name="cart_items">Cart Items</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="apply">Apply</string>
+    <string name="select_city">Select City</string>
+    <string name="from">From</string>
+    <string name="min_price">Min Price</string>
+    <string name="to">To</string>
+    <string name="max_price">Max Price</string>
+    <string name="promotional_balance">Promotional Balance</string>
+    <string name="balance">Balance</string>
+    <string name="update">Update</string>
+    <string name="notification">Notification</string>
+    <string name="product_manager">Product Manager</string>
 
 
 </resources>

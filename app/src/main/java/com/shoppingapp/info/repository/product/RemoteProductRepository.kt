@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.shoppingapp.info.data.Product
+import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.ERR_UPLOAD
 import kotlinx.coroutines.tasks.await
 import java.util.*
@@ -51,6 +52,7 @@ class RemoteProductRepository() {
 	suspend fun insertProduct(product: Product) = productsPath().document(product.productId).set(product.toHashMap())
 
 	suspend fun updateProduct(proData: Product) = productsPath().document(proData.productId).update(proData.toHashMap())
+
 
 	suspend fun getProductById(productId: String) = productsPath().document(productId).get().await().toObject(Product::class.java)
 

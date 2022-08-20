@@ -1,5 +1,6 @@
 package com.shoppingapp.info.screens.statistics
 
+import android.text.Editable
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,10 +9,15 @@ import androidx.lifecycle.viewModelScope
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.product.ProductRepository
+import com.shoppingapp.info.repository.user.RemoteUserRepository
 import com.shoppingapp.info.repository.user.UserRepository
+import com.shoppingapp.info.screens.home.HomeViewModel
+import com.shoppingapp.info.screens.users.Users
 import com.shoppingapp.info.utils.DataStatus
 import com.shoppingapp.info.utils.Result
 import kotlinx.coroutines.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class StatisticsViewModel(
     private val userRepo: UserRepository,
@@ -26,6 +32,9 @@ class StatisticsViewModel(
     /** progress **/
     private val _usersStatus = MutableLiveData<DataStatus?>()
     val usersStatus: LiveData<DataStatus?> = _usersStatus
+
+    private val _updateUserState = MutableLiveData<DataStatus?>()
+    val updateUserState: LiveData<DataStatus?> = _updateUserState
 
     private val _products = MutableLiveData<List<Product>?>()
     val products: LiveData<List<Product>?> = _products
@@ -82,6 +91,9 @@ class StatisticsViewModel(
         loadProducts()
     }
 
+    fun resetUserStatus(){
+        _usersStatus.value = null
+    }
 
     fun loadProducts() {
         Log.d(TAG,"OnLoading Products...")
@@ -127,6 +139,55 @@ class StatisticsViewModel(
                 _errorMessage.value = res.exception.message
                 _usersStatus.value = DataStatus.ERROR
             }
+        }
+    }
+
+
+
+    fun filter(userType: String, city: String, country: String, rate: String): List<User> {
+        var users = _users.value
+        if (userType.isNotEmpty()) {
+            users = users?.filter { it.userType == userType }
+        }
+        if (city.isNotEmpty()){ // no city
+//            users = users?.filter { it. == userType }
+        }
+        if (country.isNotEmpty()) {
+            users = users?.filter { it.country == country }
+        }
+        if (rate.isNotEmpty()){
+            val r = rate.toFloat()
+        }
+
+        return if(userType.isEmpty() && city.isEmpty() && country.isEmpty() && rate.isEmpty()){
+            _users.value!!
+        }else {
+            users!!
+        }
+    }
+
+
+
+    fun updateUser(user: User, index: Int) {
+        Log.d(TAG,"OnUpdateUser...")
+        resetUserStatus()
+        _updateUserState.value = DataStatus.LOADING
+        viewModelScope.launch {
+            val repository = RemoteUserRepository()
+            repository.updateUser(user)
+                .addOnSuccessListener {
+                    _updateUserState.value = DataStatus.SUCCESS
+                    val users = _users.value?.toMutableList()
+                    users?.set(index, user)
+                    _users.value = users
+
+                }
+                .addOnFailureListener { e ->
+                    Log.d(TAG,"OnUpdateBalance: update balance failed due to ${e.message}")
+                    _updateUserState.value = DataStatus.ERROR
+//               _errorMessage.value = updateTask.exception.message
+                }
+
         }
     }
 

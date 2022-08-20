@@ -9,7 +9,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.product.ProductRepository
+import com.shoppingapp.info.repository.user.RemoteUserRepository
 import com.shoppingapp.info.repository.user.UserRepository
+import com.shoppingapp.info.screens.account.AccountViewModel
 import com.shoppingapp.info.utils.DataStatus
 import com.shoppingapp.info.utils.UserType
 import com.shoppingapp.info.utils.showMessage
@@ -54,31 +56,9 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     private val _removeLikeStatus = MutableLiveData<DataStatus?>()
     val removeLikeStatus: LiveData<DataStatus?> = _removeLikeStatus
 
-    private val _cartItems= MutableLiveData<List<User.CartItem>?>()
-    val cartItems: LiveData<List<User.CartItem>?> = _cartItems
-
-//    val isUserSeller = userRepo.isUserSeller
-
-
-//    private val _isUserSeller = MutableLiveData<Boolean?>()
-//    val isUserSeller: LiveData<Boolean?> = _isUserSeller
-
-//    private val _userType = MutableLiveData<String>()
-//    val userType: LiveData<String> = _userType
-
-
-    init {
-//        _isUserSeller.value = userRepo.isUserSeller
-//        _userType.value = userRepo.userType
-    }
-
-
-
-
     /** progress **/
     private val _updateCartStatus = MutableLiveData<DataStatus?>()
     val updateCartStatus: LiveData<DataStatus?> = _updateCartStatus
-
 
     /** progress **/
     private val _removeCartStatus = MutableLiveData<DataStatus?>()
@@ -88,6 +68,8 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     private val _insertCartStatus = MutableLiveData<DataStatus?>()
     val insertCartStatus: LiveData<DataStatus?> = _insertCartStatus
 
+    private val _cartItems= MutableLiveData<List<User.CartItem>?>()
+    val cartItems: LiveData<List<User.CartItem>?> = _cartItems
 
     private val _productQuantity = MutableLiveData<Int?>()
     val productQuantity: LiveData<Int?> = _productQuantity
@@ -98,55 +80,26 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     private val _itemsPrice = MutableLiveData<Map<String, Double>>()
     val itemsPrice: LiveData<Map<String, Double>> = _itemsPrice
 
-
-    private val _isProductLiked = MutableLiveData<Boolean>()
-    val isProductLiked: LiveData<Boolean> = _isProductLiked
-
-
     private val _totalItemsPrice = MutableLiveData<Double>()
     val totalItemsPrice: LiveData<Double> = _totalItemsPrice
 
     private val _quantityCount = MutableLiveData<Int?>()
     val quantityCount: LiveData<Int?> = _quantityCount
 
-
-
-    private var _userOrders = MutableLiveData<List<User.OrderItem>>()
-    val userOrders: LiveData<List<User.OrderItem>> get() = _userOrders
-
-    private var _selectedOrder = MutableLiveData<User.OrderItem?>()
-    val selectedOrder: LiveData<User.OrderItem?> get() = _selectedOrder
-
-    private var _orderProducts = MutableLiveData<List<Product>>()
-    val orderProducts: LiveData<List<Product>> get() = _orderProducts
-
     private var _likedProducts = MutableLiveData<List<Product>?>()
     val likedProducts: LiveData<List<Product>?> = _likedProducts
 
     private var _userLikes = MutableLiveData<List<String>?>()
-    val userLikes: LiveData<List<String>?> get() = _userLikes
-
-    private var _filterCategory = MutableLiveData("All")
-    val filterCategory: LiveData<String> = _filterCategory
-
-    private val _DataStatus = MutableLiveData<DataStatus>()
-    val storeDataStatus: LiveData<DataStatus> get() = _DataStatus
-
-    private val _dataStatus = MutableLiveData<DataStatus>()
-    val dataStatus: LiveData<DataStatus> get() = _dataStatus
-
+    val userLikes: LiveData<List<String>?> = _userLikes
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
-    private val _isConnected = MutableLiveData<Boolean>()
-    val isConnected: LiveData<Boolean> get() = _isConnected
-
-
-
     private val _orders= MutableLiveData<List<User.OrderItem>?>()
     val orders: LiveData<List<User.OrderItem>?> = _orders
 
+    private val _updateUserState = MutableLiveData<DataStatus?>()
+    val updateUserState: LiveData<DataStatus?> = _updateUserState
 
 
     // load products
@@ -158,11 +111,8 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
 
     fun setData(user: User) {
         _userData.value = user
-        val isSeller = user.userType == UserType.SELLER.name
-        val userType = user.userType
-//        _isUserSeller.value = isSeller
-//        _userType.value = userType
     }
+
 
     fun loadData() {
         Log.d(TAG,"OnGettingData: Loading..")
@@ -204,23 +154,28 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
 
 
 
-    fun updateImageProfile(uri: Uri?) {
-        viewModelScope.launch {
+    fun filter(city: String, country: String, rate: String, minPrice: String, maxPrice: String): List<Product> {
+        var products = _products.value
 
-            val fileName = uri.toString()
-            val imageUri = userRepo.uploadFile(uri!!, fileName).toString()
-            Log.d("Images",imageUri)
-//            val user = _userData.value!!
-//            user.imageProfile = imageUri
-//            _userData.value = user
-//            userRepository.updateUser(user)
+        if (city.isNotEmpty()) { // no city
+//            users = users?.filter { it. == userType }
+        }
+        if (country.isNotEmpty()) {
+            products = products?.filter { it.country == country }
+        }
+        if (rate.isNotEmpty()){
+            val r = rate.toFloat()
+        }
+        if (minPrice.isNotEmpty() && maxPrice.isNotEmpty()){
+            products = products?.filter { it.price > minPrice.toDouble() && it.price < maxPrice.toDouble() }
+        }
 
-
-
-
+        return if(city.isEmpty() && country.isEmpty() && rate.isEmpty() && minPrice.isEmpty() && maxPrice.isEmpty()){
+            _products.value!!
+        }else {
+            products!!
         }
     }
-
 
 
 
@@ -280,7 +235,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
         val cartItems = _cartItems.value?.map { it.productId }
         _products.value?.forEach { product->
             val isProductInCart = cartItems?.contains(product.productId)
-            if (isProductInCart == true){
+            if (isProductInCart == true) {
                 cartProducts.add(product)
             }
             _cartProducts.value = cartProducts
@@ -340,7 +295,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
                 product.productId,
                 product.owner,
                 _productQuantity.value!!,
-                country = _userData.value?.country
+                country = _userData.value?.country!!
             )
             userRepo.insertCartItem(newItem, _userData.value!!.userId)
                 .addOnSuccessListener {

@@ -116,7 +116,7 @@ class Registration : Fragment() {
                     }
 
                     if (signupPolicySwitch.isChecked){
-                        val user = User("", name, phone, email, password, userType = usertype)
+                        val user = User("", name, phone, email, password, userType = usertype, isPublic = true, isActive = true)
                         viewModel.signUp(user)
                     }else{
                         viewModel.errorMessage.value = "You must confirm to the privacy policy!"

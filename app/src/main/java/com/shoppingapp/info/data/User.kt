@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.google.firebase.firestore.PropertyName
 import com.shoppingapp.info.utils.ObjectListTypeConvertor
 import com.shoppingapp.info.utils.OrderStatus
 import com.shoppingapp.info.utils.UserType
@@ -18,7 +19,7 @@ data class User(
     @PrimaryKey
     var userId: String = "",
     var name: String = "",
-    var phone: String = "",
+    var mobile: String = "",
     var email: String = "",
     var password: String = "",
     var imageProfile: String = "",
@@ -29,7 +30,11 @@ data class User(
     var orders: List<OrderItem> = ArrayList(),
     var userType: String = UserType.CUSTOMER.name,
     var wallet: Wallet = Wallet(),
-    var country: String = ""
+    var country: String = "",
+    @field:JvmField // for correct setters names and JSON will be parsed correctly.
+    var isPublic: Boolean? = null,
+    @field:JvmField
+    var isActive: Boolean? = null
 ): Parcelable{
 
     fun toHashMap(): HashMap<String, Any> {
@@ -37,7 +42,7 @@ data class User(
             "userId" to userId,
             "name" to name,
             "email" to email,
-            "mobile" to phone,
+            "mobile" to mobile,
             "password" to password,
             "imageProfile" to imageProfile,
             "likes" to likes,
@@ -45,11 +50,30 @@ data class User(
             "orders" to orders,
             "userType" to userType,
             "wallet" to wallet,
-            "country" to country
-
+            "country" to country,
+            "isPublic" to isPublic!!,
+            "isActive" to isActive!!
         )
     }
 
+//    val hashMap = hashMapOf<String, Any>()
+//    hashMap["userId"] = userId
+//    hashMap["name"] = name
+//    hashMap["email"] = email
+//    hashMap["mobile"] = mobile
+//    hashMap["password"] = password
+//    hashMap["imageProfile"] = imageProfile
+//    hashMap["likes"] = likes
+//    hashMap["cart"] = cart
+//    hashMap["orders"] = orders
+//    hashMap["userType"] = userType
+//    hashMap["wallet"] = wallet
+//    hashMap["country"] = country
+//    if (isPublic != null)
+//    hashMap["isPublic"] = isPublic!!
+//    if(isActive != null)
+//    hashMap["isActive"] = isActive!!
+//    return hashMap
 
 
     @Parcelize

@@ -118,7 +118,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:padding="16dp"
-                android:text="@{userData.phone}"
+                android:text="@{userData.mobile}"
                 android:textAlignment="viewEnd"
                 android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
                 app:layout_constraintBottom_toBottomOf="@+id/profile_mobile_label_tv"

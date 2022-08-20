@@ -12,17 +12,7 @@
         android:layout_height="match_parent">
 
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btn_add_product"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:layout_gravity="bottom|end"
-            android:visibility="gone"
-            tools:visibility="visible"
-            android:contentDescription="@string/add_product"
-            app:srcCompat="@drawable/ic_add_48" />
+
 
         <include
             android:id="@+id/loader_layout"
@@ -30,6 +20,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone" />
+
+
+
+
 
 
         <LinearLayout
@@ -68,6 +62,28 @@
 
 
         </LinearLayout>
+
+
+
+        <include
+            android:id="@+id/filterSheet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/filters"/>
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_add_product"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_gravity="bottom|end"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:contentDescription="@string/add_product"
+            app:srcCompat="@drawable/ic_add_48" />
+
 
     </FrameLayout>
 
