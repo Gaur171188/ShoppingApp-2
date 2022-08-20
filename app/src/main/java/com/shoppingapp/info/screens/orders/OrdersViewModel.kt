@@ -3,11 +3,10 @@ package com.shoppingapp.info.screens.orders
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.shoppingapp.info.data.User
-import com.shoppingapp.info.utils.orderStatusFilters
-import kotlinx.coroutines.launch
-import java.util.*
+import com.shoppingapp.info.utils.OrderStatus
+import com.shoppingapp.info.utils.Sort
+
 
 class OrdersViewModel(): ViewModel() {
 
@@ -37,16 +36,43 @@ class OrdersViewModel(): ViewModel() {
     }
 
 
-    fun applyFilter(filter: String, orders: List<User.OrderItem>): List<User.OrderItem> {
-        val f = filter.uppercase(Locale.ROOT)
-        val apply = if (filter == orderStatusFilters.first()) { // it will return all orders
-            return orders
-        }else{
-            orders.filter { it.status == f }
+
+//    fun filter(
+//        orders: List<User.OrderItem>,
+//        sortedBy: String): List<User.OrderItem> {
+//        var list = orders
+//        list = if (sortedBy.isNotEmpty()){
+//            when(sortedBy.uppercase()) {
+//                Sort.NAME.name -> orders.sortedBy { it.orderId }
+//                Sort.DATE.name -> orders.sortedBy { it.orderDate }
+//                OrderStatus.CONFIRMED.name -> orders.filter { it.status == sortedBy }
+//                OrderStatus.DELIVERED.name -> orders.filter { it.status == sortedBy }
+//                OrderStatus.REJECTED.name -> orders.filter { it.status == sortedBy }
+//                OrderStatus.BINDING.name -> orders.filter { it.status == sortedBy }
+//                OrderStatus.ARRIVING.name -> orders.filter { it.status == sortedBy }
+//                else-> {list}
+//            }
+//        }else{
+//            orders
+//        }
+//        return  list
+//    }
+
+    fun filter (
+        orders: List<User.OrderItem>,
+        sortedBy: String): List<User.OrderItem> {
+        val list = when (val sort = sortedBy.uppercase()) {
+            Sort.DATE.name -> { orders.sortedBy { it.orderId } }
+            Sort.NAME.name -> { orders.sortedBy { it.orderDate } }
+            else -> { orders.filter { it.status == sort } }
         }
-        return apply
+        return list
     }
 
+
+
+//
+//
 
 
 

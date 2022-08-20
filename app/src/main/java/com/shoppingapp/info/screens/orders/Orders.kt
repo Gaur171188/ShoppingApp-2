@@ -6,19 +6,19 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shoppingapp.info.R
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.OrdersBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
-import com.shoppingapp.info.utils.Constants
-import com.shoppingapp.info.utils.hideKeyboard
-import com.shoppingapp.info.utils.orderStatusFilters
+import com.shoppingapp.info.utils.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
@@ -100,6 +100,7 @@ class Orders: Fragment() {
             orderTopAppBar.topAppBar.inflateMenu(R.menu.home_app_bar_menu)
             orderTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites)
             orderTopAppBar.topAppBar.menu.removeItem(R.id.item_cart)
+            orderTopAppBar.topAppBar.menu.removeItem(R.id.item_options)
 
 
             /** button search **/
@@ -145,41 +146,81 @@ class Orders: Fragment() {
     private fun setAppBarItemClicks(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.item_filter -> {
-                val checkedItem = orderStatusFilters.indexOf(viewModel.filterOrderStatus.value)
-                showDialogWithItems(orderStatusFilters, checkedItem)
+                orderFilter()
+//                val checkedItem = orderStatusFilters.indexOf(viewModel.filterOrderStatus.value)
+//                showDialogWithItems(orderStatusFilters, checkedItem)
                 true
             }
             else -> false
         }
     }
 
+    private fun orderFilter() {
+        binding.apply {
+            orderFilter.apply {
 
-    private fun showDialogWithItems(
-        categoryItems: Array<String>,
-        checkedOption: Int = 0) {
-        var checkedItem = checkedOption
+                val bottom = BottomSheetBehavior.from(filterSheet)
+                bottom.state = BottomSheetBehavior.STATE_EXPANDED
+                setSortItems()
 
-        MaterialAlertDialogBuilder(requireContext())
-                .setTitle(getString(R.string.select_order_status))
-                .setSingleChoiceItems(categoryItems, checkedItem) { _, which ->
-                    checkedItem = which
-                }
-                .setNegativeButton(getString(R.string.pro_cat_dialog_cancel_btn)) { dialog, _ ->
-                    dialog.cancel()
-                }
-                .setPositiveButton(getString(R.string.pro_cat_dialog_ok_btn)) { dialog, _ ->
-                    if (checkedItem == -1) {
-                        dialog.cancel()
-                    } else {
-                        // apply the filter
-                        val filter = categoryItems[checkedItem]
-                        val orders = homeViewModel.orders.value ?: emptyList()
-                        orderController.setData(viewModel.applyFilter(filter, orders))
+                filterSheet.apply {
+
+                    /** button close sheet **/
+                    btnClose.setOnClickListener {
+                        bottom.state = BottomSheetBehavior.STATE_COLLAPSED
+                        hideKeyboard()
                     }
-                    dialog.cancel()
+
+                    /** button apply **/
+                    btnApply.setOnClickListener {
+                        val sort = selectSort.text.toString()
+
+                        val orders = homeViewModel.orders.value ?: emptyList()
+
+                        val filter = viewModel.filter(orders,sort)
+                        showMessage(requireContext(),filter.size.toString())
+                        orderController.setData(filter)
+                        bottom.state = BottomSheetBehavior.STATE_COLLAPSED
+                        hideKeyboard()
+                    }
+
                 }
-                .show()
+            }
+        }
     }
+
+    private fun setSortItems() {
+        val adapter = ArrayAdapter(requireContext(),android.R.layout.simple_list_item_1, sortOrderItems)
+        binding.orderFilter.selectSort.setAdapter(adapter)
+    }
+
+
+//    private fun showDialogWithItems(
+//        categoryItems: Array<String>,
+//        checkedOption: Int = 0) {
+//        var checkedItem = checkedOption
+//
+//        MaterialAlertDialogBuilder(requireContext())
+//                .setTitle(getString(R.string.select_order_status))
+//                .setSingleChoiceItems(categoryItems, checkedItem) { _, which ->
+//                    checkedItem = which
+//                }
+//                .setNegativeButton(getString(R.string.pro_cat_dialog_cancel_btn)) { dialog, _ ->
+//                    dialog.cancel()
+//                }
+//                .setPositiveButton(getString(R.string.pro_cat_dialog_ok_btn)) { dialog, _ ->
+//                    if (checkedItem == -1) {
+//                        dialog.cancel()
+//                    } else {
+//                        // apply the filter
+//                        val filter = categoryItems[checkedItem]
+//                        val orders = homeViewModel.orders.value ?: emptyList()
+//                        orderController.setData(viewModel.filter(filter, orders))
+//                    }
+//                    dialog.cancel()
+//                }
+//                .show()
+//    }
 
 
 

@@ -10,8 +10,8 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         tools:context=".screens.orders.Orders">
+
 
         <TextView
             android:id="@+id/orders_empty_message"
@@ -29,11 +29,7 @@
             android:textStyle="bold" />
 
 
-        <include
-            android:id="@+id/order_top_app_bar"
-            layout="@layout/home_top_app_bar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+
 
 
 
@@ -44,12 +40,21 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
 
+
+
+
+
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/app_bar_height"
             android:orientation="vertical">
 
+            <include
+                android:id="@+id/order_top_app_bar"
+                layout="@layout/home_top_app_bar_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
 
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -78,6 +83,13 @@
 
 
         </LinearLayout>
+
+
+        <include
+            android:id="@+id/order_filter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            layout="@layout/order_filter"/>
 
 
     </FrameLayout>

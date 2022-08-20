@@ -28,13 +28,14 @@ val ShoeColors = mapOf(
 
 
 
-val orderStatusFilters = arrayOf(
-	"ALL",
-	OrderStatus.CONFIRMED.name,
-	OrderStatus.BINDING.name,
-	OrderStatus.ARRIVING.name,
-	OrderStatus.DELIVERED.name,
-	OrderStatus.REJECTED.name
+val sortOrderItems = arrayOf(
+	Sort.NAME.name.lowercase(),
+	Sort.DATE.name.lowercase(),
+	OrderStatus.CONFIRMED.name.lowercase(),
+	OrderStatus.BINDING.name.lowercase(),
+	OrderStatus.ARRIVING.name.lowercase(),
+	OrderStatus.DELIVERED.name.lowercase(),
+	OrderStatus.REJECTED.name.lowercase()
 )
 
 //val prices = arrayOf(

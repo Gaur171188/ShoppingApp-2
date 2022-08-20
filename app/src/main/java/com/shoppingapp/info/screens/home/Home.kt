@@ -122,6 +122,7 @@ class Home : Fragment() {
                     btnClose.setOnClickListener {
                         bottom.state = BottomSheetBehavior.STATE_COLLAPSED
                         btnAddProduct.show()
+                        hideKeyboard()
                     }
 
                     /** button apply **/
@@ -138,6 +139,7 @@ class Home : Fragment() {
 
                         bottom.state = BottomSheetBehavior.STATE_COLLAPSED
                         btnAddProduct.show()
+                        hideKeyboard()
                     }
 
                 }

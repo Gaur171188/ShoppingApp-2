@@ -143,6 +143,12 @@
     <string name="update">Update</string>
     <string name="notification">Notification</string>
     <string name="product_manager">Product Manager</string>
+    <string name="sorted_by">Sorted By</string>
+    <string name="confirmed">Confirmed</string>
+    <string name="delivered">Delivered</string>
+    <string name="arriving">Arriving</string>
+    <string name="binding">Binding</string>
+    <string name="rejected">Rejected</string>
 
 
 </resources>

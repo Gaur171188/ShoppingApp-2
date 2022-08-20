@@ -19,7 +19,7 @@ enum class DataStatus { LOADING, ERROR, SUCCESS }
 enum class UserType { CUSTOMER, SELLER, ADMIN}
 enum class OrderStatus { CONFIRMED, BINDING, ARRIVING, DELIVERED, REJECTED }
 enum class Prices { LESS_THAN_100,FROM_50_TO_250,FROM_500_TO_1500,MORE_THAN_1500 }
-
+enum class Sort { NAME,DATE }
 
 
 fun getItemsPriceTotal(price: Map<String, Double>,items: List<User.CartItem>): Double {

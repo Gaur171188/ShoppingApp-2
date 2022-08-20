@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/filterSheet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:behavior_peekHeight="0dp"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+            android:background="@color/white">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_marginTop="5dp">
+
+                    <ImageView
+                        android:id="@+id/btn_close"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_cancel_24" />
+
+                    <TextView
+                        android:id="@+id/filterResults"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_gravity="center"
+                        android:textColor="@color/black"
+                        android:text="@string/filter"/>
+
+
+                </FrameLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:orientation="vertical">
+
+
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/textInputLayout"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/sorted_by"
+                        app:boxStrokeColor="@color/blue_accent_300">
+
+                        <AutoCompleteTextView
+                            android:id="@+id/selectSort"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:dropDownHeight="240dp"
+                            android:inputType="none"
+                            android:labelFor="@id/textInputLayout"
+                            android:paddingTop="12dp"
+                            android:paddingBottom="12dp"
+                            android:textStyle="bold" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <androidx.legacy.widget.Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="10dp"/>
+
+<!--                    <com.google.android.material.textfield.TextInputLayout-->
+<!--                        android:id="@+id/textInputLayout2"-->
+<!--                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:hint="Order"-->
+<!--                        app:boxStrokeColor="@color/blue_accent_300">-->
+
+<!--                        <AutoCompleteTextView-->
+<!--                            android:id="@+id/selectOrderStatus"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:dropDownHeight="240dp"-->
+<!--                            android:inputType="none"-->
+<!--                            android:labelFor="@id/textInputLayout2"-->
+<!--                            android:paddingTop="12dp"-->
+<!--                            android:paddingBottom="12dp"-->
+<!--                            android:textStyle="bold" />-->
+
+<!--                    </com.google.android.material.textfield.TextInputLayout>-->
+<!--                    -->
+
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:weightSum="3"-->
+<!--                        android:layout_marginStart="20dp"-->
+<!--                        android:layout_marginEnd="20dp"-->
+<!--                        android:orientation="horizontal">-->
+
+<!--                        <com.google.android.material.checkbox.MaterialCheckBox-->
+<!--                            android:id="@+id/btn_CheckConfirmed"-->
+<!--                            android:layout_width="0dp"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_weight="1"-->
+<!--                            android:text="@string/confirmed"/>-->
+
+<!--                        <com.google.android.material.checkbox.MaterialCheckBox-->
+<!--                            android:id="@+id/btn_CheckBinding"-->
+<!--                            android:layout_width="0dp"-->
+<!--                            android:layout_weight="1"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="@string/binding"/>-->
+
+<!--                        <com.google.android.material.checkbox.MaterialCheckBox-->
+<!--                            android:id="@+id/btn_CheckArriving"-->
+<!--                            android:layout_width="0dp"-->
+<!--                            android:layout_weight="1"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="@string/arriving"/>-->
+
+
+
+<!--                    </LinearLayout>-->
+
+
+<!--                    <androidx.legacy.widget.Space-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="10dp"/>-->
+
+
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:weightSum="2"-->
+<!--                        android:layout_marginStart="50dp"-->
+<!--                        android:layout_marginEnd="50dp"-->
+<!--                        android:orientation="horizontal">-->
+
+<!--                        <com.google.android.material.checkbox.MaterialCheckBox-->
+<!--                            android:id="@+id/btn_CheckDelivered"-->
+<!--                            android:layout_width="0dp"-->
+<!--                            android:layout_weight="1"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="@string/delivered"/>-->
+
+<!--                        <com.google.android.material.checkbox.MaterialCheckBox-->
+<!--                            android:id="@+id/btn_CheckRejected"-->
+<!--                            android:layout_width="0dp"-->
+<!--                            android:layout_weight="1"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="@string/rejected"/>-->
+
+
+<!--                    </LinearLayout>-->
+
+
+
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/btn_apply"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:backgroundTint="@color/blue_accent_300"
+                android:padding="16dp"
+                android:text="@string/apply"
+                android:layout_gravity="bottom"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </FrameLayout>
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+
+</layout>
