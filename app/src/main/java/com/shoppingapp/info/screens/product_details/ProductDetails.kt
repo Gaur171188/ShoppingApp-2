@@ -1,13 +1,14 @@
 package com.shoppingapp.info.screens.product_details
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.shoppingapp.info.R
@@ -15,8 +16,8 @@ import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.ProductDetailsBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
 import com.shoppingapp.info.utils.*
-import org.koin.android.ext.android.bind
 import org.koin.android.viewmodel.ext.android.sharedViewModel
+
 import kotlin.properties.Delegates
 
 
@@ -27,7 +28,6 @@ class ProductDetails: Fragment() {
     }
 
     private val homeViewModel by sharedViewModel<HomeViewModel>()
-    private val viewModel by sharedViewModel<ProductDetailsViewModel>()
 
     private lateinit var binding: ProductDetailsBinding
 
@@ -36,6 +36,8 @@ class ProductDetails: Fragment() {
     private var isItemInCart by Delegates.notNull<Boolean>()
     private var isLiked by Delegates.notNull<Boolean>()
     private var isEdit by Delegates.notNull<Boolean>()
+
+    private val imageController by lazy { ImageController() }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -72,7 +74,7 @@ class ProductDetails: Fragment() {
 
 
     private fun initData() {
-        product = try { arguments?.getParcelable<Product>(Constants.KEY_PRODUCT)!! }
+        product = try { arguments?.getParcelable(Constants.KEY_PRODUCT)!! }
         catch (ex: Exception){ Product() }
 
         isItemInCart = arguments?.getBoolean(Constants.KEY_CHECK_IN_CART)!!
@@ -112,8 +114,8 @@ class ProductDetails: Fragment() {
                 binding.btnAddToCart.text = getString(R.string.update_cart)
             }
 
-
         }
+
 
 
         /** insert Cart Status **/
@@ -137,7 +139,6 @@ class ProductDetails: Fragment() {
                         binding.btnAddToCart.isClickable = true
                     }
 
-                    else -> {}
                 }
             }
         }
@@ -164,7 +165,6 @@ class ProductDetails: Fragment() {
                         binding.loader.root.hide()
                         binding.btnAddToCart.isClickable = true
                     }
-                    else -> {}
                 }
             }
         }
@@ -221,29 +221,14 @@ class ProductDetails: Fragment() {
 
             binding.btnLikeProduct.isChecked = isLiked
 
-//            // set button text
-//            if (isItemInCart) {
-//                    btnAddToCart.text = getString(R.string.pro_details_go_to_cart_btn_text)
-//                } else {
-//                    btnAddToCart.text = getString(R.string.pro_details_add_to_cart_btn_text)
-//                }
-
-//            if(isEdit){
-//                binding.btnAddToCart.text = getString(R.string.update_cart)
-//            }
-
             // set images and dots
-            setImagesView()
+            setImagesAdapter()
 
             /** title, description and price  **/
             productTitle.text = product.name
             productDescription.text = product.description
             productPrice.text = resources.getString(R.string.pro_details_price_value, product.price.toString())
 
-
-//            setShoeSizeButtons()
-//            setShoeColorsChips(product.availableColors)
-//            setShoeColorsButtons()
 
 
         }
@@ -253,21 +238,33 @@ class ProductDetails: Fragment() {
     }
 
 
+    private fun setImagesAdapter(){
+        binding.apply {
+
+            imageController.setData(product.images)
+
+            /** on image clicked **/
+            imageController.clickListener = object: ImageController.OnClickListener {
+
+                override fun onItemClick(image: String) {
+
+                }
 
 
-    private fun setImagesView() {
-        if (context != null) {
-            binding.proDetailsImagesRecyclerview.isNestedScrollingEnabled = false
-            val adapter = ProductImagesAdapter(requireContext(), product.images ?: emptyList())
-            binding.proDetailsImagesRecyclerview.adapter = adapter
+            }
+
+            rvProductImages.isNestedScrollingEnabled = false
+            rvProductImages.adapter = imageController.adapter
             val rad = resources.getDimension(R.dimen.radius)
             val dotsHeight = resources.getDimensionPixelSize(R.dimen.dots_height)
             val inactiveColor = ContextCompat.getColor(requireContext(), R.color.gray)
             val activeColor = ContextCompat.getColor(requireContext(), R.color.blue_accent_300)
             val itemDecoration = DotsIndicatorDecoration(rad, rad * 4, dotsHeight, inactiveColor, activeColor)
-            binding.proDetailsImagesRecyclerview.addItemDecoration(itemDecoration)
-            PagerSnapHelper().attachToRecyclerView(binding.proDetailsImagesRecyclerview)
+            rvProductImages.addItemDecoration(itemDecoration)
+            PagerSnapHelper().attachToRecyclerView(rvProductImages)
+
         }
+
     }
 
 

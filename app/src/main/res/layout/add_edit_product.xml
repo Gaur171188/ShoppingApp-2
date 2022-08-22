@@ -9,10 +9,11 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@null">
 
         <include
-            android:id="@+id/add_pro_app_bar"
+            android:id="@+id/add_edit_product_app_bar"
             layout="@layout/layout_top_bar" />
 
         <include
@@ -28,41 +29,40 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fillViewport="true"
+            android:background="@null"
+            android:layout_marginBottom="72dp"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="72dp">
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginTop="16dp">
 
                 <TextView
                     android:id="@+id/add_pro_name_label"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
                     android:text="Product Name"
                     android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    android:textStyle="bold" />
+
+                <androidx.legacy.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/nameOutlinedTextField"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    app:boxStrokeColor="@color/blue_accent_300"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_pro_name_label">
+                    app:boxStrokeColor="@color/blue_accent_300">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/product_name"
@@ -76,13 +76,14 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <androidx.legacy.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"/>
+
                 <TextView
                     android:id="@+id/add_pro_price_label"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
                     android:text="Seller Price"
                     android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
                     android:textColor="@color/black"
@@ -92,21 +93,19 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/nameOutlinedTextField" />
 
+                <androidx.legacy.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"/>
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/priceOutlinedTextField"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    app:boxStrokeColor="@color/blue_accent_300"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_pro_price_label">
+                    app:boxStrokeColor="@color/blue_accent_300">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/pro_price_edit_text"
+                        android:id="@+id/productPrice"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
@@ -117,37 +116,35 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+
+                <androidx.legacy.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"/>
+
                 <TextView
                     android:id="@+id/add_pro_mrp_label"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
                     android:text="MRP"
                     android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/priceOutlinedTextField" />
+                    android:textStyle="bold" />
+
+
+                <androidx.legacy.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/mrpOutlinedTextField"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    app:boxStrokeColor="@color/blue_accent_300"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_pro_mrp_label">
+                    app:boxStrokeColor="@color/blue_accent_300">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/pro_mrp_edit_text"
+                        android:id="@+id/product_Mrp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="numberDecimal"
@@ -158,37 +155,35 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
+
+                <androidx.legacy.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"/>
+
                 <TextView
                     android:id="@+id/add_pro_desc_label"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
                     android:text="@string/description"
                     android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
                     android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/mrpOutlinedTextField" />
+                    android:textStyle="bold" />
+
+
+                <androidx.legacy.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/descOutlinedTextField"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    app:boxStrokeColor="@color/blue_accent_300"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_pro_desc_label">
+                    app:boxStrokeColor="@color/blue_accent_300">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/product_des"
+                        android:id="@+id/product_Description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="start|top"
@@ -201,114 +196,40 @@
 
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <TextView
-                    android:id="@+id/add_pro_images_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/add_images_to_product_des"
-                    android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_add_images_to_product"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/descOutlinedTextField" />
 
-                <ImageButton
-                    android:id="@+id/btn_add_images_to_product"
-                    android:layout_width="35dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="16dp"
-                    android:backgroundTint="@color/blue_accent_300"
-                    android:contentDescription="@string/add_images_to_product_des"
-                    android:scaleType="centerCrop"
-                    app:layout_constraintBottom_toBottomOf="@+id/add_pro_images_label"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/add_pro_images_label"
-                    app:srcCompat="@drawable/ic_add_48"
-                    app:tint="@color/white" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/add_pro_images_rv"
+                <include
+                    android:id="@+id/add_Images_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal"
-                    android:visibility="visible"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_pro_images_label"
-                    tools:itemCount="5"
-                    tools:listitem="@layout/add_image_to_product_layout" />
-
-                <TextView
-                    android:id="@+id/add_pro_sizes_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/sizes_available"
-                    android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_pro_images_rv" />
+                    layout="@layout/add_edit_images"/>
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/add_product_size_chip_group"
+
+
+                <include
+                    android:id="@+id/add_sizes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    app:chipSpacingHorizontal="10dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_pro_sizes_label"
-                    app:selectionRequired="true">
-
-                </com.google.android.material.chip.ChipGroup>
-
-                <TextView
-                    android:id="@+id/add_pro_color_label"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/colors_available"
-                    android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
-                    android:textColor="@color/black"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_product_size_chip_group" />
+                    layout="@layout/add_edit_chip_items"/>
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/add_product_color_chip_group"
+
+                <include
+                    android:id="@+id/add_colors"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    app:chipSpacingHorizontal="10dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_pro_color_label"
-                    app:selectionRequired="true">
+                    android:layout_marginTop="16dp"
+                    layout="@layout/add_edit_chip_items"/>
 
-                </com.google.android.material.chip.ChipGroup>
+
+                <androidx.legacy.widget.Space
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"/>
+
 
                 <TextView
-                    android:id="@+id/add_product_error_message"
+                    android:id="@+id/errorMessage"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -320,14 +241,13 @@
                     android:textAppearance="@style/TextAppearance.MyTheme.Subtitle2"
                     android:textColor="?attr/colorError"
                     app:drawableStartCompat="@android:drawable/stat_notify_error"
-                    app:drawableTint="?attr/colorError"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/add_product_color_chip_group" />
+                    app:drawableTint="?attr/colorError" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -339,9 +259,8 @@
             android:layout_marginBottom="8dp"
             android:orientation="horizontal">
 
-
             <Button
-                android:id="@+id/btn_add_product"
+                android:id="@+id/btn_addEditProduct"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -352,7 +271,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <Space
+            <androidx.legacy.widget.Space
                 android:layout_width="10dp"
                 android:layout_height="wrap_content"/>
 
@@ -363,7 +282,7 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/holo_red_light"
                 android:padding="16dp"
-                android:text="Delete"
+                android:text="@string/delete"
                 android:visibility="gone"
                 tools:visibility="visible"
                 android:textAllCaps="false"
@@ -375,7 +294,7 @@
         </LinearLayout>
 
 
-
-
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
 </layout>

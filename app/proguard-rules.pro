@@ -7,6 +7,11 @@
 
 -keep class com.github.aachartmodel.aainfographics.** { *; }
 
+
+# for ad banner
+-keep class androidx.recyclerview.widget.**{*;}
+-keep class androidx.viewpager2.widget.**{*;}
+
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
 # class:

@@ -29,8 +29,8 @@ class Statistics : Fragment() {
 
 
         setViews()
-        setObserves()
 
+        setObserves()
 
 
         return binding.root
@@ -162,6 +162,7 @@ class Statistics : Fragment() {
             swipeRefreshLayout.setOnRefreshListener {
                 viewModel.loadUsers()
                 viewModel.loadProducts()
+                viewModel.loadAds()
             }
 
 

@@ -23,217 +23,220 @@
             android:visibility="gone" />
 
 
-
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/pro_details_scroll_view"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fillViewport="true"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            app:layout_constraintBottom_toBottomOf="@+id/linearLayout"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="@dimen/app_bar_height">
+
+            <ImageView
+                android:id="@+id/btn_Back"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/ic_outline_arrow_back_24"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/black" />
 
 
+            <CheckBox
+                android:id="@+id/btn_LikeProduct"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="end"
+                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:button="@drawable/sl_favourite_24dp"
+                android:contentDescription="@string/like_button"
+                android:padding="4dp"
+                app:buttonTint="@color/red_600"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:checked="true" />
 
-            <LinearLayout
-                android:id="@+id/pro_details_layout"
+        </FrameLayout>
+
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/pro_details_scroll_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="72dp"
-                android:orientation="vertical">
+                android:layout_marginTop="@dimen/app_bar_height"
+                android:fillViewport="true"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
 
-                <FrameLayout
+
+                <LinearLayout
+                    android:id="@+id/pro_details_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <ImageView
-                        android:id="@+id/btn_Back"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_gravity="start"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
-                        android:src="@drawable/ic_outline_arrow_back_24"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:tint="@color/black" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="72dp"
+                    android:orientation="vertical">
 
 
-                    <CheckBox
-                        android:id="@+id/btn_LikeProduct"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_gravity="end"
-                        android:layout_margin="16dp"
-                        android:layout_marginTop="16dp"
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_ProductImages"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="3"
+                        tools:listitem="@layout/item_image" />
+
+
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="15dp"/>
+
+                    <TextView
+                        android:id="@+id/productTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
                         android:layout_marginEnd="16dp"
-                        android:button="@drawable/sl_favourite_24dp"
-                        android:contentDescription="@string/like_button"
+                        android:textAlignment="viewStart"
+                        android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/pro_details_images_recyclerview"
+                        tools:text="Some Title of The Product van be multiline" />
+
+
+                    <TextView
+                        android:id="@+id/product_price"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="16dp"
+                        android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
+                        android:textColor="@color/blue_accent_300"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/productTitle"
+                        tools:text="$ 200.99" />
+
+
+                    <TextView
+                        android:id="@+id/pro_details_specifications_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="36dp"
+                        android:text="@string/description"
+                        android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/product_price" />
+
+                    <TextView
+                        android:id="@+id/product_description"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
                         android:padding="4dp"
-                        app:buttonTint="@color/red_600"
+                        android:textSize="14sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:checked="true" />
-
-                </FrameLayout>
-
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/pro_details_images_recyclerview"
-                    android:layout_width="match_parent"
-                    android:layout_height="400dp"
-                    android:layout_marginTop="?attr/actionBarSize"
-                    android:orientation="horizontal"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:itemCount="3"
-                    tools:listitem="@layout/product_image_item" />
+                        app:layout_constraintHorizontal_bias="0.0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/pro_details_specifications_label"
+                        app:layout_constraintVertical_bias="1.0"
+                        tools:text="@string/description" />
 
 
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="15dp"/>
+                    <Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp" />
 
-                <TextView
-                    android:id="@+id/productTitle"
-                    android:layout_width="wrap_content"
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+
+                <Button
+                    android:id="@+id/btn_AddToCart"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:textAlignment="viewStart"
-                    android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/pro_details_images_recyclerview"
-                    tools:text="Some Title of The Product van be multiline" />
-
-
-                <TextView
-                    android:id="@+id/product_price"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="16dp"
-                    android:textAppearance="@style/TextAppearance.MyTheme.Headline6"
-                    android:textColor="@color/blue_accent_300"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/productTitle"
-                    tools:text="$ 200.99" />
-
-
-                <TextView
-                    android:id="@+id/pro_details_specifications_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="36dp"
-                    android:text="@string/description"
-                    android:textAppearance="@style/TextAppearance.MyTheme.Subtitle1"
+                    android:layout_weight="4"
+                    android:backgroundTint="@color/blue_accent_300"
+                    android:padding="16dp"
+                    android:textAllCaps="false"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/product_price" />
+                    tools:text="@string/add_to_cart" />
 
-                <TextView
-                    android:id="@+id/product_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:padding="4dp"
-                    android:textSize="14sp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/pro_details_specifications_label"
-                    app:layout_constraintVertical_bias="1.0"
-                    tools:text="@string/description" />
 
 
                 <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="50dp" />
+                    android:layout_width="10dp"
+                    android:layout_height="10dp" />
+
+
+                <ImageButton
+                    android:id="@+id/btn_remove_quantity"
+                    android:layout_width="33dp"
+                    android:layout_height="28dp"
+                    android:background="@null"
+                    android:contentDescription="@string/decrease_button"
+                    app:srcCompat="@drawable/ic_remove_24"
+                    app:tint="@color/black" />
+
+                <TextView
+                    android:id="@+id/cart_product_quantity"
+                    android:layout_width="40dp"
+                    android:layout_height="30dp"
+                    android:background="@color/blue_shadow_color"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:textAppearance="@style/TextAppearance.MyTheme.Body2"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="123" />
+
+                <ImageButton
+                    android:id="@+id/btn_insert_quantity"
+                    android:layout_width="33dp"
+                    android:layout_height="28dp"
+                    android:background="@null"
+                    android:contentDescription="@string/increase_button"
+                    app:srcCompat="@drawable/ic_add_24"
+                    app:tint="@color/black" />
+
 
             </LinearLayout>
 
-        </androidx.core.widget.NestedScrollView>
-
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-
-            <Button
-                android:id="@+id/btn_AddToCart"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="4"
-                android:backgroundTint="@color/blue_accent_300"
-                android:padding="16dp"
-                android:textAllCaps="false"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="@string/add_to_cart" />
 
 
 
-            <Space
-                android:layout_width="10dp"
-                android:layout_height="10dp" />
-
-
-            <ImageButton
-                android:id="@+id/btn_remove_quantity"
-                android:layout_width="33dp"
-                android:layout_height="28dp"
-                android:background="@null"
-                android:contentDescription="@string/decrease_button"
-                app:srcCompat="@drawable/ic_remove_24"
-                app:tint="@color/black" />
-
-            <TextView
-                android:id="@+id/cart_product_quantity"
-                android:layout_width="40dp"
-                android:layout_height="30dp"
-                android:background="@color/blue_shadow_color"
-                android:gravity="center_horizontal|center_vertical"
-                android:textAppearance="@style/TextAppearance.MyTheme.Body2"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                tools:text="123" />
-
-            <ImageButton
-                android:id="@+id/btn_insert_quantity"
-                android:layout_width="33dp"
-                android:layout_height="28dp"
-                android:background="@null"
-                android:contentDescription="@string/increase_button"
-                app:srcCompat="@drawable/ic_add_24"
-                app:tint="@color/black" />
-
-
-        </LinearLayout>
 
 
 
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
 

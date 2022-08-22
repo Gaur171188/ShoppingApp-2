@@ -22,16 +22,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
-enum class SignUpViewErrors { NONE, ERR_EMAIL, ERR_MOBILE, ERR_EMAIL_MOBILE, ERR_EMPTY, ERR_NOT_ACC, ERR_PWD12NS }
-
-enum class LoginViewErrors { NONE, ERR_EMPTY, ERR_MOBILE }
-
-enum class OTPStatus { NONE, CORRECT, WRONG, INVALID_REQ }
-
-enum class AddAddressViewErrors { EMPTY, ERR_FNAME_EMPTY, ERR_LNAME_EMPTY, ERR_STR1_EMPTY, ERR_CITY_EMPTY, ERR_STATE_EMPTY, ERR_ZIP_EMPTY, ERR_ZIP_INVALID, ERR_PHONE_INVALID, ERR_PHONE_EMPTY }
-
-
-
 fun showMessage(context: Context, text: String){
     Toast.makeText(context,text,Toast.LENGTH_SHORT).show()
 }

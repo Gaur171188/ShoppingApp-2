@@ -25,6 +25,11 @@ object x{
 }
 
 
+
+@BindingAdapter("loadImage")
+fun loadImage(view: ImageView, imageUri: String) = Glide.with(view.context).load(imageUri).into(view)
+
+
 @BindingAdapter("setImage")
 fun setImage(image: ImageView, images: List<String>?) {
     try {

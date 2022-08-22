@@ -2,7 +2,9 @@ package com.shoppingapp.info.utils
 
 import java.util.*
 
-val ShoeSizes = mapOf(
+
+/** you can modify the sizes for each item that you need **/
+val shoeSizes = mapOf(
 	"UK4" to 4,
 	"UK5" to 5,
 	"UK6" to 6,
@@ -14,7 +16,7 @@ val ShoeSizes = mapOf(
 	"UK12" to 12
 )
 
-val ShoeColors = mapOf(
+val shoeColors = mapOf(
 	"black" to "#000000",
 	"white" to "#FFFFFF",
 	"red" to "#FF0000",
@@ -36,6 +38,12 @@ val sortOrderItems = arrayOf(
 	OrderStatus.ARRIVING.name.lowercase(),
 	OrderStatus.DELIVERED.name.lowercase(),
 	OrderStatus.REJECTED.name.lowercase()
+)
+
+
+
+val dayItems = arrayOf(
+	"Yesterday","today"
 )
 
 //val prices = arrayOf(

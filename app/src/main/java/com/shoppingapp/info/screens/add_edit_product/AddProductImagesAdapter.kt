@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.shoppingapp.info.databinding.AddImageToProductLayoutBinding
+import com.shoppingapp.info.databinding.AddEditImageBinding
 
 
 class AddProductImagesAdapter(private val context: Context, images: List<Uri>) :
@@ -15,7 +15,7 @@ class AddProductImagesAdapter(private val context: Context, images: List<Uri>) :
 
     private var data: MutableList<Uri> = images as MutableList<Uri>
 
-    inner class ViewHolder(private var binding: AddImageToProductLayoutBinding) :
+    inner class ViewHolder(private var binding: AddEditImageBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imgUrl: Uri, pos: Int) {
             binding.addImgCloseBtn.setOnClickListener {
@@ -35,7 +35,7 @@ class AddProductImagesAdapter(private val context: Context, images: List<Uri>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            AddImageToProductLayoutBinding.inflate(
+            AddEditImageBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

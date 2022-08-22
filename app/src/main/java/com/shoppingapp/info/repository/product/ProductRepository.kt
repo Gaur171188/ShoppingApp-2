@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import com.google.android.gms.tasks.Task
+import com.shoppingapp.info.data.Ad
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.ERR_UPLOAD
@@ -23,7 +24,6 @@ class ProductRepository(val context: Context, private val remote: RemoteProductR
 
 
     suspend fun getProducts() = remote.getProducts()
-
 
     suspend fun loadProducts(): Result<List<Product>> {
         return supervisorScope {
@@ -44,8 +44,72 @@ class ProductRepository(val context: Context, private val remote: RemoteProductR
 
     suspend fun deleteProduct(productId: String) = remote.deleteProduct(productId)
 
-    suspend fun uploadFile(uri: Uri, fileName: String) = remote.uploadFile(uri, fileName)
 
+
+    suspend fun loadAds() : Result<List<Ad>> {
+        return supervisorScope {
+            val task = async { remote.loadAds() }
+            try {
+                Result.Success(task.await())
+            }catch (ex: Exception){
+                Result.Error(Exception(ex))
+            }
+        }
+    }
+
+    suspend fun insertAds(list: List<Ad>) : Result<Boolean> {
+        return supervisorScope {
+            val task = async { list.forEach { ad-> remote.insertAd(ad) } }
+            try {
+                task.await()
+                Result.Success(true)
+            }catch (ex: Exception){
+                Result.Error(Exception(ex))
+            }
+        }
+    }
+
+
+
+    suspend fun insertAd(data: Ad) : Result<Boolean> {
+        return supervisorScope {
+            val task = async { remote.insertAd(data) }
+            try {
+                task.await()
+                Result.Success(true)
+            }catch (ex: Exception){
+                Result.Error(Exception(ex))
+            }
+        }
+    }
+
+    suspend fun deleteAd(data: Ad) : Result<Boolean> {
+        return supervisorScope {
+            val task = async { remote.deleteAd(data) }
+            try {
+                task.await()
+                Result.Success(true)
+            }catch (ex: Exception){
+                Result.Error(Exception(ex))
+            }
+        }
+    }
+
+    suspend fun updateAd(data: Ad,oldAdImage: String) : Result<Boolean> {
+        return supervisorScope {
+            val task = async { remote.updateAd(data,oldAdImage) }
+            try {
+                task.await()
+                Result.Success(true)
+            }catch (ex: Exception){
+                Result.Error(Exception(ex))
+            }
+        }
+    }
+
+
+
+    suspend fun uploadFile(uri: Uri, fileName: String) = remote.uploadFile(uri, fileName)
 
     suspend fun insertFiles(filesUri: List<Uri>) = remote.insertFiles(filesUri)
 

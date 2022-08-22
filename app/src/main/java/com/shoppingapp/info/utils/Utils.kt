@@ -1,8 +1,8 @@
 package com.shoppingapp.info.utils
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.text.format.DateUtils
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
@@ -18,8 +18,14 @@ const val ERR_UPLOAD = "UploadErrorException"
 enum class DataStatus { LOADING, ERROR, SUCCESS }
 enum class UserType { CUSTOMER, SELLER, ADMIN}
 enum class OrderStatus { CONFIRMED, BINDING, ARRIVING, DELIVERED, REJECTED }
-enum class Prices { LESS_THAN_100,FROM_50_TO_250,FROM_500_TO_1500,MORE_THAN_1500 }
 enum class Sort { NAME,DATE }
+enum class Days { YESTERDAY, TODAY, MONTH_AGO }
+
+
+object CheckTime {
+    fun isYesterday(d: Date) = DateUtils.isToday(d.time + DateUtils.DAY_IN_MILLIS)
+    fun isTomorrow(d: Date) = DateUtils.isToday(d.time - DateUtils.DAY_IN_MILLIS)
+}
 
 
 fun getItemsPriceTotal(price: Map<String, Double>,items: List<User.CartItem>): Double {

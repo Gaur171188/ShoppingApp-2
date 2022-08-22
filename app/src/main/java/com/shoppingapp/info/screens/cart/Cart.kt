@@ -72,8 +72,7 @@ class Cart : Fragment() {
 
 
     private fun loadData() {
-        val products = homeViewModel.products.value ?: emptyList()
-        homeViewModel.loadCartDetails(products)
+        homeViewModel.loadCartDetails()
         binding.cartRecyclerView.adapter = initAdapter()
     }
 

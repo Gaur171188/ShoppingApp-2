@@ -8,8 +8,8 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.shoppingapp.info.data.Ad
 import com.shoppingapp.info.data.Product
-import com.shoppingapp.info.data.User
 import com.shoppingapp.info.utils.ERR_UPLOAD
 import kotlinx.coroutines.tasks.await
 import java.util.*
@@ -21,6 +21,7 @@ class RemoteProductRepository() {
 	private val storageRef = storage.reference
 
 	private fun productsPath() = fireStore.collection(PRODUCT_COLLECTION)
+	private fun adsPath() = fireStore.collection(ADS_COLLECTION)
 
 	private val _products = MutableLiveData<List<Product>?>()
 	val products: LiveData<List<Product>?> = _products
@@ -54,6 +55,22 @@ class RemoteProductRepository() {
 	suspend fun updateProduct(proData: Product) = productsPath().document(proData.productId).update(proData.toHashMap())
 
 
+
+	suspend fun insertAd(data: Ad) = adsPath().document(data.id).set(data.toHashMap())
+
+	suspend fun updateAd(data: Ad,oldAdImage: String){
+		deleteFile(oldAdImage)
+		adsPath().document(data.id).update(data.toHashMap())
+	}
+
+	suspend fun deleteAd(data: Ad) {
+		deleteFile(data.image)
+		adsPath().document(data.id).delete()
+	}
+
+	suspend fun loadAds(): List<Ad> = adsPath().get().await().toObjects(Ad::class.java)
+
+
 	suspend fun getProductById(productId: String) = productsPath().document(productId).get().await().toObject(Product::class.java)
 
 	suspend fun deleteProduct(productId: String): Task<Void> {
@@ -66,6 +83,7 @@ class RemoteProductRepository() {
 		// delete product data
 		return productsPath().document(productId).delete()
 	}
+
 
 
 	suspend fun uploadFile(uri: Uri, fileName: String): Uri? {
@@ -101,6 +119,7 @@ class RemoteProductRepository() {
 	}
 
 
+
 	suspend fun updateFiles(newList: List<Uri>, oldList: List<String>): List<String> {
 		var urlList = mutableListOf<String>()
 		newList.forEach label@{ uri ->
@@ -129,14 +148,16 @@ class RemoteProductRepository() {
 		return urlList
 	}
 
-	private fun deleteFile(fileUri: String) = storage.getReferenceFromUrl(fileUri).delete()
+	fun deleteFile(fileUri: String) = storage.getReferenceFromUrl(fileUri).delete()
 
 	private fun revertUpload(fileName: String) = storageRef.child("$PRODUCTS_IMAGES/$fileName")
+
 
 
 	companion object {
 		private const val PRODUCTS_IMAGES = "products_Images"
 		private const val PRODUCT_COLLECTION = "products"
+		private const val ADS_COLLECTION = "ads"
 		private const val PRODUCT_ID_FIELD = "productId"
 		private const val TAG = "ProductsRemoteSource"
 	}

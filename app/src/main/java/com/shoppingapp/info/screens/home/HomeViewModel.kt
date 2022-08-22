@@ -12,6 +12,7 @@ import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.repository.user.RemoteUserRepository
 import com.shoppingapp.info.repository.user.UserRepository
 import com.shoppingapp.info.screens.account.AccountViewModel
+import com.shoppingapp.info.screens.add_edit_product.AddEditProductViewModel
 import com.shoppingapp.info.utils.DataStatus
 import com.shoppingapp.info.utils.UserType
 import com.shoppingapp.info.utils.showMessage
@@ -57,6 +58,11 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     val removeLikeStatus: LiveData<DataStatus?> = _removeLikeStatus
 
     /** progress **/
+    private val _uploadAdsStatus = MutableLiveData<DataStatus?>()
+    val uploadAdsStatus: LiveData<DataStatus?> = _uploadAdsStatus
+
+
+    /** progress **/
     private val _updateCartStatus = MutableLiveData<DataStatus?>()
     val updateCartStatus: LiveData<DataStatus?> = _updateCartStatus
 
@@ -67,6 +73,19 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     /** progress **/
     private val _insertCartStatus = MutableLiveData<DataStatus?>()
     val insertCartStatus: LiveData<DataStatus?> = _insertCartStatus
+
+    /** progress **/
+    private val _productSubmitStatus = MutableLiveData<DataStatus?>()
+    val productSubmitStatus: LiveData<DataStatus?> = _productSubmitStatus
+
+    /** progress **/
+    private val _productDeleteStatus = MutableLiveData<DataStatus?>()
+    val productDeleteStatus: LiveData<DataStatus?> = _productDeleteStatus
+
+    /** progress **/
+    private val _productUpdateStatus = MutableLiveData<DataStatus?>()
+    val productUpdateStatus: LiveData<DataStatus?> = _productUpdateStatus
+
 
     private val _cartItems= MutableLiveData<List<User.CartItem>?>()
     val cartItems: LiveData<List<User.CartItem>?> = _cartItems
@@ -108,6 +127,9 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     // load user data
     // load cart products
 
+    init {
+        loadData()
+    }
 
     fun setData(user: User) {
         _userData.value = user
@@ -126,7 +148,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
             val cart = user?.cart
             val balance = user?.wallet?.balance
 
-            _orders.value = orders
+            _orders.value = orders?.sortedBy { it.orderDate }
             _userData.value = user
             _userLikes.value = likes
             _cartItems.value = cart
@@ -184,10 +206,8 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
         val cart = _userData.value?.cart!!
         val likes = _userData.value?.likes
         val productId = product.productId
-
         loadCartItems(cart)
         loadQuantity(productId,cart)
-
     }
 
     fun setQuantityOfItem (value: Int) {
@@ -213,17 +233,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
 
 
     // load cart products and prices
-    fun loadCartDetails(products: List<Product>) {
-//        val cartProducts = ArrayList<Product>()
-
-//        val cartItems = _cartItems.value?.map { it.productId }
-//        products.forEach { product->
-//            val isProductInCart = cartItems?.contains(product.productId)
-//            if (isProductInCart == true){
-//                cartProducts.add(product)
-//            }
-//            _cartProducts.value = cartProducts
-//        }
+    fun loadCartDetails() {
         loadCardProducts()
         loadItemsPrice()
         loadQuantityCount()
@@ -350,6 +360,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
 
     fun updateCartItem(productId: String) {
         Log.d(TAG, "onUpdatingCartItem: Loading..")
+        resetProgress()
         _updateCartStatus.value = DataStatus.LOADING
         viewModelScope.launch {
             val item = _cartItems.value?.find { it.productId == productId }
@@ -377,6 +388,84 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
 
 
 
+    fun deleteProduct(product: Product) {
+        Log.d(TAG, "onDeleteProduct...")
+        resetProgress()
+        _productDeleteStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            productRepo.deleteProduct(product.productId)
+                .addOnSuccessListener {
+                    Log.d(TAG,"onDeleteProduct: product has been deleted success")
+                    _productDeleteStatus.value = DataStatus.SUCCESS
+
+                    val products = _products.value?.toMutableList()!!
+                    products.remove(product)
+                    _products.value = products
+
+                }
+                .addOnFailureListener { e ->
+                    Log.d(TAG,"onDeleteProduct: delete product failed due to ${e.message}")
+                    _productDeleteStatus.value = DataStatus.ERROR
+                }
+        }
+    }
+
+
+
+
+    fun submitProduct(product: Product, imgList: MutableList<Uri>) {
+        Log.d(TAG, "onAddProduct...")
+        resetProgress()
+        _productSubmitStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            // upload image uri then save it inside product data
+            val imageUris = productRepo.insertFiles(imgList)
+            product.images = imageUris
+//            product.owner = sharePrefManager.getName()!!
+            productRepo.insertProduct(product)
+                .addOnSuccessListener {
+                    Log.d(TAG,"OnAddingProduct: Product has been added")
+
+                    _productSubmitStatus.value = DataStatus.SUCCESS
+                    val products = _products.value?.toMutableList()!!
+                    products.add(product)
+                    _products.value = products
+
+
+                }
+                .addOnFailureListener { e ->
+                    _productSubmitStatus.value = DataStatus.ERROR
+                    Log.d(TAG,"OnAddingProduct: Failed")
+                }
+        }
+    }
+
+
+    fun updateProduct(product: Product, newImages: List<Uri>,oldImages: List<String>) {
+        Log.d(TAG, "onUpdateProduct..")
+        resetProgress()
+        _productUpdateStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            val newImagesUri = productRepo.updateFiles(newImages,oldImages)
+            product.images = newImagesUri
+            Log.d(TAG,product.productId)
+
+            productRepo.updateProduct(product)
+                .addOnSuccessListener {
+                    Log.d(TAG,"OnAddingProduct: Product has been Update")
+                    _productUpdateStatus.value = DataStatus.SUCCESS
+
+                    val products = _products.value?.filter { it.productId != product.productId  }?.toMutableList()!!
+                    products.add(product)
+                    _products.value = products
+
+                }
+                .addOnFailureListener { e ->
+                    _productUpdateStatus.value = DataStatus.ERROR
+                    Log.d(TAG,"OnAddingProduct: Failed to update due to ${e.message}")
+                }
+        }
+    }
 
 
 
@@ -386,60 +475,6 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
 
 
 
-
-
-
-
-
-
-
-    //    // load cart products and prices
-//    fun loadCartProduct() {
-//        val cartProducts = ArrayList<Product>()
-//        val priceMap = mutableMapOf<String, Double>()
-//        val cartItems = _cartItems.value?.map { it.productId }
-//        _products.value?.forEach { product->
-//            val isProductInCart = cartItems?.contains(product.productId)
-//            if (isProductInCart == true){
-//                cartProducts.add(product)
-//            }
-//            _cartProducts.value = cartProducts
-//            _cartItems.value?.forEach { item ->
-//                val cartProduct = cartProducts.find { it.productId == item.productId }!!
-//                priceMap[item.itemId] = cartProduct.price
-//            }
-//            _itemsPrice.value = priceMap
-//
-//        }
-//    }
-//
-
-
-
-//        private suspend fun getAllProductsInCart() {
-//        viewModelScope.launch {
-//            val priceMap = mutableMapOf<String, Double>()
-//            val proList = mutableListOf<Product>()
-//
-//            _cartItems.value?.let { itemList ->
-//                itemList.forEach label@ { item ->
-//                    val productDeferredRes = async {
-//                        productRepository.getProductById(item.productId, true)
-//                    }
-//                    val proRes = productDeferredRes.await()
-//                    if (proRes is Success) {
-//                        val proData = proRes.data
-//                        proList.add(proData)
-//                        priceMap[item.itemId] = proData.price
-//                    } else {
-//                        return@label
-//                    }
-//                }
-//            }
-//            _priceList.value = priceMap
-//            _cartProducts.value = proList
-//        }
-//    }
 
 
 
@@ -452,9 +487,13 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
                 .addOnSuccessListener {
                     Log.d(TAG,"OnLikeProduct: like has been added success")
                     _addLikeStatus.value = DataStatus.SUCCESS
+
                     val likedProducts = _likedProducts.value?.toMutableList()
                     likedProducts?.add(product)
                     _likedProducts.value = likedProducts
+                    _userLikes.value = _likedProducts.value?.map { it.productId }
+
+
                 }
                 .addOnFailureListener { e ->
                     Log.d(TAG,"OnLikeProduct: error happen during adding due to ${e.message}")
@@ -463,6 +502,7 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
                 }
         }
     }
+
 
     fun removeLikeByProductId (product: Product) {
         Log.d(TAG,"OnLikeProduct: Loading..")
@@ -473,10 +513,12 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
                 .addOnSuccessListener {
                     Log.d(TAG,"OnLikeProduct: like has been removed success")
                     _removeLikeStatus.value = DataStatus.SUCCESS
-//                    val likedProducts = _likedProducts.value?.filter { it.productId != product.productId }
+
                     val likedProducts = _likedProducts.value?.toMutableList()
                     likedProducts?.remove(product)
                     _likedProducts.value = likedProducts
+                    _userLikes.value = _likedProducts.value?.map { it.productId }
+
                 }
                 .addOnFailureListener { e ->
                     Log.d(TAG,"OnLikeProduct: error happen during removing due to ${e.message}")
@@ -491,8 +533,13 @@ class HomeViewModel(val userRepo: UserRepository, val productRepo: ProductReposi
     fun resetProgress() {
         _addLikeStatus.value = null
         _removeLikeStatus.value = null
+        _insertCartStatus.value = null
         _updateCartStatus.value = null
         _errorMessage.value = null
+        _uploadAdsStatus.value = null
+        _productDeleteStatus.value = null
+        _productSubmitStatus.value = null
+        _productUpdateStatus.value = null
     }
 
 

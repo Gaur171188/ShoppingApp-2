@@ -26,34 +26,22 @@ import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class Favorites : Fragment() {
 
-    companion object{
-        const val TAG = "Favorites"
-    }
+    companion object{ const val TAG = "Favorites" }
 
-
-    private lateinit var viewModel: FavoritesViewModel
     private val homeViewModel by sharedViewModel<HomeViewModel>()
-
 
     private lateinit var binding: FavoritiesBinding
     private val favoritesController by lazy { FavoritesController() }
-//    private var likedProducts = ArrayList<Product>()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.favorities, container, false)
 
         binding.favTopAppBar.topAppBar.title = "Favorite Products"
-        viewModel = ViewModelProvider(this)[FavoritesViewModel::class.java]
-
-//        likedProducts = arguments?.get("userLikes") as List<Product>
-
 
 
         setViews()
         setObserves()
-
-//        viewModel.initData(likedProducts)
 
         return binding.root
 
@@ -71,57 +59,26 @@ class Favorites : Fragment() {
             if (!likedProducts.isNullOrEmpty()){
                 favoritesController.setData(likedProducts)
                 binding.tvEmptyFavorits.hide()
-            }else{
+            }else {
                 favoritesController.setData(emptyList())
                 binding.tvEmptyFavorits.show()
             }
         }
 
-//        with(viewModel) {
-//
-//            /** remove like status **/
-//            removeLikeStatus.observe(viewLifecycleOwner) { status ->
-//                when (status) {
-//                    DataStatus.SUCCESS -> {
-//                        favoritesController.setData(likedProducts)
-//                    } // once the data it will updated once the item is removed.
-//                    DataStatus.LOADING -> {}
-//                    DataStatus.ERROR -> {}
-//                    else -> {}
-//                }
-//
-//
-//            }
-//
-//        }
-    }
 
 
-    private fun setProductsAdapter() {
-//        val products = homeViewModel.likedProducts.value ?: emptyList()
-//        likedProducts.addAll(products)
-//        favoritesController.setData(emptyList())
-
-
-        /** click listener **/
-        favoritesController.clickListener = object : FavoritesController.OnClickListener{
-
-            override fun onProductClick(product: Product) {
-
-                val data = bundleOf(Constants.KEY_PRODUCT to product)
-                findNavController().navigate(R.id.action_favorites_to_productDetails, data)
-
+            /** remove like status **/
+            homeViewModel.removeLikeStatus.observe(viewLifecycleOwner) { status ->
+                if (status != null){
+                    when (status) {
+                        DataStatus.LOADING -> {}
+                        DataStatus.SUCCESS -> {homeViewModel.resetProgress()}
+                        DataStatus.ERROR -> {}
+                    }
+                }
             }
 
 
-            override fun onLikeClick(product: Product) {
-//                val userId = homeViewModel.userData.value?.userId!!
-                homeViewModel.removeLikeByProductId(product)
-//                likedProducts.remove(product)
-
-            }
-
-        }
 
     }
 
@@ -131,18 +88,43 @@ class Favorites : Fragment() {
 
         setProductsAdapter()
 
-        binding.favoriteProductsRecyclerView.apply {
-            val itemDecoration = RecyclerViewPaddingItemDecoration(requireContext())
-            if (itemDecorationCount == 0) {
-                addItemDecoration(itemDecoration)
-            }
-            adapter = favoritesController.adapter
-        }
+//        binding.favoriteProductsRecyclerView.apply {
+//            val itemDecoration = RecyclerViewPaddingItemDecoration(requireContext())
+//            if (itemDecorationCount == 0) {
+//                addItemDecoration(itemDecoration)
+//            }
+//            adapter = favoritesController.adapter
+//        }
 
 
         // back button
         binding.favTopAppBar.topAppBar.setOnClickListener {
             findNavController().navigateUp()
+        }
+
+
+
+    }
+
+
+
+    private fun setProductsAdapter() {
+        binding.apply {
+            /** click listener **/
+            favoritesController.clickListener = object : FavoritesController.OnClickListener {
+
+                override fun onProductClick(product: Product) {
+                    val data = bundleOf(Constants.KEY_PRODUCT to product)
+                    findNavController().navigate(R.id.action_favorites_to_productDetails, data)
+                }
+
+                override fun onLikeClick(product: Product) {
+                    homeViewModel.removeLikeByProductId(product)
+                }
+
+            }
+
+            rvFavorites.adapter = favoritesController.adapter
         }
 
 

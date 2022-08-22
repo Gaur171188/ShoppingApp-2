@@ -49,7 +49,7 @@
 
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/favorite_products_recycler_view"
+                android:id="@+id/rv_Favorites"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
@@ -63,5 +63,6 @@
                 android:visibility="visible"
                 tools:listitem="@layout/item_product_favorites" />
         </LinearLayout>
+
     </FrameLayout>
 </layout>

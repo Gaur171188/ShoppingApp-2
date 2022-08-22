@@ -2,56 +2,63 @@ package com.shoppingapp.info.screens.home
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
+import android.widget.FrameLayout
 import android.widget.PopupMenu
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.denzcoskun.imageslider.interfaces.ItemClickListener
+import com.denzcoskun.imageslider.models.SlideModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shoppingapp.info.R
 import com.shoppingapp.info.activities.RegistrationActivity
+import com.shoppingapp.info.data.Ad
 import com.shoppingapp.info.data.Product
+import com.shoppingapp.info.databinding.AdsBinding
 import com.shoppingapp.info.databinding.HomeBinding
+import com.shoppingapp.info.screens.add_edit_product.AddProductImagesAdapter
 import com.shoppingapp.info.screens.profile.ProfileViewModel
+import com.shoppingapp.info.screens.statistics.StatisticsViewModel
 import com.shoppingapp.info.utils.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
+
 
 @RequiresApi(Build.VERSION_CODES.Q)
 class Home : Fragment() {
 
-    companion object{
-        const val TAG = "Home"
-    }
+    companion object{ const val TAG = "Home" }
 
     private lateinit var binding: HomeBinding
     private val viewModel by sharedViewModel<HomeViewModel>()
     private val profileViewModel by sharedViewModel<ProfileViewModel>()
+    private val statisticsViewModel by sharedViewModel<StatisticsViewModel>()
 
-//    private lateinit var favoritesViewModel: FavoritesViewModel
-
-    private val focusChangeListener = MyOnFocusChangeListener()
 
     private val productController by lazy { ProductController() }
+    private var imagesList = mutableListOf<Uri>()
+
+    private lateinit var bottomAdSheet: BottomSheetBehavior<FrameLayout>
 
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = DataBindingUtil.inflate(layoutInflater,R.layout.home,container,false)
+        binding = DataBindingUtil.inflate(layoutInflater, R.layout.home,container,false)
 
+        bottomAdSheet = BottomSheetBehavior.from(binding.adManagerSheet.adManagerSheet)
 
         initData()
-
         setViews()
         setObservers()
 
@@ -60,25 +67,16 @@ class Home : Fragment() {
 
 
 
+
+
+
+
     private fun initData() {
-//        val userType = SharePrefManager(requireContext()).getUserType().toString()
-//        val isUserSeller = SharePrefManager(requireContext()).isUserSeller()
         val user = SharePrefManager(requireContext()).loadUser()
-
-
         viewModel.setData(user)
-//        showMessage(requireContext(), user.userType)
     }
 
 
-    override fun onResume() {
-        super.onResume()
-
-//        showMessage(requireContext(), viewModel.userType.value!!)
-
-        viewModel.loadData()
-
-    }
 
 
 
@@ -88,17 +86,19 @@ class Home : Fragment() {
             /** swipe to refresh **/
             swipeRefreshLayout.setOnRefreshListener {
                 viewModel.loadData()
+                statisticsViewModel.loadAds()
             }
+
 
             setHomeTopAppBar()
             setProductsAdapter()
 
-//
-//            /** button add product **/
-//            btnAddProduct.setOnClickListener {
-//                showDialogWithItems(ProductCategories, 0, false)
-//            }
 
+            /** button add product **/
+            btnAddProduct.setOnClickListener {
+                val data = bundleOf(Constants.KEY_IS_EDIT to false)
+                findNavController().navigate(R.id.action_home_to_addEditProduct, data)
+            }
 
 
 
@@ -106,6 +106,75 @@ class Home : Fragment() {
 
     }
 
+
+
+    private fun adManagerSheet(isEdit: Boolean,oldAd: Ad?) {
+        binding.apply {
+            adManagerSheet.apply {
+                imagesList.clear()
+
+                bottomAdSheet.state = BottomSheetBehavior.STATE_EXPANDED
+
+                manageAdAppBar.sheetLabel.text = resources.getString(R.string.ad_manager)
+
+                val adapter = AddProductImagesAdapter(requireContext(), imagesList)
+                addImages.rvImages.adapter = adapter
+
+                if (isEdit){
+                    addImages.addImagesLabel.text = "Update your Ad"
+                    btnApply.text =  resources.getString(R.string.update)
+                    imagesList.add(oldAd?.image!!.toUri())
+                    adTitle.setText(oldAd.title)
+                    btnDelete.show()
+
+                }else{
+                    btnDelete.hide()
+                    addImages.addImagesLabel.text = "Select Image For You Ad"
+                    adTitle.setText("")
+                    btnApply.text =  resources.getString(R.string.apply)
+                }
+
+                /** button select images **/
+                addImages.btnAddImage.setOnClickListener {
+                    getImages.launch("image/*")
+                }
+
+                /** button close sheet **/
+                manageAdAppBar.btnClose.setOnClickListener {
+                    bottomAdSheet.state = BottomSheetBehavior.STATE_COLLAPSED
+                    hideKeyboard()
+                }
+
+                /** button remove ad **/
+                btnDelete.setOnClickListener {
+                    oldAd?.image = imagesList.first().toString()
+                    statisticsViewModel.deleteAd(oldAd!!)
+                }
+
+                /** button apply **/
+                btnApply.setOnClickListener {
+                    if (imagesList.isNotEmpty()){
+                        if (!isEdit){
+                            val ad = Ad("",imagesList.first().toString(), title = adTitle.text?.trim().toString())
+                            statisticsViewModel.insertAd(ad)
+                        } else {
+                            if (oldAd != null) {
+                                val oldImage = oldAd.image
+                                oldAd.title = adTitle.text?.trim().toString()
+                                oldAd.image = imagesList.first().toString()
+                                statisticsViewModel.updateAd(oldAd,oldImage)
+                            }
+                        }
+
+                    }else {
+                        showMessage(requireContext(),"required ad image")
+                    }
+
+                }
+
+            }
+        }
+    }
 
 
     private fun productFilterSheet() {
@@ -121,7 +190,7 @@ class Home : Fragment() {
                     /** button close sheet **/
                     btnClose.setOnClickListener {
                         bottom.state = BottomSheetBehavior.STATE_COLLAPSED
-                        btnAddProduct.show()
+                        setAddProductButtonStatus()
                         hideKeyboard()
                     }
 
@@ -138,7 +207,7 @@ class Home : Fragment() {
                         productController.setData(filter)
 
                         bottom.state = BottomSheetBehavior.STATE_COLLAPSED
-                        btnAddProduct.show()
+                        setAddProductButtonStatus()
                         hideKeyboard()
                     }
 
@@ -148,30 +217,30 @@ class Home : Fragment() {
     }
 
 
+    private fun setAddProductButtonStatus() {
+        if (viewModel.userData.value?.userType == UserType.SELLER.name){
+            binding.btnAddProduct.show()
+        }else{
+            binding.btnAddProduct.hide()
+        }
+    }
+
     private fun setUserViews() {
         binding.apply {
-
             when(SharePrefManager(requireContext()).loadUser().userType) {
                 UserType.CUSTOMER.name -> { /** customer **/
-                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_options)
+                    homeTopAppBar.topAppBar.inflateMenu(R.menu.customer_home_app_bar_menu)
                     btnAddProduct.hide()
-
                 }
                 UserType.SELLER.name -> { /** seller **/
-                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites)
-                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_cart)
-                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_options)
+                    homeTopAppBar.topAppBar.inflateMenu(R.menu.seller_home_app_bar_menu)
                     btnAddProduct.show()
-
                 }
                 UserType.ADMIN.name ->{ /** admin **/
-                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_favorites)
-                    homeTopAppBar.topAppBar.menu.removeItem(R.id.item_cart)
+                    homeTopAppBar.topAppBar.inflateMenu(R.menu.admin_home_app_bar_menu)
                     btnAddProduct.hide()
-
                 }
             }
-
         }
     }
 
@@ -190,11 +259,21 @@ class Home : Fragment() {
                     productController.likes = likes
                     productController.setData(mix)
                     swipeRefreshLayout.isRefreshing = false
-                }else{
-
                 }
-
             }
+
+
+            /** ads live data **/
+            statisticsViewModel.ads.observe(viewLifecycleOwner) { ads ->
+                if (!ads.isNullOrEmpty()){
+
+                    setAdBanner(ads)
+                    swipeRefreshLayout.isRefreshing = false
+                }else{
+                    adBanner.root.hide()
+                }
+            }
+
 
 
             /** products status **/
@@ -218,8 +297,8 @@ class Home : Fragment() {
                 viewModel.addLikeStatus.observe(viewLifecycleOwner) { status ->
                 if (status != null){
                     when(status){
-                        DataStatus.SUCCESS -> { viewModel.resetProgress() }
                         DataStatus.LOADING -> {}
+                        DataStatus.SUCCESS -> { viewModel.resetProgress() }
                         DataStatus.ERROR -> {}
                     }
                 }
@@ -228,13 +307,81 @@ class Home : Fragment() {
 
 
             /** is sign out **/
-            profileViewModel.isSignOut.observe(viewLifecycleOwner){isSignOut->
+            profileViewModel.isSignOut.observe(viewLifecycleOwner){ isSignOut->
                 if (isSignOut == true){
                     val intent = Intent(requireContext(), RegistrationActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                     startActivity(intent)
                 }
             }
+
+
+            /** insert ad status **/
+            statisticsViewModel.insertAdStatus.observe(viewLifecycleOwner) { status->
+                if (status != null){
+                    when(status){
+                        DataStatus.LOADING -> {
+                            adManagerSheet.loader.root.show()
+                        }
+                        DataStatus.SUCCESS -> {
+                            adManagerSheet.loader.root.hide()
+                            statisticsViewModel.resetProgress()
+                            bottomAdSheet.state = BottomSheetBehavior.STATE_COLLAPSED
+                            hideKeyboard()
+
+                        }
+                        DataStatus.ERROR -> {
+                            adManagerSheet.loader.root.hide()
+                        }
+                    }
+                }
+            }
+
+
+
+            /** update ad status **/
+            statisticsViewModel.updateAdStatus.observe(viewLifecycleOwner) { status->
+                if (status != null){
+                    when(status) {
+                        DataStatus.LOADING -> {
+                            adManagerSheet.loader.root.show()
+                        }
+                        DataStatus.SUCCESS -> {
+                            adManagerSheet.loader.root.hide()
+                            statisticsViewModel.resetProgress()
+                            bottomAdSheet.state = BottomSheetBehavior.STATE_COLLAPSED
+                            hideKeyboard()
+                        }
+                        DataStatus.ERROR -> {
+                            adManagerSheet.loader.root.hide()
+                        }
+                    }
+                }
+            }
+
+
+
+            /** update ad status **/
+            statisticsViewModel.deleteAdStatus.observe(viewLifecycleOwner) { status->
+                if (status != null){
+                    when(status) {
+                        DataStatus.LOADING -> {
+                            adManagerSheet.loader.root.show()
+                        }
+                        DataStatus.SUCCESS -> {
+                            adManagerSheet.loader.root.hide()
+                            statisticsViewModel.resetProgress()
+                            bottomAdSheet.state = BottomSheetBehavior.STATE_COLLAPSED
+                            hideKeyboard()
+                        }
+                        DataStatus.ERROR -> {
+                            adManagerSheet.loader.root.hide()
+                        }
+                    }
+                }
+            }
+
+
 
 
 
@@ -245,29 +392,27 @@ class Home : Fragment() {
     }
 
 
-//    private fun setPrices() {
-//        val adapter = ArrayAdapter(requireContext(),android.R.layout.simple_list_item_1, prices)
-//        binding.filterSheet.specificFiltersProduct.selectPrice.setAdapter(adapter)
-//    }
-
-        private fun setRate() {
-            val rateValues = arrayOf("1","2","3","4","5")
+    private fun setRate() {
+        val rateValues = arrayOf("1","2","3","4","5")
         val adapter = ArrayAdapter(requireContext(),android.R.layout.simple_list_item_1, rateValues)
         binding.filterSheet.selectRate.setAdapter(adapter)
     }
 
 
+    private val getImages = registerForActivityResult(ActivityResultContracts.GetMultipleContents()) { result ->
+        imagesList.addAll(result)
+        if (imagesList.size > 1) {
+            imagesList = imagesList.subList(0, 1)
+            showMessage(requireContext(),"you can set 1 ad as a maximum")
+        }
+        val adapter = context?.let { AddProductImagesAdapter(it, imagesList) }
+        binding.adManagerSheet.addImages.rvImages.adapter = adapter
+    }
 
     private fun setAppBarItemClicks(menuItem: MenuItem): Boolean {
         return when (menuItem.itemId) {
             R.id.item_filter -> {
                 productFilterSheet()
-//                val extraFilters = arrayOf("All", "None")
-
-//                // todo replace product categories with categories filter data.
-//                val categoryList = ProductCategories.plus(extraFilters)
-//                val checkedItem = categoryList.indexOf(viewModel.filterCategory.value)
-//                showDialogWithItems(categoryList, checkedItem, true)
                 true
             }
             R.id.item_favorites -> {
@@ -288,16 +433,42 @@ class Home : Fragment() {
     }
 
 
+    private fun setAdBanner(list: List<Ad>) {
+        binding.adBanner.apply {
 
-    @RequiresApi(Build.VERSION_CODES.Q)
+            val imageList = ArrayList<SlideModel>()
+            list.forEach { ad ->
+                val slide = SlideModel(ad.image)
+                if (!ad.title.isNullOrEmpty()) { // if ad does not have a title the gray ad bar it will be removed
+                    slide.title = ad.title
+                }
+                imageList.add(slide)
+            }
+
+            imageSlider.setImageList(imageList)
+
+            /** on Ad Clicked **/
+            imageSlider.setItemClickListener( object : ItemClickListener {
+                override fun onItemSelected(position: Int) {
+                    val isAdmin = viewModel.userData.value?.userType == UserType.ADMIN.name
+                    if(isAdmin){
+                        val ad = list[position]
+                        adManagerSheet(isEdit = true, ad)
+                    }
+
+                }
+            })
+            root.show()
+        }
+
+
+    }
+
+
     private fun setHomeTopAppBar() {
         binding.apply {
 
-            /** set app bar menu **/
-            homeTopAppBar.topAppBar.inflateMenu(R.menu.home_app_bar_menu)
-
             setUserViews()
-
 
             /** set hint **/
             homeTopAppBar.homeSearchEditText.hint = resources.getString(R.string.search_product)
@@ -329,8 +500,7 @@ class Home : Fragment() {
         }
     }
 
-    // the icons in menu does not appear in android version below 10
-    @RequiresApi(Build.VERSION_CODES.Q)
+    // the icons in menu does not appear in android version below than 10
     private fun showAdminOptionMenu(v: View) {
         val popupMenu = PopupMenu(requireContext(),v)
         popupMenu.menuInflater.inflate(R.menu.admin_options_menu,popupMenu.menu)
@@ -338,27 +508,23 @@ class Home : Fragment() {
         popupMenu.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.item_notification -> {}
-
                 R.id.item_productManager -> {}
-
-                R.id.item_signOut -> {
-                    profileViewModel.signOut()
-                }
-
+                R.id.item_adManager ->{ adManagerSheet(isEdit = false,null) }
+                R.id.item_signOut -> { profileViewModel.signOut() }
             }
             true
         }
         popupMenu.show()
     }
 
+
+
     private fun setProductsAdapter() {
         val likesList = viewModel.userLikes.value ?: emptyList()
-        val isSeller = viewModel.userData.value?.userType == UserType.SELLER.name
         val userType = viewModel.userData.value?.userType!!
         productController.userType = userType
         productController.likes = likesList
         productController.setData(emptyList())
-
 
         /** click listener **/
         productController.clickListener = object: ProductController.OnClickListener {
@@ -379,7 +545,7 @@ class Home : Fragment() {
                     val data = bundleOf(
                         Constants.KEY_IS_EDIT to true,
                         Constants.KEY_PRODUCT to product )
-                    findNavController().navigate(R.id.action_goto_addProduct, data)
+                    findNavController().navigate(R.id.action_home_to_addEditProduct, data)
                 }
 
 
@@ -396,12 +562,8 @@ class Home : Fragment() {
 
             }
 
-
-
-
-
-
         }
+
 
         binding.productsRecyclerView.apply {
             val gridLayoutManager = GridLayoutManager(context, 2)
@@ -432,37 +594,6 @@ class Home : Fragment() {
 
 
 
-    private fun showDialogWithItems(categoryItems: Array<String>, checkedOption: Int = 0, ) {
-        var checkedItem = checkedOption
-        context?.let {
-            MaterialAlertDialogBuilder(it)
-                .setTitle(getString(R.string.pro_cat_dialog_title))
-                .setSingleChoiceItems(categoryItems, checkedItem) { _, which ->
-                    checkedItem = which
-                }
-                .setNegativeButton(getString(R.string.pro_cat_dialog_cancel_btn)) { dialog, _ ->
-                    dialog.cancel()
-                }
-                .setPositiveButton(getString(R.string.pro_cat_dialog_ok_btn)) { dialog, _ ->
-                    if (checkedItem == -1) {
-                        dialog.cancel()
-                    } else {
-                        val selectedItem = categoryItems[checkedItem]
-                    }
-                    dialog.cancel()
-                }
-                .show()
-        }
-    }
-
-
-//    private fun navigateToAddEditProductScreen(isEdit: Boolean, catName: String? = null) {
-//        findNavController().navigate(
-//            R.id.action_goto_addProduct,
-//            bundleOf("isEdit" to isEdit, Constants.KEY_CATEGORY to catName)
-//        )
-//    }
-
     private fun getMixedDataList(data: List<Product>, adsList: List<Int>): List<Any> {
         val itemsList = mutableListOf<Any>()
         itemsList.addAll(data.sortedBy { it.productId })
@@ -480,8 +611,12 @@ class Home : Fragment() {
         return itemsList
     }
 
+
+
     private fun getAdsList(): List<Int> {
         return listOf(R.drawable.ad_ex_2, R.drawable.ad_ex_1, R.drawable.ad_ex_3)
     }
+
+
 }
 

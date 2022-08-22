@@ -13,12 +13,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.chip.Chip
 import com.shoppingapp.info.R
-import com.shoppingapp.info.utils.ShoeColors
-import com.shoppingapp.info.utils.ShoeSizes
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.databinding.AddEditProductBinding
 import com.shoppingapp.info.screens.home.HomeViewModel
@@ -56,7 +53,7 @@ class AddEditProduct : Fragment() {
                 makeToast("Maximum 3 images are allowed!")
             }
             val adapter = context?.let { AddProductImagesAdapter(it, imgList) }
-            binding.addProImagesRv.adapter = adapter
+            binding.addImagesLayout.rvImages.adapter = adapter
         }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -94,7 +91,7 @@ class AddEditProduct : Fragment() {
 
 
             /** product update status **/
-            viewModel.productUpdateStatus.observe(viewLifecycleOwner) { status ->
+            homeViewModel.productUpdateStatus.observe(viewLifecycleOwner) { status ->
                 if (status != null){
                     when (status) {
                         DataStatus.LOADING -> {
@@ -102,7 +99,7 @@ class AddEditProduct : Fragment() {
                         }
                         DataStatus.SUCCESS -> {
                             binding.loaderLayout.loaderFrameLayout.hide()
-                            viewModel.resetStatus()
+                            homeViewModel.resetProgress()
                             findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
                         }
                         DataStatus.ERROR ->{
@@ -114,7 +111,7 @@ class AddEditProduct : Fragment() {
 
 
             /** product update status **/
-            viewModel.productDeleteStatus.observe(viewLifecycleOwner) { status ->
+            homeViewModel.productDeleteStatus.observe(viewLifecycleOwner) { status ->
                 if (status != null){
                     when (status) {
                         DataStatus.LOADING -> {
@@ -122,7 +119,7 @@ class AddEditProduct : Fragment() {
                         }
                         DataStatus.SUCCESS -> {
                             binding.loaderLayout.loaderFrameLayout.hide()
-                            viewModel.resetStatus()
+                            homeViewModel.resetProgress()
                             findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
                         }
                         DataStatus.ERROR -> {
@@ -135,7 +132,7 @@ class AddEditProduct : Fragment() {
 
 
             /** product submit status **/
-            viewModel.productSubmitStatus.observe(viewLifecycleOwner) { status ->
+            homeViewModel.productSubmitStatus.observe(viewLifecycleOwner) { status ->
                 if (status != null){
                     when (status) {
                         DataStatus.LOADING -> {
@@ -143,7 +140,7 @@ class AddEditProduct : Fragment() {
                         }
                         DataStatus.SUCCESS -> {
                             binding.loaderLayout.loaderFrameLayout.hide()
-                            viewModel.resetStatus()
+                            homeViewModel.resetProgress()
                             findNavController().navigate(R.id.action_addProductFragment_to_homeFragment)
                         }
                         DataStatus.ERROR -> {
@@ -166,22 +163,22 @@ class AddEditProduct : Fragment() {
     // todo put this in data binding
     private fun fillDataInAllViews() {
         binding.apply {
-            addProAppBar.topAppBar.title = "Edit Product - ${product.name}"
+            addEditProductAppBar.topAppBar.title = "Edit Product - ${product.name}"
             productName.setText(product.name)
-            proPriceEditText.setText(product.price.toString())
-            proMrpEditText.setText(product.mrp.toString())
-            productDes.setText(product.description)
+            productPrice.setText(product.price.toString())
+            productMrp.setText(product.mrp.toString())
+            productDescription.setText(product.description)
 
 
             imgList = product.images.map { it.toUri() } as MutableList<Uri>
             val adapter = AddProductImagesAdapter(requireContext(), imgList)
-            addProImagesRv.adapter = adapter
+            addImagesLayout.rvImages.adapter = adapter
 
-            btnAddProduct.text = "Update"
+            btnAddEditProduct.text = "Update"
             btnDeleteProduct.show()
-
-            setShoeColorsChips(product.availableColors)
-            setShoeSizesChips(product.availableSizes)
+//
+            setColors(product.availableColors)
+            setSizes(product.availableSizes)
 
         }
     }
@@ -189,42 +186,50 @@ class AddEditProduct : Fragment() {
     private fun setViews() {
         binding.apply {
             if (!isEdit) { // add new product
-                addProAppBar.topAppBar.title = "Add Product - ${product.category}"
+                addEditProductAppBar.topAppBar.title = "Add Product - ${product.category}"
+
+                addImagesLayout.addImagesLabel.text = "Add Images (Max 3)"
+                addSizes.labelChipGroup.text = "Available Sizes"
+                addColors.labelChipGroup.text = "Available Colors"
 
                 val adapter = AddProductImagesAdapter(requireContext(), imgList)
-                addProImagesRv.adapter = adapter
-                btnAddProduct.text = "Add Product"
-            }else{
+                addImagesLayout.rvImages.adapter = adapter
+                btnAddEditProduct.text = "Add Product"
+
+                setSizes()
+                setColors()
+
+            }else {
                 fillDataInAllViews()
             }
-            btnAddImagesToProduct.setOnClickListener {
+            addImagesLayout.btnAddImage.setOnClickListener {
                 getImages.launch("image/*")
             }
 
 
             /** button back **/
-            addProAppBar.topAppBar.setNavigationOnClickListener {
+            addEditProductAppBar.topAppBar.setNavigationOnClickListener {
                 findNavController().navigateUp()
             }
 
             loaderLayout.loaderFrameLayout.visibility = View.GONE
 
-//            setShoeSizesChips()
-//            setShoeColorsChips()
 
-            addProductErrorMessage.visibility = View.GONE
+
+            errorMessage.visibility = View.GONE
             productName.onFocusChangeListener = focusChangeListener
-            proPriceEditText.onFocusChangeListener = focusChangeListener
-            proMrpEditText.onFocusChangeListener = focusChangeListener
-            productDes.onFocusChangeListener = focusChangeListener
+            productPrice.onFocusChangeListener = focusChangeListener
+            productMrp.onFocusChangeListener = focusChangeListener
+            productDescription.onFocusChangeListener = focusChangeListener
 
-            btnAddProduct.setOnClickListener {
+            /** button add edit product **/
+            btnAddEditProduct.setOnClickListener {
                 onAddProduct()
             }
 
             /** button delete product **/
             btnDeleteProduct.setOnClickListener {
-                viewModel.deleteProduct(product.productId)
+                homeViewModel.deleteProduct(product)
             }
 
 
@@ -236,25 +241,25 @@ class AddEditProduct : Fragment() {
     private fun onAddProduct() {
         binding.apply {
             val name = productName.text.toString()
-            val price = proPriceEditText.text.toString().toDoubleOrNull()
-            val mrp = proMrpEditText.text.toString().toDoubleOrNull()
-            val desc = productDes.text.toString()
+            val price = productPrice.text.toString().toDoubleOrNull()
+            val mrp = productMrp.text.toString().toDoubleOrNull()
+            val desc = productDescription.text.toString()
 
             if (name.isEmpty()){
                 productName.error = "Product Name required!"
                 productName.requestFocus()
             }
             if (price.toString().isEmpty()){
-                proPriceEditText.error = "Price required!"
-                proPriceEditText.requestFocus()
+                productPrice.error = "Price required!"
+                productPrice.requestFocus()
             }
             if (mrp.toString().isEmpty()){
-                proMrpEditText.error = "Mrc required!"
-                proMrpEditText.requestFocus()
+                productMrp.error = "Mrc required!"
+                productMrp.requestFocus()
             }
             if (desc.isEmpty()){
-                productDes.error = "Description required!"
-                productDes.requestFocus()
+                productDescription.error = "Description required!"
+                productDescription.requestFocus()
             }
             if (colorsList.isEmpty()){
                 showMessage(requireContext(),"colors required!")
@@ -281,7 +286,7 @@ class AddEditProduct : Fragment() {
                     country = country
                 )
                 if (!isEdit){ // insert new product
-                    viewModel.submitProduct(newProduct,imgList)
+                    homeViewModel.submitProduct(newProduct,imgList)
                 }else{ // update product
                     product.name = name
                     product.mrp = mrp!!
@@ -289,7 +294,7 @@ class AddEditProduct : Fragment() {
                     product.availableColors = colorsList.toList()
                     product.availableSizes = sizeList.toList()
                     product.price = price!!.toDouble()
-                    viewModel.updateProduct(product,imgList,product.images)
+                    homeViewModel.updateProduct(product,imgList,product.images)
                 }
 
             }
@@ -298,10 +303,10 @@ class AddEditProduct : Fragment() {
 
     }
 
-    private fun setShoeSizesChips(shoeList: List<Int?>) {
-        binding.addProductSizeChipGroup.apply {
+    private fun setSizes(sizes: List<Int?> = emptyList()) {
+        binding.addSizes.addChipGroup.apply {
             removeAllViews()
-            for ((_, v) in ShoeSizes) {
+            for ((k, v) in shoeSizes) {
                 val chip = Chip(context)
                 chip.id = v
                 chip.tag = v
@@ -309,10 +314,13 @@ class AddEditProduct : Fragment() {
                 chip.text = "$v"
                 chip.isCheckable = true
 
-                if (shoeList.contains(v) == true) {
+
+                if (sizes.contains(v)) {
                     chip.isChecked = true
                     sizeList.add(chip.tag.toString().toInt())
                 }
+
+
 
                 /** select size button **/
                 chip.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -329,11 +337,13 @@ class AddEditProduct : Fragment() {
         }
     }
 
-    private fun setShoeColorsChips(colorList: List<String?> = emptyList()) {
-        binding.addProductColorChipGroup.apply {
+
+
+    private fun setColors(colors: List<String?> = emptyList()) {
+        binding.addColors.addChipGroup.apply {
             removeAllViews()
             var ind = 1
-            for ((k, v) in ShoeColors) {
+            for ((k, v) in shoeColors) {
                 val chip = Chip(context)
                 chip.id = ind
                 chip.tag = k
@@ -347,10 +357,13 @@ class AddEditProduct : Fragment() {
                 chip.chipBackgroundColor = ColorStateList.valueOf(Color.parseColor(v))
                 chip.isCheckable = true
 
-                if (colorList?.contains(k) == true) {
+
+                if (colors.contains(k)) {
                     chip.isChecked = true
                     colorsList.add(chip.tag.toString())
                 }
+
+
 
                 /** select color button **/
                 chip.setOnCheckedChangeListener { buttonView, isChecked ->

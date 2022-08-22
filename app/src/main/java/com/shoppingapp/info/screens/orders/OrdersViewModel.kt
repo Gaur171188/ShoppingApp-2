@@ -37,27 +37,6 @@ class OrdersViewModel(): ViewModel() {
 
 
 
-//    fun filter(
-//        orders: List<User.OrderItem>,
-//        sortedBy: String): List<User.OrderItem> {
-//        var list = orders
-//        list = if (sortedBy.isNotEmpty()){
-//            when(sortedBy.uppercase()) {
-//                Sort.NAME.name -> orders.sortedBy { it.orderId }
-//                Sort.DATE.name -> orders.sortedBy { it.orderDate }
-//                OrderStatus.CONFIRMED.name -> orders.filter { it.status == sortedBy }
-//                OrderStatus.DELIVERED.name -> orders.filter { it.status == sortedBy }
-//                OrderStatus.REJECTED.name -> orders.filter { it.status == sortedBy }
-//                OrderStatus.BINDING.name -> orders.filter { it.status == sortedBy }
-//                OrderStatus.ARRIVING.name -> orders.filter { it.status == sortedBy }
-//                else-> {list}
-//            }
-//        }else{
-//            orders
-//        }
-//        return  list
-//    }
-
     fun filter (
         orders: List<User.OrderItem>,
         sortedBy: String): List<User.OrderItem> {
@@ -68,13 +47,6 @@ class OrdersViewModel(): ViewModel() {
         }
         return list
     }
-
-
-
-//
-//
-
-
 
 
 //    fun finalizeOrder(userId: String) {

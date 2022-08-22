@@ -12,6 +12,14 @@
         android:icon="@drawable/ic_product_manager"
         android:title="@string/product_manager"/>
 
+
+    <item
+        android:id="@+id/item_adManager"
+        android:enabled="true"
+        android:icon="@drawable/ic_ad_unit"
+        android:title="@string/ad_manager"/>
+
+
     <item
         android:id="@+id/item_signOut"
         android:enabled="true"

@@ -1,18 +1,17 @@
 package com.shoppingapp.info.screens.statistics
 
-import android.text.Editable
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.shoppingapp.info.data.Ad
 import com.shoppingapp.info.data.Product
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.repository.product.ProductRepository
 import com.shoppingapp.info.repository.user.RemoteUserRepository
 import com.shoppingapp.info.repository.user.UserRepository
-import com.shoppingapp.info.screens.home.HomeViewModel
-import com.shoppingapp.info.screens.users.Users
 import com.shoppingapp.info.utils.DataStatus
 import com.shoppingapp.info.utils.Result
 import kotlinx.coroutines.*
@@ -33,8 +32,27 @@ class StatisticsViewModel(
     private val _usersStatus = MutableLiveData<DataStatus?>()
     val usersStatus: LiveData<DataStatus?> = _usersStatus
 
+    /** progress **/
+    private val _adsStatus = MutableLiveData<DataStatus?>()
+    val adsStatus: LiveData<DataStatus?> = _adsStatus
+
+
+    /** progress **/
     private val _updateUserState = MutableLiveData<DataStatus?>()
     val updateUserState: LiveData<DataStatus?> = _updateUserState
+
+    /** progress **/
+    private val _insertAdStatus = MutableLiveData<DataStatus?>()
+    val insertAdStatus: LiveData<DataStatus?> = _insertAdStatus
+
+    /** progress **/
+    private val _updateAdStatus = MutableLiveData<DataStatus?>()
+    val updateAdStatus: LiveData<DataStatus?> = _updateAdStatus
+
+    /** progress **/
+    private val _deleteAdStatus = MutableLiveData<DataStatus?>()
+    val deleteAdStatus: LiveData<DataStatus?> = _deleteAdStatus
+
 
     private val _products = MutableLiveData<List<Product>?>()
     val products: LiveData<List<Product>?> = _products
@@ -42,26 +60,11 @@ class StatisticsViewModel(
     private val _users = MutableLiveData<List<User>?>()
     val users: LiveData<List<User>?> = _users
 
+    private val _ads = MutableLiveData<List<Ad>?>()
+    val ads: LiveData<List<Ad>?> = _ads
+
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
-
-    private val _bindingOrders = MutableLiveData<List<User.OrderItem>>()
-    val bindingOrders: LiveData<List<User.OrderItem>?> = _bindingOrders
-
-    private val _confirmedOrders = MutableLiveData<List<User.OrderItem>?>()
-    val confirmedOrders: LiveData<List<User.OrderItem>?> = _confirmedOrders
-
-    private val _rejectedOrders = MutableLiveData<List<User.OrderItem>?>()
-    val rejectedOrders: LiveData<List<User.OrderItem>?> = _rejectedOrders
-
-    private val _deliveringOrders = MutableLiveData<List<User.OrderItem>?>()
-    val deliveringOrders: LiveData<List<User.OrderItem>?> = _deliveringOrders
-
-    private val _arrivingOrders = MutableLiveData<List<User.OrderItem>?>()
-    val arrivingOrders: LiveData<List<User.OrderItem>?> = _arrivingOrders
-
-    private val _usersCount = MutableLiveData<Int?>()
-    val usersCount: LiveData<Int?> = _usersCount
 
     private val _orders = MutableLiveData<List<User.OrderItem?>>()
     val orders: LiveData<List<User.OrderItem?>> = _orders
@@ -75,11 +78,8 @@ class StatisticsViewModel(
     private val _cartsCountries = MutableLiveData<List<String>?>()
     val cartsCountries: LiveData<List<String>?> = _cartsCountries
 
-
     private val _productsCountries = MutableLiveData<List<String>?>()
     val productsCountries: LiveData<List<String>?> = _productsCountries
-
-
 
 
     private val scopeIO = Dispatchers.IO
@@ -89,15 +89,12 @@ class StatisticsViewModel(
     init {
         loadUsers()
         loadProducts()
+        loadAds()
     }
 
-    fun resetUserStatus(){
-        _usersStatus.value = null
-    }
 
     fun loadProducts() {
         Log.d(TAG,"OnLoading Products...")
-        restProductsStatus()
         _productsStatus.value = DataStatus.LOADING
         viewModelScope.launch {
             val res = withContext(scopeIO) { productRepo.loadProducts() }
@@ -120,7 +117,6 @@ class StatisticsViewModel(
 
     fun loadUsers() {
         Log.d(TAG,"OnLoading Users...")
-        restUsersStatus()
         _usersStatus.value = DataStatus.LOADING
         viewModelScope.launch {
             val res = withContext(scopeIO){ userRepo.loadUsers() }
@@ -128,7 +124,6 @@ class StatisticsViewModel(
                 Log.d(TAG,"OnSuccess: users has been loaded success")
                 val users = res.data
                 _users.value = users
-                _usersCount.value = users.size
                 setOrders()
                 setCarts()
                 setUsersCountries()
@@ -143,13 +138,31 @@ class StatisticsViewModel(
     }
 
 
+    fun loadAds() {
+        Log.d(TAG,"OnLoading Ads...")
+        resetProgress()
+        _adsStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            val task = withContext(Dispatchers.IO){productRepo.loadAds()}
+            if (task is Result.Success){
+                Log.d(TAG,"OnSuccess: ads has been loaded success")
+                val data = task.data
+                _ads.value = data
+            }else if(task is Result.Error){
+                Log.d(TAG,"onFailed: failed to add ads due to ${task.exception.message}")
+                _insertAdStatus.value = DataStatus.ERROR
+                _errorMessage.value = task.exception.message
+            }
+        }
+    }
+
 
     fun filter(userType: String, city: String, country: String, rate: String): List<User> {
         var users = _users.value
         if (userType.isNotEmpty()) {
             users = users?.filter { it.userType == userType }
         }
-        if (city.isNotEmpty()){ // no city
+        if (city.isNotEmpty()) { // no city
 //            users = users?.filter { it. == userType }
         }
         if (country.isNotEmpty()) {
@@ -159,7 +172,7 @@ class StatisticsViewModel(
             val r = rate.toFloat()
         }
 
-        return if(userType.isEmpty() && city.isEmpty() && country.isEmpty() && rate.isEmpty()){
+        return if( userType.isEmpty() && city.isEmpty() && country.isEmpty() && rate.isEmpty()) {
             _users.value!!
         }else {
             users!!
@@ -170,13 +183,14 @@ class StatisticsViewModel(
 
     fun updateUser(user: User, index: Int) {
         Log.d(TAG,"OnUpdateUser...")
-        resetUserStatus()
+        resetProgress()
         _updateUserState.value = DataStatus.LOADING
         viewModelScope.launch {
             val repository = RemoteUserRepository()
             repository.updateUser(user)
                 .addOnSuccessListener {
                     _updateUserState.value = DataStatus.SUCCESS
+
                     val users = _users.value?.toMutableList()
                     users?.set(index, user)
                     _users.value = users
@@ -185,25 +199,13 @@ class StatisticsViewModel(
                 .addOnFailureListener { e ->
                     Log.d(TAG,"OnUpdateBalance: update balance failed due to ${e.message}")
                     _updateUserState.value = DataStatus.ERROR
-//               _errorMessage.value = updateTask.exception.message
+                    _errorMessage.value = e.message
                 }
 
         }
     }
 
 
-//    // get the items in all carts of users
-//    private fun setCarts() {
-//        val items = ArrayList<User.CartItem>()
-//        val allCarts = _users.value?.map { it.cart }
-//        allCarts?.forEach { carts->
-//            carts.forEach { cart ->
-//                items.add(cart)
-//            }
-//        }
-//        _cartItems.value = items
-//    }
-    // get the all orders of users
 
     private fun setCarts() {
         val items = ArrayList<User.CartItem>()
@@ -285,16 +287,97 @@ class StatisticsViewModel(
     }
 
 
+    fun insertAd(newAd: Ad) {
+        Log.d(TAG,"onInsertAd...")
+        resetProgress()
+        _insertAdStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            val newImage = newAd.image.toUri()
+            val fileName = newImage.lastPathSegment?.split("/")?.last().toString()
+            val imageUri = productRepo.uploadFile(newImage,fileName).toString()
+            val id = UUID.randomUUID().toString()
+            val task = withContext( Dispatchers.IO ){ productRepo.insertAd(Ad(id,imageUri)) }
+            if (task is Result.Success){
+                Log.d(TAG,"onInsertAd: ads has been added success")
 
-    private fun restUsersStatus() {
+                val updatesAds = _ads.value?.toMutableList()
+                updatesAds?.add(newAd) // add new ad
+                _ads.value = updatesAds
+
+                _insertAdStatus.value = DataStatus.SUCCESS
+            }else if(task is Result.Error){
+                Log.d(TAG,"onInsertAd: failed to add ads due to ${task.exception.message}")
+                _insertAdStatus.value = DataStatus.ERROR
+                _errorMessage.value = task.exception.message
+            }
+        }
+    }
+
+
+    fun deleteAd(oldAd: Ad){
+        Log.d(TAG,"onDeleteAd...")
+        _deleteAdStatus.value = DataStatus.LOADING
+        resetProgress()
+        viewModelScope.launch {
+            val task = withContext( Dispatchers.IO ){ productRepo.deleteAd(oldAd) }
+            if (task is Result.Success){
+                Log.d(TAG,"onDeleteAd: ads has been deleted success")
+
+                val updatesAds = _ads.value?.filter { it.id != oldAd.id }?.toMutableList() // delete old ad
+                _ads.value = updatesAds
+
+                _deleteAdStatus.value = DataStatus.SUCCESS
+            }else if(task is Result.Error){
+                Log.d(TAG,"onDeleteAd: failed to delete ads due to ${task.exception.message}")
+                _deleteAdStatus.value = DataStatus.ERROR
+                _errorMessage.value = task.exception.message
+            }
+        }
+    }
+
+    fun updateAd(newAd: Ad, oldAdImage: String) {
+        Log.d(TAG,"onUpdateAd...")
+        resetProgress()
+        _updateAdStatus.value = DataStatus.LOADING
+        viewModelScope.launch {
+            val checkText = "content://"
+            if (newAd.image.contains(checkText)) { // new image it will uploaded
+                val newImage = newAd.image.toUri()
+                val fileName = oldAdImage.toUri().lastPathSegment?.split("/")?.last().toString()
+                val imageUri = productRepo.uploadFile(newImage,fileName).toString()
+                newAd.image = imageUri
+            }
+
+            val task = withContext( Dispatchers.IO ){ productRepo.updateAd(newAd,oldAdImage) }
+            if (task is Result.Success){
+                Log.d(TAG,"onUpdateAd: ads has been updated success")
+
+                val updatesAds = _ads.value?.filter { it.id != newAd.id }?.toMutableList() // remove old ad
+                updatesAds?.add(newAd) // update ad by new one
+                _ads.value = updatesAds
+
+                _updateAdStatus.value = DataStatus.SUCCESS
+            }else if(task is Result.Error){
+                Log.d(TAG,"onUpdateAd: failed to update ads due to ${task.exception.message}")
+                _updateAdStatus.value = DataStatus.ERROR
+                _errorMessage.value = task.exception.message
+            }
+        }
+    }
+
+
+
+    fun resetProgress() {
         _errorMessage.value = null
         _usersStatus.value = null
+        _productsStatus.value = null
+        _updateUserState.value = null
+        _insertAdStatus.value = null
+        _adsStatus.value = null
+        _updateAdStatus.value = null
+        _deleteAdStatus.value = null
     }
 
-    private fun restProductsStatus() {
-        _errorMessage.value = null
-        _productsStatus.value = null
-    }
 
 
 

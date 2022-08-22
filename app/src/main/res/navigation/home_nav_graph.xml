@@ -137,7 +137,7 @@
         android:id="@+id/action_accountFragment_to_ordersFragment"
         app:destination="@id/orders" />
     <action
-        android:id="@+id/action_goto_addProduct"
+        android:id="@+id/action_home_to_addEditProduct"
         app:destination="@id/addEditProduct" />
     <fragment
         android:id="@+id/orderDetails"
@@ -157,7 +157,7 @@
         android:label="fragment_home"
         tools:layout="@layout/home">
         <action
-            android:id="@+id/action_goto_addProduct"
+            android:id="@+id/action_home_to_addEditProduct"
             app:destination="@id/addEditProduct" />
         <action
             android:id="@+id/action_homeFragment_to_favoritesFragment"
@@ -168,6 +168,9 @@
         <action
             android:id="@+id/action_home_to_cart"
             app:destination="@id/cart" />
+        <action
+            android:id="@+id/action_home_to_productManager"
+            app:destination="@id/productManager" />
     </fragment>
     <fragment
         android:id="@+id/selectAddress"
@@ -193,5 +196,10 @@
         android:name="com.shoppingapp.info.screens.users.Users"
         android:label="Users"
         tools:layout="@layout/users"/>
+    <fragment
+        android:id="@+id/productManager"
+        android:name="com.shoppingapp.info.screens.product_manager.ProductManager"
+        android:label="ProductManager"
+        tools:layout="@layout/product_manager"/>
 
 </navigation>

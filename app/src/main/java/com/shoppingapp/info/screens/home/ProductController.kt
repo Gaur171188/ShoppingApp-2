@@ -46,11 +46,11 @@ class ProductController(): TypedEpoxyController<List<Any>>() {
                 is Ad -> {
                     val image = data.image
                     homeAd {
-                        id(image)
-                        image(image)
-                        onItemClick { v->
-                            clickListener.onAdClicked()
-                        }
+//                        id(image)
+//                        image(image)
+//                        onItemClick { v->
+//                            clickListener.onAdClicked()
+//                        }
                     }
                 }
 

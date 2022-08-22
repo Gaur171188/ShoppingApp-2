@@ -1,7 +1,6 @@
 package com.shoppingapp.info.screens.users
 
-import android.annotation.SuppressLint
-import android.content.Intent
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,33 +8,22 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
-import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.shoppingapp.info.R
-import com.shoppingapp.info.activities.MainActivity
-import com.shoppingapp.info.activities.RegistrationActivity
 import com.shoppingapp.info.data.User
 import com.shoppingapp.info.databinding.UsersBinding
-import com.shoppingapp.info.screens.account.AccountViewModel
-import com.shoppingapp.info.screens.home.HomeViewModel
-import com.shoppingapp.info.screens.profile.ProfileViewModel
 import com.shoppingapp.info.screens.statistics.StatisticsViewModel
 import com.shoppingapp.info.utils.*
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 
-@SuppressLint("NotifyDataSetChanged")
 class Users : Fragment() {
-
 
     private lateinit var binding: UsersBinding
     private val statisticsViewModel by sharedViewModel<StatisticsViewModel>()
-//    private val userController by lazy { UserController() }
     private val userAdapter by lazy { UserAdapter() }
-    private val profileViewModel by sharedViewModel<ProfileViewModel>()
-    private val homeViewModel by sharedViewModel<HomeViewModel>()
 
 
     private lateinit var userBottomSheet : BottomSheetBehavior<View>
@@ -46,10 +34,8 @@ class Users : Fragment() {
         userBottomSheet = BottomSheetBehavior.from(binding.userSheet.userSheet)
 
 
-
         setViews()
         setObserves()
-
 
 
         return binding.root
@@ -81,26 +67,16 @@ class Users : Fragment() {
                         DataStatus.SUCCESS-> {
                             userSheet.loader.root.hide()
                             userBottomSheet.state = BottomSheetBehavior.STATE_COLLAPSED
-                            statisticsViewModel.resetUserStatus()
+                            statisticsViewModel.resetProgress()
                         }
                         DataStatus.ERROR-> {
                             userSheet.loader.root.hide()
-                            statisticsViewModel.resetUserStatus()
+                            statisticsViewModel.resetProgress()
                         }
                     }
                 }
             }
 
-
-//
-//            /** is sign out **/
-//            profileViewModel.isSignOut.observe(viewLifecycleOwner){isSignOut->
-//                if (isSignOut == true){
-//                    val intent = Intent(requireContext(), RegistrationActivity::class.java)
-//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//                    startActivity(intent)
-//                }
-//            }
 
 
 
@@ -111,9 +87,9 @@ class Users : Fragment() {
 
     private fun setViews() {
         binding.apply {
+
             setUserAdapter()
             setUsersTopAppBar()
-
 
             /** swipe refresh layout **/
             swipeRefreshLayout.setOnRefreshListener {
@@ -129,20 +105,13 @@ class Users : Fragment() {
 
         /** on user clicked **/
         userAdapter.onClickListener = object: UserAdapter.OnClickListener {
+
             override fun onItemClicked(user: User, index: Int) {
                 userProfileSheet(user.userId,index)
             }
 
         }
         binding.rvUsers.adapter = userAdapter
-//        /** on user clicked **/
-//        userController.clickListener = object: UserController.OnClickListener {
-//            override fun onUserClicked(user: User, index: Int) {
-//                userProfileSheet(user,index)
-//            }
-//
-//        }
-//        binding.rvUsers.adapter = userController.adapter
     }
 
 
@@ -184,12 +153,8 @@ class Users : Fragment() {
                     setAppBarItemClicks(menuItem)
                 }
 
-
-
-
             }
         }
-
 
     }
 
@@ -197,12 +162,8 @@ class Users : Fragment() {
         return when (menuItem.itemId) {
             R.id.item_filter -> {
                 userFilterSheet()
-//                val items = arrayOf("SELLER","CUSTOMER")
-//                showDialogWithItems(items, 0)
                 true
             }
-
-
             else -> false
         }
     }
@@ -217,8 +178,6 @@ class Users : Fragment() {
                 userBottomSheet = BottomSheetBehavior.from(userSheet)
                 userBottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
                 userSheet.apply {
-
-
 
                     /** button update **/
                     btnUpdate.setOnClickListener {
@@ -282,13 +241,9 @@ class Users : Fragment() {
                         val rate = selectRate.text.toString()
 
                         val filter = statisticsViewModel.filter(userType,city,country,rate)
-
                         userAdapter.putData(filter)
-//                        userAdapter.data = filter
-//                        rvUsers.adapter?.notifyDataSetChanged()
-//                        userController.setData(filter)
-
                         bottom.state = BottomSheetBehavior.STATE_COLLAPSED
+
                     }
 
                 }
@@ -321,13 +276,6 @@ class Users : Fragment() {
                 .show()
     }
 
-
-
-//    fun showBottomSheed(){
-//        val bottomSheet = BottomSheetDialog(requireContext())
-//        BottomSheetBehavior<View>
-//        val
-//    }
 
 
 
