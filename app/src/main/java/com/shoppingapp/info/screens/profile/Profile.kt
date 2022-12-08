@@ -33,14 +33,14 @@ class Profile: Fragment() {
 
     private lateinit var binding: ProfileBinding
     private val homeViewModel: HomeViewModel by sharedViewModel()
-    private lateinit var viewModel: ProfileViewModel
+    private val viewModel: ProfileViewModel by sharedViewModel()
     private var imageUri: Uri? = null
     private var user: User? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.profile, container, false)
-        viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
+//        viewModel = ViewModelProvider(this)[ProfileViewModel::class.java]
 
         initData()
         setViews()

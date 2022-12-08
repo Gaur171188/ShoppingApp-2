@@ -20,7 +20,7 @@ import kotlinx.coroutines.tasks.await
 import java.lang.IndexOutOfBoundsException
 
 @OptIn(DelicateCoroutinesApi::class)
-class RemoteUserRepository() {
+class RemoteUserRepository {
 
     private val fireStore by lazy { FirebaseFirestore.getInstance() }
     private val auth by lazy { FirebaseAuth.getInstance() }
@@ -30,7 +30,7 @@ class RemoteUserRepository() {
 
 
 
-    fun isUserLogged() = auth.currentUser != null
+    fun isUserLogged() = auth.currentUser
 
     suspend fun signWithEmailAndPassword(email: String, password: String): AuthResult? {
         return auth.signInWithEmailAndPassword(email, password).await()

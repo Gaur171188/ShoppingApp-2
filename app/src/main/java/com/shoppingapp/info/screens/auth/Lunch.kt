@@ -56,7 +56,7 @@ class Lunch : Fragment() {
         val isLogged = viewModel.isUserLogged
 //        showMessage(requireContext(),viewModel.userType!!)
 
-        if (isRem && isLogged) { // user is rem me  and logged
+        if (isRem && isLogged != null) { // user is rem me  and logged
             val intent = Intent(requireContext(), MainActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             startActivity(intent)
